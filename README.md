@@ -94,14 +94,24 @@ Page metadata is built through `src/lib/seo/page-head.ts` instead of repeating r
 
 See `docs/architecture.md` and `docs/seo-migration.md`.
 
-## Future Sanity integration
+## Sanity Studio
 
-Sanity is **not** installed in this foundation. The routing, sitemap, and SEO helpers are structured so a later CMS can supply pages, experiences, blog posts, FAQs, cattle listings, team members, testimonials, promotions, navigation, and site settings. Photography should eventually come from Sanity’s image CDN.
+Content is modeled in `/studio` and connected to the Sanity project **Udderly Site**. The public website does not fetch Sanity content yet.
+
+```bash
+cd studio
+npm install
+npm run dev
+```
+
+Studio runs at http://localhost:3333
+
+Photography should eventually come from Sanity’s image CDN.
 
 ## Intentionally not implemented yet
 
 - Real visual design and brand typography
-- Sanity CMS
+- Website frontend integration with Sanity
 - Authentication
 - PostgreSQL, Redis, NestJS, Supabase
 - FareHarbor, Wherewolf, Square, Meta, Google, OpenAI, or other business integrations

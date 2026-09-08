@@ -12,6 +12,7 @@ export default tseslint.config(
       'node_modules/**',
       'coverage/**',
       'src/routeTree.gen.ts',
+      'studio/**',
     ],
   },
   eslint.configs.recommended,

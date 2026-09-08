@@ -36,7 +36,7 @@ A `www` → apex (or apex → `www`) redirect needs the confirmed canonical host
 
 ## Images
 
-No photography is bundled in this scaffold. When Sanity is added, prefer Sanity’s image CDN for CMS-managed assets, with:
+No photography is bundled in the website scaffold. Prefer Sanity’s image CDN for CMS-managed assets, with:
 
 - responsive widths
 - modern formats
@@ -44,6 +44,14 @@ No photography is bundled in this scaffold. When Sanity is added, prefer Sanity�
 - lazy loading below the fold
 - high-priority loading only for genuine hero images
 - meaningful alt text
+
+## Sanity CMS
+
+Studio lives in `/studio` and is connected to project `umbuxpyp` / dataset `production`.
+
+Content types and page-builder sections are defined there. The public website does not query Sanity yet. Sales listings are public website content only; applicant and CRM data stays out of this repository.
+
+Pages should be composed from approved sections rather than giant hard-coded page components.
 
 ## Analytics
 
@@ -60,12 +68,6 @@ Public forms are not implemented. When they are added they should use:
 - clear success and error states
 
 Do not put mail-provider keys in client code.
-
-## Sanity readiness
-
-Likely future CMS types: Page, Experience, Blog Post, FAQ, Cattle Listing, Team Member, Testimonial, Promotion, Navigation, Site Settings.
-
-Pages should be composed from approved sections (Hero, Rich Text, Image + Text, Experience Grid, FAQ, Testimonials, Gallery, CTA, Video, Cattle Listings) rather than giant hard-coded page components. Do not add those schemas in this repository until Sanity is intentionally installed.
 
 ## Docker / Traefik
 
