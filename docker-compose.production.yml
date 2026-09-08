@@ -1,0 +1,29 @@
+name: udderly-website-production
+
+services:
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: "0.0.0.0"
+      PORT: "3000"
+      APP_HOST: ${APP_HOST}
+      PUBLIC_CANONICAL_ORIGIN: ${PUBLIC_CANONICAL_ORIGIN}
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.udderly-website-production.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.udderly-website-production.entrypoints=websecure
+      - traefik.http.routers.udderly-website-production.tls=true
+      - traefik.http.routers.udderly-website-production.tls.certresolver=letsencrypt
+      - traefik.http.routers.udderly-website-production.service=udderly-website-production
+      - traefik.http.services.udderly-website-production.loadbalancer.server.port=3000
+
+networks:
+  web:
+    external: true

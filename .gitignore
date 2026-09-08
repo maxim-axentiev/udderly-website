@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+.vinxi/
+.nitro/
+.tanstack/
+.turbo/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment (keep example files)
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Test / coverage
+coverage/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
