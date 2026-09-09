@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Container } from '@/components/layout/container'
+import { ButtonLink } from '@/components/ui/button'
+import { Heading } from '@/components/ui/heading'
 import { getCanonicalOrigin } from '@/lib/seo/canonical'
 import { createWebSiteJsonLd } from '@/lib/seo/json-ld'
 import { createPageHead } from '@/lib/seo/page-head'
@@ -25,9 +27,12 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   return (
-    <Container className="py-16">
-      <h1 className="text-3xl font-medium">{SITE_NAME}</h1>
-      <p className="mt-4 text-muted">{SITE_TAGLINE}</p>
+    <Container className="py-16 md:py-24">
+      <Heading as="h1">{SITE_NAME}</Heading>
+      <p className="mt-4 max-w-narrow text-lg text-muted">{SITE_TAGLINE}</p>
+      <div className="mt-8">
+        <ButtonLink href="/experiences">See experiences</ButtonLink>
+      </div>
     </Container>
   )
 }

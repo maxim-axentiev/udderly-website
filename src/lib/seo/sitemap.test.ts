@@ -10,7 +10,7 @@ describe('sitemap foundation', () => {
   it('includes the homepage and excludes the health endpoint', () => {
     const entries = getStaticSitemapEntries()
 
-    expect(entries.map((entry) => entry.path)).toEqual(['/'])
+    expect(entries.map((entry) => entry.path)).toEqual(['/', '/experiences'])
     expect(isSitemapPathExcluded('/health')).toBe(true)
     expect(isSitemapPathExcluded('/')).toBe(false)
   })

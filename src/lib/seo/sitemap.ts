@@ -28,11 +28,29 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       changeFrequency: 'weekly',
       priority: 1,
     },
+    {
+      path: '/experiences',
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
   ]
 }
 
 export async function getSitemapEntries(): Promise<SitemapEntry[]> {
-  return getStaticSitemapEntries()
+  const { fetchExperienceSitemapSlugs } = await import('@/lib/sanity/fetch')
+
+  try {
+    const slugs = await fetchExperienceSitemapSlugs()
+    const experienceEntries: SitemapEntry[] = slugs.map((slug) => ({
+      path: `/${slug}`,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }))
+
+    return [...getStaticSitemapEntries(), ...experienceEntries]
+  } catch {
+    return getStaticSitemapEntries()
+  }
 }
 
 export function isSitemapPathExcluded(path: string): boolean {

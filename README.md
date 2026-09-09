@@ -34,7 +34,9 @@ Local URL: [http://localhost:8080](http://localhost:8080)
 
 Useful paths:
 
-- `/` — placeholder homepage
+- `/` — homepage
+- `/experiences` — published experiences hub
+- `/{slug}` — individual experience (legacy root-level URLs)
 - `/health` — JSON health check
 - `/robots.txt` — crawl policy (disallow while no canonical origin is set)
 - `/sitemap.xml` — 404 until `PUBLIC_CANONICAL_ORIGIN` is set
