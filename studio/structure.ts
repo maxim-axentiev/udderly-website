@@ -12,18 +12,20 @@ export const structure: StructureResolver = (S) =>
           .items([
             S.documentTypeListItem('page').title('Pages'),
             S.documentTypeListItem('experience').title('Experiences'),
+            S.documentTypeListItem('corporateProgram').title('Corporate Training'),
             S.listItem()
-              .title('Meet the herd')
+              .title('Meet the Herd')
               .child(
                 S.list()
-                  .title('Meet the herd')
+                  .title('Meet the Herd')
                   .items([
                     S.documentTypeListItem('animal').title('Animals'),
                     S.documentTypeListItem('animalSpecies').title('Species'),
                   ]),
               ),
-            S.documentTypeListItem('animalListing').title('Animals for sale'),
-            S.documentTypeListItem('post').title('Farm updates'),
+            S.documentTypeListItem('adoptionOffering').title('Adopt an Animal'),
+            S.documentTypeListItem('animalListing').title('Animals for Sale'),
+            S.documentTypeListItem('urbortArticle').title('URBORT'),
           ]),
       ),
       S.divider(),
@@ -35,6 +37,7 @@ export const structure: StructureResolver = (S) =>
             S.documentTypeListItem('testimonial').title('Testimonials'),
             S.documentTypeListItem('promotion').title('Promotions'),
             S.documentTypeListItem('teamMember').title('Team'),
+            S.documentTypeListItem('policy').title('Policies'),
           ]),
       ),
       S.divider(),

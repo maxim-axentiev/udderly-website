@@ -1,7 +1,7 @@
 import {BoltIcon} from '../../lib/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {experienceCategories, experienceSeasons} from '../constants'
+import {experienceCategories, experienceFormats, experienceSeasons} from '../constants'
 import {featuredField, orderRankField, slugField} from '../fields'
 
 export const experience = defineType({
@@ -22,6 +22,7 @@ export const experience = defineType({
       title: 'Title',
       type: 'string',
       group: 'content',
+      description: 'Public name of this farm experience.',
       validation: (rule) => rule.required().max(80),
     }),
     slugField('title', 'content'),
@@ -31,6 +32,7 @@ export const experience = defineType({
       type: 'text',
       rows: 3,
       group: 'content',
+      description: 'Used on the Experiences hub and cards.',
       validation: (rule) => rule.required().max(220),
     }),
     defineField({
@@ -38,6 +40,7 @@ export const experience = defineType({
       title: 'Full description',
       type: 'portableText',
       group: 'content',
+      description: 'Main story on the individual experience page.',
     }),
     defineField({
       name: 'heroImage',
@@ -59,8 +62,17 @@ export const experience = defineType({
       title: 'Experience type',
       type: 'string',
       group: 'visit',
+      description: 'Helps group similar experiences on the website.',
       options: {list: [...experienceCategories]},
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'animalSpecies',
+      title: 'Animals / species this experience features',
+      type: 'array',
+      group: 'visit',
+      description: 'Optional grouping, for example alpacas or highland cattle. Individual animals are chosen below.',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'animalSpecies'}]})],
     }),
     defineField({
       name: 'season',
@@ -75,14 +87,28 @@ export const experience = defineType({
       title: 'Duration',
       type: 'string',
       group: 'visit',
-      description: 'Display text only, for example “2 hours” or “Overnight”.',
+      description: 'Shown on the website, for example “2 hours” or “Overnight”.',
     }),
     defineField({
       name: 'priceDisplay',
-      title: 'Price display',
+      title: 'Price shown on the website',
       type: 'string',
       group: 'visit',
-      description: 'Display text only, for example “From $45”. Booking systems are not connected yet.',
+      description: 'Display text only, for example “From $45”. Booking is handled by the booking URL.',
+    }),
+    defineField({
+      name: 'groupSize',
+      title: 'Group size',
+      type: 'string',
+      group: 'visit',
+      description: 'Optional, for example “Up to 8 guests”.',
+    }),
+    defineField({
+      name: 'sessionType',
+      title: 'Private or shared',
+      type: 'string',
+      group: 'visit',
+      options: {list: [...experienceFormats]},
     }),
     defineField({
       name: 'ageGuidance',
@@ -92,15 +118,23 @@ export const experience = defineType({
     }),
     defineField({
       name: 'visitorInfo',
-      title: 'Accessibility and visitor information',
+      title: 'Important visitor information',
+      type: 'portableText',
+      group: 'visit',
+      description: 'What guests need to know before they come.',
+    }),
+    defineField({
+      name: 'accessibilityInfo',
+      title: 'Accessibility information',
       type: 'portableText',
       group: 'visit',
     }),
     defineField({
       name: 'bookingUrl',
-      title: 'Booking URL',
+      title: 'Booking link',
       type: 'url',
       group: 'visit',
+      description: 'Where the Book button should send guests.',
       validation: (rule) => rule.uri({scheme: ['http', 'https']}),
     }),
     defineField({
@@ -108,7 +142,7 @@ export const experience = defineType({
       title: 'Animals guests will meet',
       type: 'array',
       group: 'related',
-      description: 'Choose animals here. Do not also try to attach the experience from each animal.',
+      description: 'Choose from Meet the Herd. Animal photos and stories stay on the animal record.',
       of: [defineArrayMember({type: 'reference', to: [{type: 'animal'}]})],
     }),
     defineField({
@@ -116,6 +150,7 @@ export const experience = defineType({
       title: 'Related FAQs',
       type: 'array',
       group: 'related',
+      description: 'These same FAQs can also appear on the site-wide FAQ page.',
       of: [defineArrayMember({type: 'reference', to: [{type: 'faq'}]})],
     }),
     defineField({
@@ -126,11 +161,33 @@ export const experience = defineType({
       of: [defineArrayMember({type: 'reference', to: [{type: 'testimonial'}]})],
     }),
     defineField({
+      name: 'cancellationPolicy',
+      title: 'Cancellation policy',
+      type: 'reference',
+      group: 'related',
+      description: 'Reuse a policy instead of pasting it on every experience.',
+      to: [{type: 'policy'}],
+    }),
+    defineField({
+      name: 'welfarePolicy',
+      title: 'Animal welfare information',
+      type: 'reference',
+      group: 'related',
+      to: [{type: 'policy'}],
+    }),
+    defineField({
+      name: 'relatedExperiences',
+      title: 'Related experiences',
+      type: 'array',
+      group: 'related',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'experience'}]})],
+    }),
+    defineField({
       name: 'sections',
       title: 'Additional page sections',
       type: 'pageBuilder',
       group: 'content',
-      description: 'Optional extra sections below the main experience content.',
+      description: 'Optional extra sections below the standard experience layout.',
     }),
     defineField({
       name: 'seo',
@@ -140,13 +197,14 @@ export const experience = defineType({
     }),
     defineField({
       name: 'active',
-      title: 'Active',
+      title: 'Show on the website',
       type: 'boolean',
       group: 'settings',
+      description: 'Turn off to hide this experience without deleting it.',
       initialValue: true,
     }),
     featuredField('settings'),
-    orderRankField(undefined, 'settings'),
+    orderRankField('Lower numbers appear first on the Experiences hub.', 'settings'),
   ],
   preview: {
     select: {
@@ -158,7 +216,7 @@ export const experience = defineType({
     prepare({title, media, active, category}) {
       return {
         title: title || 'Untitled experience',
-        subtitle: `${category || 'Experience'}${active === false ? ' · inactive' : ''}`,
+        subtitle: `${category || 'Experience'}${active === false ? ' · hidden' : ''}`,
         media,
       }
     },

@@ -10,6 +10,7 @@ export const siteSettings = defineType({
     {name: 'business', title: 'Business', default: true},
     {name: 'seo', title: 'Default SEO'},
     {name: 'notice', title: 'Announcement'},
+    {name: 'hours', title: 'Hours'},
   ],
   fields: [
     defineField({
@@ -40,9 +41,26 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: 'socialLinks',
-      title: 'Social links',
+      title: 'Social profiles',
       type: 'socialLinks',
       group: 'business',
+    }),
+    defineField({
+      name: 'hoursNote',
+      title: 'Current / seasonal hours note',
+      type: 'text',
+      rows: 2,
+      group: 'hours',
+      description: 'Optional note used on Contact and Farm Market, for example winter hours.',
+    }),
+    defineField({
+      name: 'weeklyHours',
+      title: 'Weekly hours',
+      type: 'array',
+      group: 'hours',
+      description: 'Shared hours for Contact and Farm Market. Add a row for each day you want to show.',
+      of: [{type: 'dayHours'}],
+      validation: (rule) => rule.max(7),
     }),
     defineField({
       name: 'defaultSeo',

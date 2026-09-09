@@ -3,13 +3,14 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 
 import {slugField} from '../fields'
 
-export const post = defineType({
-  name: 'post',
-  title: 'Farm update',
+export const urbortArticle = defineType({
+  name: 'urbortArticle',
+  title: 'URBORT article',
   type: 'document',
   icon: BookIcon,
   groups: [
     {name: 'content', title: 'Content', default: true},
+    {name: 'related', title: 'Related'},
     {name: 'seo', title: 'SEO'},
   ],
   fields: [
@@ -18,7 +19,7 @@ export const post = defineType({
       title: 'Title',
       type: 'string',
       group: 'content',
-      validation: (rule) => rule.required().max(90),
+      validation: (rule) => rule.required().max(110),
     }),
     slugField('title', 'content'),
     defineField({
@@ -27,6 +28,7 @@ export const post = defineType({
       type: 'text',
       rows: 3,
       group: 'content',
+      description: 'Short summary for the URBORT hub and sharing cards.',
       validation: (rule) => rule.max(220),
     }),
     defineField({
@@ -50,18 +52,48 @@ export const post = defineType({
     }),
     defineField({
       name: 'body',
-      title: 'Content',
+      title: 'Article',
       type: 'portableText',
       group: 'content',
+      description: 'You can add headings, images, galleries, and YouTube or Vimeo videos in the article.',
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'externalLinks',
+      title: 'External / media links',
+      type: 'array',
+      group: 'content',
+      of: [defineArrayMember({type: 'link'})],
     }),
     defineField({
       name: 'tags',
       title: 'Tags',
       type: 'array',
       group: 'content',
+      description: 'Optional labels such as animal story or farm experiment.',
       of: [defineArrayMember({type: 'string'})],
       options: {layout: 'tags'},
+    }),
+    defineField({
+      name: 'relatedAnimals',
+      title: 'Related animals',
+      type: 'array',
+      group: 'related',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'animal'}]})],
+    }),
+    defineField({
+      name: 'relatedExperiences',
+      title: 'Related experiences',
+      type: 'array',
+      group: 'related',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'experience'}]})],
+    }),
+    defineField({
+      name: 'relatedArticles',
+      title: 'Related URBORT articles',
+      type: 'array',
+      group: 'related',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'urbortArticle'}]})],
     }),
     defineField({
       name: 'seo',
@@ -78,7 +110,7 @@ export const post = defineType({
     },
     prepare({title, media, publishedAt}) {
       return {
-        title: title || 'Untitled update',
+        title: title || 'Untitled URBORT article',
         subtitle: publishedAt ? new Date(publishedAt).toLocaleDateString() : 'No publish date',
         media,
       }

@@ -1,9 +1,9 @@
 import {BookIcon} from '../../lib/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-export const postGrid = defineType({
-  name: 'postGrid',
-  title: 'Farm updates',
+export const urbortGrid = defineType({
+  name: 'urbortGrid',
+  title: 'URBORT grid',
   type: 'object',
   icon: BookIcon,
   fields: [
@@ -11,16 +11,16 @@ export const postGrid = defineType({
       name: 'heading',
       title: 'Heading',
       type: 'string',
-      initialValue: 'Farm updates',
+      initialValue: 'URBORT',
     }),
     defineField({
       name: 'source',
-      title: 'Which posts to show',
+      title: 'Which articles to show',
       type: 'string',
       options: {
         list: [
-          {title: 'Latest posts', value: 'latest'},
-          {title: 'Selected posts', value: 'selected'},
+          {title: 'Latest articles', value: 'latest'},
+          {title: 'Selected articles', value: 'selected'},
         ],
         layout: 'radio',
       },
@@ -28,36 +28,34 @@ export const postGrid = defineType({
     }),
     defineField({
       name: 'limit',
-      title: 'How many posts',
+      title: 'How many articles',
       type: 'number',
       initialValue: 3,
       hidden: ({parent}) => parent?.source !== 'latest',
       validation: (rule) => rule.min(1).max(12).integer(),
     }),
     defineField({
-      name: 'posts',
-      title: 'Selected posts',
+      name: 'articles',
+      title: 'Selected articles',
       type: 'array',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'post'}]})],
+      of: [defineArrayMember({type: 'reference', to: [{type: 'urbortArticle'}]})],
       hidden: ({parent}) => parent?.source !== 'selected',
       validation: (rule) =>
         rule.custom((value, context) => {
           const parent = context.parent as {source?: string} | undefined
           if (parent?.source === 'selected' && (!value || value.length === 0)) {
-            return 'Choose at least one farm update.'
+            return 'Choose at least one URBORT article.'
           }
           return true
         }),
     }),
   ],
   preview: {
-    select: {
-      title: 'heading',
-    },
+    select: {title: 'heading'},
     prepare({title}) {
       return {
-        title: title || 'Farm updates',
-        subtitle: 'Farm updates',
+        title: title || 'URBORT',
+        subtitle: 'URBORT grid',
       }
     },
   },

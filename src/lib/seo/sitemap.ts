@@ -18,7 +18,7 @@ export type SitemapEntry = {
 
 /**
  * Static routes that should appear in the sitemap.
- * Future Sanity pages, experiences, posts, and cattle listings can be
+ * Future Sanity pages, experiences, URBORT articles, and cattle listings can be
  * concatenated onto this list from a CMS query.
  */
 export function getStaticSitemapEntries(): SitemapEntry[] {

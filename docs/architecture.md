@@ -51,6 +51,8 @@ Studio lives in `/studio` and is connected to project `umbuxpyp` / dataset `prod
 
 Content types and page-builder sections are defined there. The public website does not query Sanity yet. Sales listings are public website content only; applicant and CRM data stays out of this repository.
 
+Editorial types include Experiences, Corporate Programs, Animals, Adoption Offerings, Animals for Sale, URBORT articles, FAQs, Policies, and flexible Pages for unique marketing pages such as Glamping and Corporate Experiences.
+
 Pages should be composed from approved sections rather than giant hard-coded page components.
 
 ## Analytics

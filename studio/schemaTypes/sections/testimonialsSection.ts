@@ -21,10 +21,34 @@ export const testimonialsSection = defineType({
         list: [
           {title: 'Featured testimonials', value: 'featured'},
           {title: 'Selected testimonials', value: 'selected'},
+          {title: 'By topic', value: 'topic'},
         ],
         layout: 'radio',
       },
       initialValue: 'featured',
+    }),
+    defineField({
+      name: 'topic',
+      title: 'Topic',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'General', value: 'general'},
+          {title: 'Experience', value: 'experience'},
+          {title: 'Corporate', value: 'corporate'},
+          {title: 'Glamping', value: 'glamping'},
+          {title: 'Adoption', value: 'adoption'},
+        ],
+      },
+      hidden: ({parent}) => parent?.source !== 'topic',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const parent = context.parent as {source?: string} | undefined
+          if (parent?.source === 'topic' && !value) {
+            return 'Choose a topic.'
+          }
+          return true
+        }),
     }),
     defineField({
       name: 'testimonials',

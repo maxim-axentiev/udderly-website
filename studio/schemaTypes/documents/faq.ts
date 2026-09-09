@@ -26,6 +26,7 @@ export const faq = defineType({
       name: 'category',
       title: 'Category',
       type: 'string',
+      description: 'Shown on the website. Choose the FAQ category so pages can reuse the same questions.',
       options: {list: [...faqCategories]},
       initialValue: 'general',
       validation: (rule) => rule.required(),

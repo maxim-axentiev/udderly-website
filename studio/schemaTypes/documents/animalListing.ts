@@ -1,8 +1,12 @@
 import {TagIcon} from '../../lib/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {listingSexes, listingStatuses} from '../constants'
+import {listingDetailProfiles, listingSexes, listingStatuses} from '../constants'
 import {featuredField, orderRankField, slugField} from '../fields'
+
+function isCattleListing(document?: Record<string, unknown>) {
+  return document?.detailsProfile === 'cattle'
+}
 
 export const animalListing = defineType({
   name: 'animalListing',
@@ -21,6 +25,7 @@ export const animalListing = defineType({
       title: 'Listing name',
       type: 'string',
       group: 'content',
+      description: 'Public name of this listing. This is website content only, not a sales record.',
       validation: (rule) => rule.required().max(80),
     }),
     slugField('title', 'content'),
@@ -29,7 +34,7 @@ export const animalListing = defineType({
       title: 'Listing status',
       type: 'string',
       group: 'settings',
-      description: 'Public website status only. Applicant and sales pipeline data is not stored here.',
+      description: 'What visitors should see. Applicant and sales-pipeline information is not stored here.',
       options: {list: [...listingStatuses]},
       initialValue: 'available',
       validation: (rule) => rule.required(),
@@ -40,6 +45,16 @@ export const animalListing = defineType({
       type: 'reference',
       group: 'details',
       to: [{type: 'animalSpecies'}],
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'detailsProfile',
+      title: 'Listing details',
+      type: 'string',
+      group: 'details',
+      description: 'Cattle listings show lineage, genetics, colour, and size. Other species hide those fields.',
+      options: {list: [...listingDetailProfiles], layout: 'radio'},
+      initialValue: 'general',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -69,6 +84,56 @@ export const animalListing = defineType({
       group: 'details',
     }),
     defineField({
+      name: 'colour',
+      title: 'Colour',
+      type: 'string',
+      group: 'details',
+      hidden: ({document}) => !isCattleListing(document as Record<string, unknown> | undefined),
+    }),
+    defineField({
+      name: 'parents',
+      title: 'Parents / lineage',
+      type: 'text',
+      rows: 3,
+      group: 'details',
+      hidden: ({document}) => !isCattleListing(document as Record<string, unknown> | undefined),
+    }),
+    defineField({
+      name: 'genetics',
+      title: 'Genetics / chondro status',
+      type: 'string',
+      group: 'details',
+      hidden: ({document}) => !isCattleListing(document as Record<string, unknown> | undefined),
+    }),
+    defineField({
+      name: 'expectedSize',
+      title: 'Expected size',
+      type: 'string',
+      group: 'details',
+      hidden: ({document}) => !isCattleListing(document as Record<string, unknown> | undefined),
+    }),
+    defineField({
+      name: 'readyDate',
+      title: 'Ready date',
+      type: 'date',
+      group: 'details',
+      description: 'Optional public date, if this animal is not ready yet.',
+    }),
+    defineField({
+      name: 'personality',
+      title: 'Personality',
+      type: 'text',
+      rows: 3,
+      group: 'content',
+    }),
+    defineField({
+      name: 'placementRequirements',
+      title: 'Placement requirements',
+      type: 'portableText',
+      group: 'details',
+      description: 'Public requirements for a suitable home. Do not store applicant answers here.',
+    }),
+    defineField({
       name: 'images',
       title: 'Images',
       type: 'array',
@@ -86,14 +151,14 @@ export const animalListing = defineType({
     }),
     defineField({
       name: 'priceDisplay',
-      title: 'Price display',
+      title: 'Price shown on the website',
       type: 'string',
       group: 'details',
       description: 'Optional public text, for example “Contact for price”.',
     }),
     defineField({
       name: 'traits',
-      title: 'Traits and details',
+      title: 'Other traits',
       type: 'array',
       group: 'details',
       of: [defineArrayMember({type: 'string'})],

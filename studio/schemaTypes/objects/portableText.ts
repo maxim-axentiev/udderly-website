@@ -54,5 +54,13 @@ export const portableText = defineType({
       type: 'altImage',
       title: 'Image',
     }),
+    defineArrayMember({
+      type: 'gallery',
+      title: 'Gallery',
+    }),
+    defineArrayMember({
+      type: 'videoEmbed',
+      title: 'Video',
+    }),
   ],
 })

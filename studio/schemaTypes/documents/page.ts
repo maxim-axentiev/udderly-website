@@ -34,7 +34,8 @@ export const page = defineType({
       title: 'Page sections',
       type: 'pageBuilder',
       group: 'content',
-      description: 'Add and reorder sections. The website controls how each section looks.',
+      description:
+        'Add and reorder sections. Use this for unique pages such as Home, Glamping, Corporate Experiences, Our Story, Contact, and Farm Market. Repeated content like experiences and animals should be chosen from their own records.',
     }),
     defineField({
       name: 'seo',

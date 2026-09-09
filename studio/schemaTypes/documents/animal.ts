@@ -81,6 +81,7 @@ export const animal = defineType({
       type: 'text',
       rows: 3,
       group: 'content',
+      description: 'Used on Meet the Herd cards and experience “meet the herd” sections.',
       validation: (rule) => rule.required().max(220),
     }),
     defineField({
@@ -88,6 +89,7 @@ export const animal = defineType({
       title: 'Personality and story',
       type: 'portableText',
       group: 'content',
+      description: 'Used on the animal’s own page and anywhere else this animal is featured.',
     }),
     defineField({
       name: 'funFacts',

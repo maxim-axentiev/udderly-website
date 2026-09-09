@@ -1,6 +1,7 @@
 import {CommentIcon} from '../../lib/icons'
 import {defineField, defineType} from 'sanity'
 
+import {testimonialTopics} from '../constants'
 import {featuredField, orderRankField} from '../fields'
 
 export const testimonial = defineType({
@@ -23,22 +24,39 @@ export const testimonial = defineType({
       validation: (rule) => rule.required().max(80),
     }),
     defineField({
-      name: 'source',
-      title: 'Source',
+      name: 'topic',
+      title: 'Used for',
       type: 'string',
-      description: 'Optional, for example Google, Facebook, or a stay name.',
-    }),
-    defineField({
-      name: 'sourceUrl',
-      title: 'Source URL',
-      type: 'url',
-      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+      description: 'Helps pick the right quotes for Experiences, Corporate, Glamping, or Adoption pages.',
+      options: {list: [...testimonialTopics]},
+      initialValue: 'general',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'experience',
       title: 'Related experience',
       type: 'reference',
       to: [{type: 'experience'}],
+      hidden: ({document}) => document?.topic !== 'experience',
+    }),
+    defineField({
+      name: 'corporateProgram',
+      title: 'Related corporate program',
+      type: 'reference',
+      to: [{type: 'corporateProgram'}],
+      hidden: ({document}) => document?.topic !== 'corporate',
+    }),
+    defineField({
+      name: 'source',
+      title: 'Source',
+      type: 'string',
+      description: 'Optional, for example Google or Facebook.',
+    }),
+    defineField({
+      name: 'sourceUrl',
+      title: 'Source URL',
+      type: 'url',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
     }),
     defineField({
       name: 'image',
@@ -53,11 +71,12 @@ export const testimonial = defineType({
       title: 'guestName',
       subtitle: 'quote',
       media: 'image',
+      topic: 'topic',
     },
-    prepare({title, subtitle, media}) {
+    prepare({title, subtitle, media, topic}) {
       return {
         title: title || 'Anonymous guest',
-        subtitle: subtitle,
+        subtitle: topic ? `${topic} · ${subtitle || ''}` : subtitle,
         media,
       }
     },
