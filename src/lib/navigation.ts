@@ -7,6 +7,11 @@ export const primaryNav = [
   { label: 'Our Farm', href: '/our-farm' },
 ] as const
 
+export const footerNav = [
+  ...primaryNav,
+  { label: 'Contact', href: '/contact' },
+] as const
+
 export const footerLegalNav = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },

@@ -11,5 +11,7 @@ declare namespace NodeJS {
     PORT?: string
     APP_HOST?: string
     PUBLIC_CANONICAL_ORIGIN?: string
+    GOOGLE_PLACES_API_KEY?: string
+    GOOGLE_PLACE_ID?: string
   }
 }

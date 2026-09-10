@@ -1,20 +1,26 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Container } from '@/components/layout/container'
-import { ButtonLink } from '@/components/ui/button'
-import { Heading } from '@/components/ui/heading'
+import { HomePage } from '@/components/home/home-page'
+import { homepageSeo } from '@/content/homepage'
+import { getGooglePlaceReviewsFn } from '@/lib/google-places/server'
 import { getCanonicalOrigin } from '@/lib/seo/canonical'
 import { createWebSiteJsonLd } from '@/lib/seo/json-ld'
 import { createPageHead } from '@/lib/seo/page-head'
-import { SITE_NAME, SITE_TAGLINE } from '@/lib/site'
+import { SITE_NAME } from '@/lib/site'
 
 export const Route = createFileRoute('/')({
+  loader: async () => {
+    const googleReviews = await getGooglePlaceReviewsFn()
+    return { googleReviews }
+  },
   head: () => {
     const origin = getCanonicalOrigin()
 
     return createPageHead({
-      title: SITE_NAME,
-      description: SITE_TAGLINE,
+      title: homepageSeo.title,
+      description: homepageSeo.description,
+      ogTitle: homepageSeo.ogTitle,
+      ogDescription: homepageSeo.ogDescription,
       path: '/',
       jsonLd: createWebSiteJsonLd({
         name: SITE_NAME,
@@ -22,17 +28,10 @@ export const Route = createFileRoute('/')({
       }),
     })
   },
-  component: HomePage,
+  component: HomeRoute,
 })
 
-function HomePage() {
-  return (
-    <Container className="py-16 md:py-24">
-      <Heading as="h1">{SITE_NAME}</Heading>
-      <p className="mt-4 max-w-narrow text-lg text-muted">{SITE_TAGLINE}</p>
-      <div className="mt-8">
-        <ButtonLink href="/experiences">See experiences</ButtonLink>
-      </div>
-    </Container>
-  )
+function HomeRoute() {
+  const { googleReviews } = Route.useLoaderData()
+  return <HomePage reviewsFeed={googleReviews} />
 }

@@ -5,17 +5,17 @@ import { cn } from '@/lib/cn'
 
 const buttonVariants = {
   primary:
-    'bg-primary text-primary-foreground hover:brightness-110',
+    'btn-cta bg-cta text-cta-foreground shadow-[4px_4px_0_var(--color-headline)] hover:-translate-y-0.5 hover:text-cta-hover hover:shadow-[6px_6px_0_var(--color-headline)] active:text-cta-hover visited:text-cta-foreground focus-visible:text-cta-foreground',
   secondary:
-    'bg-secondary text-secondary-foreground hover:brightness-105',
+    'border-2 border-headline bg-background text-headline shadow-[3px_3px_0_var(--color-headline)] hover:bg-secondary-accent',
   outline:
-    'border border-border bg-surface text-foreground hover:bg-background',
+    'border-2 border-headline bg-background text-headline shadow-[3px_3px_0_var(--color-headline)] hover:bg-secondary-accent',
 } as const
 
 const buttonSizes = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2.5 text-sm',
-  lg: 'px-6 py-3 text-base',
+  sm: 'min-h-12 px-6 text-base',
+  md: 'min-h-12 px-6 text-base',
+  lg: 'min-h-14 px-8 text-lg',
 } as const
 
 export type ButtonVariant = keyof typeof buttonVariants
@@ -31,7 +31,7 @@ function buttonClassName({
   className?: string
 } = {}) {
   return cn(
-    'inline-flex items-center justify-center rounded-md font-medium no-underline transition',
+    'inline-flex items-center justify-center gap-2 rounded-full font-display font-extrabold tracking-wide uppercase no-underline transition-[color,transform,box-shadow] duration-200',
     buttonVariants[variant],
     buttonSizes[size],
     className,
