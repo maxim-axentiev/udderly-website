@@ -11,6 +11,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json package-lock.json ./
 COPY tsconfig.json vite.config.ts eslint.config.js vitest.config.ts ./
 COPY src ./src
+COPY public ./public
 
 RUN npm run build
 
