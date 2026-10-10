@@ -1,63 +1,102 @@
 import type {StructureResolver} from 'sanity/structure'
 
+import {
+  BoltIcon,
+  CaseIcon,
+  CogIcon,
+  DocumentIcon,
+  HeartIcon,
+  ListIcon,
+  MenuIcon,
+  PlayIcon,
+} from './lib/icons'
 import {SINGLETON_IDS} from './lib/singletons'
 
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Content')
+    .title('Website content')
     .items([
-      S.listItem().title('Website').child(
-        S.list()
-          .title('Website')
-          .items([
-            S.documentTypeListItem('page').title('Pages'),
-            S.documentTypeListItem('experience').title('Experiences'),
-            S.documentTypeListItem('corporateProgram').title('Corporate Training'),
-            S.listItem()
-              .title('Meet the Herd')
-              .child(
-                S.list()
-                  .title('Meet the Herd')
-                  .items([
-                    S.documentTypeListItem('animal').title('Animals'),
-                    S.documentTypeListItem('animalSpecies').title('Species'),
-                  ]),
-              ),
-            S.documentTypeListItem('adoptionOffering').title('Adopt an Animal'),
-            S.documentTypeListItem('animalListing').title('Animals for Sale'),
-            S.documentTypeListItem('urbortArticle').title('URBORT'),
-          ]),
-      ),
+      S.listItem()
+        .title('Visit')
+        .icon(BoltIcon)
+        .child(
+          S.list()
+            .title('Visit')
+            .items([
+              S.documentTypeListItem('experience').title('Experiences'),
+              S.documentTypeListItem('corporateProgram').title('Corporate Programs'),
+            ]),
+        ),
+      S.listItem()
+        .title('The Farm')
+        .icon(HeartIcon)
+        .child(
+          S.list()
+            .title('The Farm')
+            .items([
+              S.documentTypeListItem('animal').title('Animals'),
+              S.documentTypeListItem('animalSpecies').title('Animal Species'),
+              S.documentTypeListItem('teamMember').title('Team Members'),
+              S.documentTypeListItem('urbortArticle').title('URBORT'),
+            ]),
+        ),
+      S.listItem()
+        .title('Take One Home')
+        .icon(CaseIcon)
+        .child(
+          S.list()
+            .title('Take One Home')
+            .items([
+              S.documentTypeListItem('adoptionOffering').title('Adoption Offerings'),
+              S.documentTypeListItem('animalListing').title('Animals for Sale'),
+            ]),
+        ),
       S.divider(),
-      S.listItem().title('Reusable content').child(
-        S.list()
-          .title('Reusable content')
-          .items([
-            S.documentTypeListItem('faq').title('FAQs'),
-            S.documentTypeListItem('testimonial').title('Testimonials'),
-            S.documentTypeListItem('promotion').title('Promotions'),
-            S.documentTypeListItem('teamMember').title('Team'),
-            S.documentTypeListItem('policy').title('Policies'),
-          ]),
-      ),
+      S.listItem()
+        .title('Shared Content')
+        .icon(ListIcon)
+        .child(
+          S.list()
+            .title('Shared Content')
+            .items([
+              S.documentTypeListItem('faq').title('FAQs'),
+              S.documentTypeListItem('policy').title('Policies'),
+              S.documentTypeListItem('testimonial').title('Testimonials'),
+              S.documentTypeListItem('promotion').title('Promotions'),
+            ]),
+        ),
+      S.listItem()
+        .title('Website Settings')
+        .icon(CogIcon)
+        .child(
+          S.list()
+            .title('Website Settings')
+            .items([
+              S.listItem()
+                .title('Navigation')
+                .id(SINGLETON_IDS.navigation)
+                .icon(MenuIcon)
+                .child(S.document().schemaType('navigation').documentId(SINGLETON_IDS.navigation)),
+              S.listItem()
+                .title('Site Settings')
+                .id(SINGLETON_IDS.siteSettings)
+                .icon(CogIcon)
+                .child(S.document().schemaType('siteSettings').documentId(SINGLETON_IDS.siteSettings)),
+              S.listItem()
+                .title('Farm Sounds')
+                .id(SINGLETON_IDS.farmSounds)
+                .icon(PlayIcon)
+                .child(S.document().schemaType('farmSounds').documentId(SINGLETON_IDS.farmSounds)),
+              S.documentTypeListItem('easterEgg').title('Easter Eggs'),
+            ]),
+        ),
       S.divider(),
-      S.listItem().title('Website settings').child(
-        S.list()
-          .title('Website settings')
-          .items([
-            S.listItem()
-              .title('Navigation')
-              .id(SINGLETON_IDS.navigation)
-              .child(S.document().schemaType('navigation').documentId(SINGLETON_IDS.navigation)),
-            S.listItem()
-              .title('Site settings')
-              .id(SINGLETON_IDS.siteSettings)
-              .child(S.document().schemaType('siteSettings').documentId(SINGLETON_IDS.siteSettings)),
-            S.listItem()
-              .title('Farm sounds')
-              .id(SINGLETON_IDS.farmSounds)
-              .child(S.document().schemaType('farmSounds').documentId(SINGLETON_IDS.farmSounds)),
-            S.documentTypeListItem('easterEgg').title('Easter eggs'),
-          ]),
-      ),
+      S.listItem()
+        .title('Other')
+        .icon(DocumentIcon)
+        .child(
+          S.list()
+            .title('Other')
+            .items([S.documentTypeListItem('page').title('Pages')]),
+        ),
     ])

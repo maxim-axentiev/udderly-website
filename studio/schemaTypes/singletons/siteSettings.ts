@@ -1,5 +1,5 @@
 import {CogIcon} from '../../lib/icons'
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -11,6 +11,7 @@ export const siteSettings = defineType({
     {name: 'seo', title: 'Default SEO'},
     {name: 'notice', title: 'Announcement'},
     {name: 'hours', title: 'Hours'},
+    {name: 'homepage', title: 'Homepage'},
   ],
   fields: [
     defineField({
@@ -44,6 +45,33 @@ export const siteSettings = defineType({
       title: 'Social profiles',
       type: 'socialLinks',
       group: 'business',
+    }),
+    defineField({
+      name: 'bookingCta',
+      title: 'Book an Experience button',
+      type: 'link',
+      group: 'business',
+      description:
+        'Used in the website header. Experience pages still use each experience’s own booking link.',
+    }),
+    defineField({
+      name: 'footerTagline',
+      title: 'Footer tagline',
+      type: 'string',
+      group: 'business',
+      initialValue: 'Come Do Something Udderly Ridiculous',
+      description: 'Short line under the footer wordmark.',
+      validation: (rule) => rule.max(120),
+    }),
+    defineField({
+      name: 'homepageFaqs',
+      title: 'Homepage FAQs',
+      type: 'array',
+      group: 'homepage',
+      description:
+        'Choose and order existing FAQ documents for the homepage accordion. Only these selected questions appear. Leave empty to keep the current website copy. Cancellation and opening-hours answers must live on complete FAQ documents — weekly hours and policy documents are not used here.',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'faq'}]})],
+      validation: (rule) => rule.unique().max(20),
     }),
     defineField({
       name: 'hoursNote',

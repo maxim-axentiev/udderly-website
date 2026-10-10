@@ -64,6 +64,7 @@ type ButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   size?: ButtonSize
   href: string
   external?: boolean
+  openInNewTab?: boolean
 }
 
 export function ButtonLink({
@@ -72,33 +73,33 @@ export function ButtonLink({
   size = 'md',
   href,
   external,
+  openInNewTab,
   children,
   ...props
 }: ButtonLinkProps) {
   const classes = buttonClassName({ variant, size, className })
+  const useInternalLink =
+    !external && openInNewTab !== true && (href === '/' || href === '/experiences')
 
-  if (!external && href === '/') {
+  if (useInternalLink) {
     return (
-      <Link to="/" className={classes}>
+      <Link to={href === '/' ? '/' : '/experiences'} className={classes}>
         {children}
       </Link>
     )
   }
 
-  if (!external && href === '/experiences') {
-    return (
-      <Link to="/experiences" className={classes}>
-        {children}
-      </Link>
-    )
-  }
+  const shouldOpenNewTab =
+    openInNewTab === true ||
+    external === true ||
+    (openInNewTab !== false && href.startsWith('http'))
 
   return (
     <a
       href={href}
       className={classes}
-      rel={external || href.startsWith('http') ? 'noreferrer' : undefined}
-      {...(href.startsWith('http') ? { target: '_blank' } : {})}
+      rel={shouldOpenNewTab ? 'noreferrer' : undefined}
+      {...(shouldOpenNewTab ? { target: '_blank' } : {})}
       {...props}
     >
       {children}

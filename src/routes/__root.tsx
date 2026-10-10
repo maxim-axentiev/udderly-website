@@ -9,21 +9,32 @@ import {
 
 import { NotFoundPage } from '@/components/layout/not-found-page'
 import { SiteLayout } from '@/components/layout/site-layout'
+import { getSiteChromeFn } from '@/lib/sanity/server'
 import { createPageHead } from '@/lib/seo/page-head'
+import { mergeSiteChrome, type SiteChrome } from '@/lib/site-chrome'
 import { SITE_NAME } from '@/lib/site'
 import appCss from '@/styles.css?url'
 
 export const Route = createRootRoute({
-  head: ({ matches }) => {
+  loader: async () => {
+    try {
+      const chrome = (await getSiteChromeFn()) as SiteChrome
+      return { chrome }
+    } catch {
+      return { chrome: mergeSiteChrome(null) }
+    }
+  },
+  head: ({ matches, loaderData }) => {
     const missing = matches.some(
       (match) =>
         match.status === 'notFound' ||
         (match.error !== undefined && isNotFound(match.error)),
     )
+    const siteName = loaderData?.chrome?.siteName ?? SITE_NAME
 
     const notFoundHead = missing
       ? createPageHead({
-          title: `Page not available | ${SITE_NAME}`,
+          title: `Page not available | ${siteName}`,
           noindex: true,
         })
       : { meta: [], links: [], scripts: [] }
@@ -49,9 +60,12 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
+  const data = Route.useLoaderData()
+  const chrome = data?.chrome ?? mergeSiteChrome(null)
+
   return (
     <RootDocument>
-      <SiteLayout>
+      <SiteLayout chrome={chrome}>
         <Outlet />
       </SiteLayout>
     </RootDocument>

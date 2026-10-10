@@ -93,3 +93,42 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
 }`
 
 export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(slug.current)].slug.current`
+
+const cmsLink = `{
+  label,
+  linkType,
+  href,
+  openInNewTab,
+  internalLink->{_type, "slug": slug.current}
+}`
+
+export const navigationQuery = `*[_id == "navigation"][0]{
+  headerItems[]{
+    link ${cmsLink},
+    children[]{ link ${cmsLink} }
+  },
+  footerItems[]{ link ${cmsLink} },
+  legalItems[]{ link ${cmsLink} }
+}`
+
+export const siteSettingsQuery = `*[_id == "siteSettings"][0]{
+  siteName,
+  email,
+  phone,
+  footerTagline,
+  bookingCta ${cmsLink},
+  address { line1, line2, city, region, postalCode, country },
+  socialLinks { facebook, instagram, youtube, tiktok }
+}`
+
+export const homepageFaqsQuery = `*[_id == "siteSettings"][0]{
+  homepageFaqs[]{
+    _key,
+    "faq": @->{
+      _id,
+      question,
+      answer,
+      active
+    }
+  }
+}`

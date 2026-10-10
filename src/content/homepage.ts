@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Temporary homepage fixture content.
  * Replace this module with Sanity-backed data later without rewriting section layout.
  */
@@ -120,7 +120,7 @@ export const homepageExperienceCards = [
   {
     title: 'Farm glamping with the animals',
     fact: 'STAY OVER',
-    copy: 'Unwind in a luxury RV right on the farm, with front-row seats to stunning sunsets and animals who’ll audition for your next Instagram post.',
+    copy: 'Unwind in a luxury RV right on the farm, with front-row seats to stunning sunsets and animals whoâ€™ll audition for your next Instagram post.',
     cta: { label: 'Sleepover with the animals', href: '/stay' },
     image: {
       src: glampingPhoto,
@@ -165,10 +165,10 @@ export const homepageOwners = {
   kicker: 'Meet the owners',
   title: 'Welcome to Udderly Ridiculous Farm Life',
   paragraphs: [
-    'Hi, we’re Cheryl & Greg! Beside us is our friendly farm greeter dog, Aspen. Welcome to Udderly Ridiculous Farm Life, our third-generation family farm about 30min from Kitchener-Waterloo. Our story began with a ridiculous idea to make goat-milk ice cream, which quickly grew to experiences when customers asked us to offer Goat Yoga. We thought, “Who’d want goats chewing on their Lululemon pants?” (apparently a lot of people).',
+    'Hi, weâ€™re Cheryl & Greg! Beside us is our friendly farm greeter dog, Aspen. Welcome to Udderly Ridiculous Farm Life, our third-generation family farm about 30min from Kitchener-Waterloo. Our story began with a ridiculous idea to make goat-milk ice cream, which quickly grew to experiences when customers asked us to offer Goat Yoga. We thought, â€œWhoâ€™d want goats chewing on their Lululemon pants?â€ (apparently a lot of people).',
     'Our family farm has become the place for people seeking a true connection to animals and agriculture. A place where sustainability thrives and the human-animal bond sparks joy and understanding.',
   ],
-  fastForward: 'Fast forward to today…',
+  fastForward: 'Fast forward to todayâ€¦',
   milestones: [
     '14 awards for our experiences',
     'Gone viral on TikTok and Instagram',
@@ -288,7 +288,7 @@ export const homepageWelfare = {
     },
     {
       name: 'Resort with room service',
-      copy: 'We prioritize natural behaviours and enrichment for our animals. From climbing structures for goats to grazing pastures for alpacas, we ensure they have opportunities to play, explore, and thrive. Basically, it’s a luxury resort with room service, but for animals.',
+      copy: 'We prioritize natural behaviours and enrichment for our animals. From climbing structures for goats to grazing pastures for alpacas, we ensure they have opportunities to play, explore, and thrive. Basically, itâ€™s a luxury resort with room service, but for animals.',
       image: { src: welfare8, alt: 'Mini donkey showing its teeth', width: 900, height: 900 },
     },
   ],
@@ -298,8 +298,8 @@ export const homepageStore = {
   store: {
     badge: 'Farm Market Store',
     title: 'Bring a piece of the farm home with you',
-    copy: 'After your experience, take home a souvenir. Whether it’s a conversation starter or a treat for your belly. We’ve stocked items from over 100 local producers, and you know it’s good because we’re ridiculously picky about what we offer! It’s a win-win-win: you support local businesses, support us, and take something special home with you. We love a triple win!',
-    cta: { label: 'See what’s inside', href: '/our-farm' },
+    copy: 'After your experience, take home a souvenir. Whether itâ€™s a conversation starter or a treat for your belly. Weâ€™ve stocked items from over 100 local producers, and you know itâ€™s good because weâ€™re ridiculously picky about what we offer! Itâ€™s a win-win-win: you support local businesses, support us, and take something special home with you. We love a triple win!',
+    cta: { label: 'See whatâ€™s inside', href: '/our-farm' },
     image: {
       src: storePhoto,
       alt: 'Looking through the doorway into the Farm Market Store with wooden barrels and local products',
@@ -311,9 +311,9 @@ export const homepageStore = {
     badge: 'Goat Milk Ice-Cream',
     title: 'Enjoy our goat milk ice-cream',
     paragraphs: [
-      'Are you like 65% of lactose intolerant folks? No problem. Our award-winning goat milk ice cream is the perfect treat for a smooth car ride home…no awkward pit stops or windows-down moments.',
-      'Packed with more nutrients than regular ice cream and featuring rich, unique flavours like Vanilla Lavender and Wine & Dark Chocolate, it’s all made with real, locally sourced ingredients.',
-      'You’re on a farm with goats… you need to try goat milk ice cream!',
+      'Are you like 65% of lactose intolerant folks? No problem. Our award-winning goat milk ice cream is the perfect treat for a smooth car ride homeâ€¦no awkward pit stops or windows-down moments.',
+      'Packed with more nutrients than regular ice cream and featuring rich, unique flavours like Vanilla Lavender and Wine & Dark Chocolate, itâ€™s all made with real, locally sourced ingredients.',
+      'Youâ€™re on a farm with goatsâ€¦ you need to try goat milk ice cream!',
     ],
     cta: { label: 'See the ridiculous flavours', href: '/our-farm' },
     image: {
@@ -326,7 +326,7 @@ export const homepageStore = {
   giftGoat: {
     kicker: 'Gift A Goat',
     title: 'Eating ice-cream gives back',
-    copy: 'For every tub of Udderly Ridiculous goat milk ice cream you enjoy, we donate a portion of the profit to provide goats to rural communities in need through our Gift a Goat™ program, in partnership with World Vision Canada.',
+    copy: 'For every tub of Udderly Ridiculous goat milk ice cream you enjoy, we donate a portion of the profit to provide goats to rural communities in need through our Gift a Goatâ„¢ program, in partnership with World Vision Canada.',
     countLabel: 'Goats gifted',
     target: 118,
     image: {
@@ -348,13 +348,13 @@ export const homepageReviews = {
   googleOrderNote: "Shown in Google's order of relevance.",
   readMoreLabel: 'Read more on Google',
   unavailableCopy:
-    'Google reviews will appear here once the farm’s Google Maps listing is connected.',
+    'Google reviews will appear here once the farmâ€™s Google Maps listing is connected.',
 }
 
 export const homepageNewsletter = {
   title: 'The Udderly Update',
-  copy: 'Sign up for our monthly email newsletter to be the first to know about special promotions, new experiences, farm & animal updates, and just ridiculous content that’ll make you gasp, ooh, aw, and woah!',
-  confirmation: 'Placeholder confirmation — nothing is stored yet.',
+  copy: 'Sign up for our monthly email newsletter to be the first to know about special promotions, new experiences, farm & animal updates, and just ridiculous content thatâ€™ll make you gasp, ooh, aw, and woah!',
+  confirmation: 'Placeholder confirmation â€” nothing is stored yet.',
   mobileAnimals: [
     { src: newsletterMobile1, alt: 'Alpaca peeking over the newsletter form', rotate: '-rotate-3' },
     { src: newsletterMobile2, alt: 'Mini donkey peeking over the newsletter form', rotate: 'rotate-2' },
@@ -412,77 +412,5 @@ export const homepageUrbort = {
   ],
 }
 
-export const homepageFaqs = [
-  {
-    q: 'Are you a petting farm?',
-    a: 'Nope! The words “petting farm” give us the ick! We’re much more ethical and treat our animals better, which means they’re happy, healthy, and ready to connect with you!',
-  },
-  {
-    q: 'Is your farm pet friendly?',
-    a: 'Nope! Although we’re sure your dog is really cute and great, our animals may get scared by their presence (unless you have a pet rock or something, then they’ll probably be okay)! Also, our guard llama will see it as a stranger and do his job… and he’s really dang good at his job!',
-  },
-  {
-    q: 'Are kids allowed on the farm?',
-    a: 'Yup! However, please read the experience descriptions carefully, as some of our activities have age restrictions for the safety and comfort of our animals and other guests. We recommend checking these details before booking to ensure the experience is the perfect fit for your family — because while goats love kids, they don’t do babysitting!',
-  },
-  {
-    q: 'Do I need a reservation to visit the farm?',
-    a: 'Nope! You can always stop by the farm market store or stroll our walkable paths to see the animals during our open hours. But if you’re planning on doing an experience without booking it in advance, there’s a chance it may already be full! So we definitely recommend to book an experience in advance… unless you enjoy the thrill of last-minute plans, then good luck and buy yourself an ice-cream while you’re here!',
-  },
-  {
-    q: 'Is the farm wheelchair accessible?',
-    a: 'Ehh, kinda? We’re not officially wheelchair certified because we don’t have specific features like ramps or electric doors, but plenty of visitors with wheelchairs have successfully navigated the farm. Our spaces are wide enough to accommodate, and our staff is always happy to assist you.',
-  },
-  {
-    q: 'Is parking available?',
-    a: 'Yup! Parking is located next to the farm market store, and there are handicap spots closer to the entrance. Um, not sure what else you need to know about our parking… OH, read the signs and please don’t drive through the farm. Thank you!',
-  },
-  {
-    q: 'What is your cancellation policy?',
-    a: 'Here you go my friend! You’ll see this cancellation policy on every experience page:',
-    list: [
-      'Please note in order to create the best experience for our guests and our animals we have limited numbers in each experience. It is very difficult to rebook a last-minute cancellation and so we have instituted a fair cancellation policy that we need to adhere to.',
-      'Customers will receive full credit (less booking system processing fee) in case of operator cancellation due to weather or other unforeseen circumstances that are out of our control.',
-      'Cancellations can be made with a full refund or credit 5 days or more prior to the experience (less booking system processing fee).',
-      'Cancellations can be made with 50% refund or 50% credit 2-4 days prior to the experience (less booking system processing fee).',
-      'Cancellations within 48 hours of their booked experience will not be refunded or credited.',
-      'No-shows will not be provided a refund or credit for the experience.',
-    ],
-  },
-  {
-    q: 'What happens when there is bad weather?',
-    a: 'THE SHOW GOES ON! Most of our experiences can continue despite bad weather. For example, Goat Recess is moved inside the barn, there’s a large tent for Goat Yoga, and you’ll eat under gazebos during Alpaca Lunch and Sunset Picnics. For other experiences, we recommend bringing protective clothing like a raincoat or poncho if rain is in the forecast. If you’re prone to mosquito bites, we also suggest bringing some bug spray. If the weather is dangerously terrible, then we will offer credit and refunds.',
-  },
-  {
-    q: 'What days and times are you open?',
-    a: 'Spring/summer/fall | May – September:',
-    list: [
-      'Monday – closed',
-      'Tuesday – closed',
-      'Wednesday – 10:00am to 5:00pm',
-      'Thursday – 10:00am to 5:00pm',
-      'Friday – 10:00am to 6:00pm',
-      'Saturday – 10:00am to 6:00pm',
-      'Sunday – 10:00am to 5:00pm',
-    ],
-    a2: 'Winter | October to April:',
-    list2: [
-      'Monday – closed',
-      'Tuesday – closed',
-      'Wednesday – closed',
-      'Thursday – closed',
-      'Friday – 10:00am to 5:00pm',
-      'Saturday – 10:00am to 5:00pm',
-      'Sunday – 10:00am to 5:00pm',
-      'Midweek only by appointment or chance (call us)',
-    ],
-  },
-  {
-    q: 'How early should I arrive before my experience begins?',
-    a: 'We recommend arriving 10 minutes before your experience begins to check in, sign the waiver if you haven’t already, wash your hands, and mentally prepare to feel cute aggression. We typically start right on time so you can get the most out of your experience! If you arrive earlier than 10 minutes, feel free to browse the farm market store or stroll the walkable paths to see the animals — just be sure to ask a staff member about the paths.',
-  },
-  {
-    q: 'Is there a washroom on site?',
-    a: 'Yup, we have three washrooms! There is one washroom inside the farm market store. You’ll notice there are two doors inside the washroom: one that leads from the store to the washroom, and one that leads from the washroom to the goat barn. Please lock both doors when you’re inside—otherwise, someone might walk in, and we’re pretty sure you wouldn’t want that. Oh, and definitely don’t open the door to the goat barn, unless you want goats jumping on your lap while you’re on the toilet. Sounds fun, but it’s not (we promise), and getting them back into the barn is a whole operation! There are two more spacious washrooms outside behind the goat barn!',
-  },
-] as const
+export { homepageFaqs } from '@/content/homepage-faqs'
+

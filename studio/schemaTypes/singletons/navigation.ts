@@ -21,6 +21,15 @@ export const navigation = defineType({
       of: [defineArrayMember({type: 'navLink'})],
       validation: (rule) => rule.max(12),
     }),
+    defineField({
+      name: 'legalItems',
+      title: 'Footer legal links',
+      type: 'array',
+      description:
+        'Privacy Policy, Terms of Service, and Cookies Policy. Leave empty to keep the current website links. Do not paste policy text here.',
+      of: [defineArrayMember({type: 'navLink'})],
+      validation: (rule) => rule.max(3),
+    }),
   ],
   preview: {
     prepare() {

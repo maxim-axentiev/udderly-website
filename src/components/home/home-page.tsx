@@ -9,12 +9,15 @@ import { ReviewsSection } from '@/components/home/reviews-section'
 import { StoreSection } from '@/components/home/store-section'
 import { UrbortSection } from '@/components/home/urbort-section'
 import { WelfareSection } from '@/components/home/welfare-section'
+import type { HomepageFaqItem } from '@/lib/homepage-faqs'
 import type { ReviewsFeed } from '@/lib/reviews/model'
 
 export function HomePage({
   reviewsFeed,
+  faqs,
 }: {
   reviewsFeed: ReviewsFeed
+  faqs: HomepageFaqItem[]
 }) {
   return (
     <div className="home-page bg-background text-body-copy">
@@ -28,7 +31,7 @@ export function HomePage({
       <ReviewsSection reviewsFeed={reviewsFeed} />
       <NewsletterSection />
       <UrbortSection />
-      <FaqSection />
+      <FaqSection faqs={faqs} />
     </div>
   )
 }

@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migrate:homepage-faqs:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/lib/migration/homepage-faqs-preview.ts"
   },
   "dependencies": {
     "@portabletext/react": "^8.0.1",

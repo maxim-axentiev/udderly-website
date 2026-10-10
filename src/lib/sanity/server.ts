@@ -1,8 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
 
+import { resolveHomepageFaqs } from '@/lib/homepage-faqs'
+import { mergeSiteChrome } from '@/lib/site-chrome'
+
 import {
   fetchExperienceBySlug,
   fetchExperienceHub,
+  fetchHomepageFaqDocument,
+  fetchSiteChromeDocuments,
 } from './fetch'
 
 export const getExperienceBySlugFn = createServerFn({ method: 'GET', strict: false })
@@ -19,3 +24,19 @@ export const getExperienceHubFn = createServerFn({
   method: 'GET',
   strict: false,
 }).handler(async () => fetchExperienceHub())
+
+export const getSiteChromeFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => {
+  const documents = await fetchSiteChromeDocuments()
+  return mergeSiteChrome(documents)
+})
+
+export const getHomepageFaqsFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => {
+  const document = await fetchHomepageFaqDocument()
+  return resolveHomepageFaqs(document)
+})

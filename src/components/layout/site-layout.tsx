@@ -2,8 +2,15 @@ import type { ReactNode } from 'react'
 
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
+import type { SiteChrome } from '@/lib/site-chrome'
 
-export function SiteLayout({ children }: { children: ReactNode }) {
+export function SiteLayout({
+  children,
+  chrome,
+}: {
+  children: ReactNode
+  chrome: SiteChrome
+}) {
   return (
     <div className="flex min-h-screen flex-col bg-background text-body-copy">
       <a
@@ -12,11 +19,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <SiteHeader />
+      <SiteHeader chrome={chrome} />
       <main id="main-content" className="flex-1">
         {children}
       </main>
-      <SiteFooter />
+      <SiteFooter chrome={chrome} />
     </div>
   )
 }
