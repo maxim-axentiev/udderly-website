@@ -4,6 +4,7 @@ import {
   BoltIcon,
   CaseIcon,
   CogIcon,
+  ComposeIcon,
   DocumentIcon,
   HeartIcon,
   ListIcon,
@@ -16,6 +17,20 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Website content')
     .items([
+      S.listItem()
+        .title('Home')
+        .icon(ComposeIcon)
+        .child(
+          S.list()
+            .title('Home')
+            .items([
+              S.listItem()
+                .title('Homepage')
+                .id(SINGLETON_IDS.homepage)
+                .icon(ComposeIcon)
+                .child(S.document().schemaType('homepage').documentId(SINGLETON_IDS.homepage)),
+            ]),
+        ),
       S.listItem()
         .title('Visit')
         .icon(BoltIcon)
@@ -81,7 +96,9 @@ export const structure: StructureResolver = (S) =>
                 .title('Site Settings')
                 .id(SINGLETON_IDS.siteSettings)
                 .icon(CogIcon)
-                .child(S.document().schemaType('siteSettings').documentId(SINGLETON_IDS.siteSettings)),
+                .child(
+                  S.document().schemaType('siteSettings').documentId(SINGLETON_IDS.siteSettings),
+                ),
               S.listItem()
                 .title('Farm Sounds')
                 .id(SINGLETON_IDS.farmSounds)

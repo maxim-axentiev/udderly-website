@@ -1,4 +1,4 @@
-export const SINGLETON_TYPES = ['siteSettings', 'farmSounds', 'navigation'] as const
+export const SINGLETON_TYPES = ['siteSettings', 'farmSounds', 'navigation', 'homepage'] as const
 
 export type SingletonType = (typeof SINGLETON_TYPES)[number]
 
@@ -6,6 +6,7 @@ export const SINGLETON_IDS: Record<SingletonType, string> = {
   siteSettings: 'siteSettings',
   farmSounds: 'farmSounds',
   navigation: 'navigation',
+  homepage: 'homepage',
 }
 
 export function isSingletonType(type: string): type is SingletonType {
