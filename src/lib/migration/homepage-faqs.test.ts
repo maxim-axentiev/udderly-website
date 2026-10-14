@@ -30,11 +30,26 @@ describe('homepage FAQ migration documents', () => {
   })
 
   it('uses stable prefixed IDs and required FAQ schema fields', () => {
+    expect(documents.map((document) => document._id)).toEqual([
+      'homepageFaq-01-are-you-a-petting-farm',
+      'homepageFaq-02-is-your-farm-pet-friendly',
+      'homepageFaq-03-are-kids-allowed-on-the-farm',
+      'homepageFaq-04-do-i-need-a-reservation-to-visit-the-farm',
+      'homepageFaq-05-is-the-farm-wheelchair-accessible',
+      'homepageFaq-06-is-parking-available',
+      'homepageFaq-07-what-is-your-cancellation-policy',
+      'homepageFaq-08-what-happens-when-there-is-bad-weather',
+      'homepageFaq-09-what-days-and-times-are-you-open',
+      'homepageFaq-10-how-early-should-i-arrive-before-my-experience-begins',
+      'homepageFaq-11-is-there-a-washroom-on-site',
+    ])
+
     documents.forEach((document, index) => {
       const editorial = homepageFaqEditorialFields[index]
       expect(editorial).toBeDefined()
       expect(document._id).toBe(homepageFaqDocumentId(editorial!.slug))
       expect(document._id.startsWith(HOMEPAGE_FAQ_ID_PREFIX)).toBe(true)
+      expect(document._id.includes('.')).toBe(false)
       expect(document._type).toBe('faq')
       expect(document.active).toBe(true)
       expect(document.sortOrder).toBe((index + 1) * 10)
@@ -100,6 +115,22 @@ describe('homepage FAQ migration preview', () => {
     expect(preview.siteSettingsPatchPreview.set.homepageFaqs).toEqual(references)
     expect(preview.mutations.every((mutation) => 'createIfNotExists' in mutation)).toBe(true)
     expect(preview.mutations.map((mutation) => mutation.createIfNotExists._id)).toEqual(
+      preview.documents.map((document) => document._id),
+    )
+    expect(references.map((reference) => reference._key)).toEqual([
+      'homepageFaq.ref.01',
+      'homepageFaq.ref.02',
+      'homepageFaq.ref.03',
+      'homepageFaq.ref.04',
+      'homepageFaq.ref.05',
+      'homepageFaq.ref.06',
+      'homepageFaq.ref.07',
+      'homepageFaq.ref.08',
+      'homepageFaq.ref.09',
+      'homepageFaq.ref.10',
+      'homepageFaq.ref.11',
+    ])
+    expect(references.map((reference) => reference._ref)).toEqual(
       preview.documents.map((document) => document._id),
     )
   })

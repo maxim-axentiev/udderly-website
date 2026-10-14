@@ -1,7 +1,7 @@
 import { homepageFaqs } from '../../content/homepage-faqs.ts'
 import { hasPortableText } from '../portable-text.ts'
 
-export const HOMEPAGE_FAQ_ID_PREFIX = 'homepageFaq.'
+export const HOMEPAGE_FAQ_ID_PREFIX = 'homepageFaq-'
 export const FAQ_QUESTION_MAX_LENGTH = 160
 export const SANITY_FAQ_CATEGORIES = [
   'visiting',
@@ -53,8 +53,8 @@ export type HomepageFaqReference = {
 
 /**
  * Editorial metadata only. Category is required by the FAQ schema and is not
- * present in the homepage fixture. IDs are stable and prefixed so later
- * createIfNotExists cannot collide with unrelated FAQ documents.
+ * present in the homepage fixture. IDs are stable. The hyphen keeps each ID on
+ * Sanity's public root path; a period would make the document private.
  */
 export const homepageFaqEditorialFields = [
   { slug: '01-are-you-a-petting-farm', category: 'animals' },
@@ -243,7 +243,8 @@ export function buildHomepageFaqDryRun() {
     limitations: [
       'Fixture answers have no links or emphasis marks; none were added.',
       'Portable Text list/paragraph spacing on the CMS homepage path may differ slightly from the fixture accordion.',
-      'Existing production FAQ documents were not queried; ID conflicts remain unverified.',
+      'Document IDs match the published public FAQs. This dry-run does not query or write to production.',
+      'createIfNotExists would leave an existing hyphenated FAQ unchanged. It must not target the private dotted IDs.',
       'siteSettings.homepageFaqs is previewed only and is not patched.',
     ],
   }
