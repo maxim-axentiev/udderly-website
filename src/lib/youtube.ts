@@ -24,3 +24,21 @@ export function getYoutubeEmbedUrl(videoUrl: string): string {
     return ''
   }
 }
+
+export function getHomepageVideoEmbedUrl(videoUrl: string): string {
+  try {
+    const url = new URL(videoUrl)
+    const host = url.hostname.replace(/^www\./, '')
+    if (host === 'youtube.com' || host === 'youtu.be') {
+      return getYoutubeEmbedUrl(videoUrl)
+    }
+    if (host === 'vimeo.com' || host === 'player.vimeo.com') {
+      const id = url.pathname.split('/').filter(Boolean).pop() ?? ''
+      if (!/^\d+$/.test(id)) return ''
+      return `https://player.vimeo.com/video/${id}`
+    }
+  } catch {
+    return ''
+  }
+  return ''
+}

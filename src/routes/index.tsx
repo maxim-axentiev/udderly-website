@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { HomePage } from '@/components/home/home-page'
 import { homepageSeo } from '@/content/homepage'
 import { getGooglePlaceReviewsFn } from '@/lib/google-places/server'
-import { getHomepageFaqsFn } from '@/lib/sanity/server'
+import { getHomepageContentFn, getHomepageFaqsFn } from '@/lib/sanity/server'
 import { getCanonicalOrigin } from '@/lib/seo/canonical'
 import { createWebSiteJsonLd } from '@/lib/seo/json-ld'
 import { createPageHead } from '@/lib/seo/page-head'
@@ -11,20 +11,22 @@ import { SITE_NAME } from '@/lib/site'
 
 export const Route = createFileRoute('/')({
   loader: async () => {
-    const [googleReviews, faqs] = await Promise.all([
+    const [googleReviews, faqs, homepage] = await Promise.all([
       getGooglePlaceReviewsFn(),
       getHomepageFaqsFn(),
+      getHomepageContentFn(),
     ])
-    return { googleReviews, faqs }
+    return { googleReviews, faqs, homepage }
   },
-  head: () => {
+  head: ({ loaderData }) => {
     const origin = getCanonicalOrigin()
+    const seo = loaderData?.homepage.seo ?? homepageSeo
 
     return createPageHead({
-      title: homepageSeo.title,
-      description: homepageSeo.description,
-      ogTitle: homepageSeo.ogTitle,
-      ogDescription: homepageSeo.ogDescription,
+      title: seo.title,
+      description: seo.description,
+      ogTitle: seo.ogTitle,
+      ogDescription: seo.ogDescription,
       path: '/',
       jsonLd: createWebSiteJsonLd({
         name: SITE_NAME,
@@ -36,6 +38,6 @@ export const Route = createFileRoute('/')({
 })
 
 function HomeRoute() {
-  const { googleReviews, faqs } = Route.useLoaderData()
-  return <HomePage reviewsFeed={googleReviews} faqs={faqs} />
+  const { googleReviews, faqs, homepage } = Route.useLoaderData()
+  return <HomePage reviewsFeed={googleReviews} faqs={faqs} content={homepage} />
 }

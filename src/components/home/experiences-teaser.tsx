@@ -1,36 +1,34 @@
 import { ArrowRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
-import { homepageExperienceCards } from '@/content/homepage'
+import { useHomepageContent } from './homepage-content-context'
+import { HomeImage } from './homepage-content'
 
 export function ExperiencesTeaser() {
+  const { experiences } = useHomepageContent()
   return (
     <section id="experiences" className="overflow-hidden bg-farm-blue py-20 md:py-28">
       <Container width="brand">
         <div className="flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
           <h2 className="font-display text-[clamp(2.8rem,8vw,8rem)] font-black uppercase leading-[0.78] text-headline">
-            Pick your
+            {experiences.headingFirst}
             <br />
-            <span className="text-stroke">ridiculousness.</span>
+            <span className="text-stroke">{experiences.headingSecond}</span>
           </h2>
           <p className="max-w-sm border-l-4 border-primary-accent pl-5 text-lg font-semibold">
-            Four ways to get ridiculous, mischievous, and happy...ous.
+            {experiences.intro}
           </p>
         </div>
 
         <div className="mt-16 grid gap-9 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5 lg:pb-14">
-          {homepageExperienceCards.map((experience, index) => (
+          {experiences.cards.map((experience, index) => (
             <article
-              key={experience.title}
+              key={experience.id}
               className={`group relative flex flex-col border-2 border-headline bg-background p-3 shadow-[7px_7px_0_var(--color-headline)] transition-transform duration-200 hover:-translate-y-2 ${experience.className}`}
             >
               <div className="relative overflow-hidden">
-                <img
-                  src={experience.image.src}
-                  alt={experience.image.alt}
-                  width={experience.image.width}
-                  height={experience.image.height}
+                <HomeImage
+                  image={experience.image}
                   loading="lazy"
-                  decoding="async"
                   className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <span

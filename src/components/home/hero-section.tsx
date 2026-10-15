@@ -1,10 +1,14 @@
+import { Fragment } from 'react'
+
 import { ArrowRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
 import { ButtonLink } from '@/components/ui/button'
-import { homepageHero } from '@/content/homepage'
+import { useHomepageContent } from './homepage-content-context'
+import { HomeImage } from './homepage-content'
 
 export function HeroSection() {
-  const { image } = homepageHero
+  const { hero } = useHomepageContent()
+  const { image } = hero
 
   return (
     <section className="relative overflow-hidden bg-farm-beige">
@@ -18,18 +22,18 @@ export function HeroSection() {
       >
         <div className="relative z-10 lg:pb-14">
           <h1 className="max-w-3xl font-display text-[clamp(4.6rem,10vw,9.5rem)] font-black uppercase leading-[0.75] text-headline">
-            {homepageHero.headlineBefore}{' '}
+            {hero.headlineBefore}{' '}
             <span className="relative inline-block text-primary-accent after:absolute after:-bottom-2 after:left-1 after:h-2 after:w-full after:-rotate-1 after:bg-secondary-accent">
-              {homepageHero.headlineAccent}
+              {hero.headlineAccent}
             </span>{' '}
-            {homepageHero.headlineAfter}
+            {hero.headlineAfter}
           </h1>
           <p className="mt-10 max-w-xl text-lg font-medium leading-relaxed md:text-xl">
-            {homepageHero.copy}
+            {hero.copy}
           </p>
           <div className="mt-8">
-            <ButtonLink href={homepageHero.cta.href} size="lg">
-              {homepageHero.cta.label} <ArrowRightIcon />
+            <ButtonLink href={hero.cta.href} size="lg">
+              {hero.cta.label} <ArrowRightIcon />
             </ButtonLink>
           </div>
         </div>
@@ -40,21 +44,20 @@ export function HeroSection() {
             aria-hidden="true"
           />
           <div className="absolute -left-2 bottom-2 z-20 -rotate-6 bg-primary-accent px-5 py-3 font-accent text-lg italic text-primary-foreground shadow-[5px_5px_0_var(--color-headline)] md:text-2xl">
-            {homepageHero.sticker}
+            {hero.sticker}
           </div>
-          <img
-            src={image.src}
-            alt={image.alt}
-            width={image.width}
-            height={image.height}
+          <HomeImage
+            image={image}
             fetchPriority="high"
-            decoding="async"
             className="relative z-10 ml-auto aspect-[4/5] w-[88%] rotate-2 rounded-[45%_45%_10%_10%/25%_25%_8%_8%] border-[5px] border-background object-cover object-center shadow-[12px_14px_0_var(--color-headline)]"
           />
           <div className="gentle-float absolute -right-1 -top-5 z-20 flex size-28 items-center justify-center rounded-full border-2 border-headline bg-background p-3 text-center font-display text-lg font-black uppercase leading-none text-headline shadow-[4px_4px_0_var(--color-primary-accent)] md:size-36 md:text-2xl">
-            Ooh,
-            <br />
-            amazing
+            {hero.badgeLines.map((line, index) => (
+              <Fragment key={`${index}-${line}`}>
+                {index > 0 ? <br /> : null}
+                {line}
+              </Fragment>
+            ))}
           </div>
         </div>
       </Container>

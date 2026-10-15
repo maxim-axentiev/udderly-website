@@ -1,7 +1,7 @@
 import { Container } from '@/components/layout/container'
 import { ButtonLink } from '@/components/ui/button'
-import { homepageReviews } from '@/content/homepage'
 import { ReviewsCarousel } from '@/components/home/reviews-carousel'
+import { useHomepageContent } from '@/components/home/homepage-content-context'
 import { ReviewStars } from '@/components/home/review-stars'
 import {
   formatGoogleRating,
@@ -10,6 +10,7 @@ import {
 import type { ReviewsFeed } from '@/lib/reviews/model'
 
 export function ReviewsSection({ reviewsFeed }: { reviewsFeed: ReviewsFeed }) {
+  const { reviews: copy } = useHomepageContent()
   const summary =
     reviewsFeed.available && reviewsFeed.rating !== null
       ? {
@@ -17,7 +18,7 @@ export function ReviewsSection({ reviewsFeed }: { reviewsFeed: ReviewsFeed }) {
           count:
             reviewsFeed.userRatingCount !== null
               ? formatGoogleReviewCount(reviewsFeed.userRatingCount)
-              : homepageReviews.googleAttribution,
+              : copy.attribution,
         }
       : null
 
@@ -30,11 +31,11 @@ export function ReviewsSection({ reviewsFeed }: { reviewsFeed: ReviewsFeed }) {
         <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
           <div className="max-w-4xl">
             <h2 className="font-display text-[clamp(2.6rem,7.5vw,7rem)] font-black uppercase leading-[0.8] text-headline">
-              {homepageReviews.title}
+              {copy.title}
             </h2>
             <p className="mt-4 max-w-xl text-sm font-semibold">
-              {homepageReviews.googleAttribution}
-              {reviews.length ? ` ${homepageReviews.googleOrderNote}` : null}
+              {copy.attribution}
+              {reviews.length ? ` ${copy.orderNote}` : null}
             </p>
           </div>
 
@@ -53,17 +54,21 @@ export function ReviewsSection({ reviewsFeed }: { reviewsFeed: ReviewsFeed }) {
                 }
               />
               <p className="mt-1 text-sm font-bold uppercase text-headline">
-                {summary?.count ?? homepageReviews.googleAttribution}
+                {summary?.count ?? copy.attribution}
               </p>
             </div>
           </div>
         </div>
 
         {reviews.length ? (
-          <ReviewsCarousel reviews={reviews} />
+          <ReviewsCarousel
+            reviews={reviews}
+            readFullLabel={copy.readFullLabel}
+            showLessLabel={copy.showLessLabel}
+          />
         ) : (
           <p className="mt-14 max-w-xl border-2 border-headline bg-background p-5 text-sm leading-relaxed shadow-[7px_7px_0_var(--color-headline)]">
-            {homepageReviews.unavailableCopy}
+            {copy.unavailable}
           </p>
         )}
 
@@ -75,11 +80,11 @@ export function ReviewsSection({ reviewsFeed }: { reviewsFeed: ReviewsFeed }) {
               target="_blank"
               className="font-display text-lg font-extrabold uppercase text-primary-accent hover:underline"
             >
-              {homepageReviews.readMoreLabel}
+              {copy.readMoreLabel}
             </a>
           ) : null}
-          <ButtonLink href={homepageReviews.cta.href} size="lg">
-            {homepageReviews.cta.label}
+          <ButtonLink href={copy.cta.href} size="lg">
+            {copy.cta.label}
           </ButtonLink>
         </div>
       </Container>

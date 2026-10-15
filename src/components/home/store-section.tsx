@@ -1,12 +1,12 @@
 import { ArrowRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
 import { ButtonLink } from '@/components/ui/button'
-import { homepageStore } from '@/content/homepage'
-
 import { GiftGoatCounter } from './gift-goat-counter'
+import { useHomepageContent } from './homepage-content-context'
+import { HomeImage } from './homepage-content'
 
 export function StoreSection() {
-  const { store, iceCream, giftGoat } = homepageStore
+  const { store, iceCream, giftGoat } = useHomepageContent()
 
   return (
     <section id="store" className="overflow-hidden bg-background py-20 md:py-28">
@@ -14,13 +14,9 @@ export function StoreSection() {
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="relative">
             <div className="absolute -inset-4 -rotate-2 bg-secondary-accent" aria-hidden="true" />
-            <img
-              src={store.image.src}
-              alt={store.image.alt}
-              width={store.image.width}
-              height={store.image.height}
+            <HomeImage
+              image={store.image}
               loading="lazy"
-              decoding="async"
               className="relative w-full border-2 border-headline object-cover"
             />
           </div>
@@ -41,13 +37,9 @@ export function StoreSection() {
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="relative lg:order-2">
             <div className="absolute -inset-4 rotate-2 bg-primary-accent" aria-hidden="true" />
-            <img
-              src={iceCream.image.src}
-              alt={iceCream.image.alt}
-              width={iceCream.image.width}
-              height={iceCream.image.height}
+            <HomeImage
+              image={iceCream.image}
               loading="lazy"
-              decoding="async"
               className="relative w-full border-2 border-headline object-cover"
             />
           </div>
@@ -70,13 +62,9 @@ export function StoreSection() {
         </div>
 
         <div className="grid items-center gap-10 border-2 border-headline bg-farm-beige p-7 shadow-[10px_10px_0_var(--color-headline)] md:grid-cols-[auto_1fr_auto] md:p-12">
-          <img
-            src={giftGoat.image.src}
-            alt={giftGoat.image.alt}
-            width={giftGoat.image.width}
-            height={giftGoat.image.height}
+          <HomeImage
+            image={giftGoat.image}
             loading="lazy"
-            decoding="async"
             className="mx-auto size-36 -rotate-3 rounded-full border-2 border-headline bg-background object-contain shadow-[4px_4px_0_var(--color-headline)] transition-transform duration-500 motion-safe:hover:rotate-12 motion-safe:hover:scale-110 md:size-44"
           />
           <div>
@@ -89,7 +77,7 @@ export function StoreSection() {
             <p className="mt-4 max-w-xl leading-relaxed">{giftGoat.copy}</p>
           </div>
           <div className="text-center md:text-right">
-            <GiftGoatCounter target={giftGoat.target} />
+            <GiftGoatCounter target={giftGoat.count} />
             <p className="mt-2 font-display text-lg font-black uppercase text-headline">
               {giftGoat.countLabel}
             </p>

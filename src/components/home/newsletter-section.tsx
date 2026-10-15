@@ -2,12 +2,14 @@ import { useState, type FormEvent } from 'react'
 
 import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui/button'
-import { homepageNewsletter } from '@/content/homepage'
+import { useHomepageContent } from './homepage-content-context'
+import { HomeImage } from './homepage-content'
 
 const fieldClass =
   'min-h-12 w-full rounded-full border-2 border-headline bg-background px-5 text-base text-headline placeholder:text-body-copy/60'
 
 export function NewsletterSection() {
+  const newsletter = useHomepageContent().newsletter
   const [signedUp, setSignedUp] = useState(false)
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -23,15 +25,11 @@ export function NewsletterSection() {
             className="pointer-events-none absolute inset-x-[-0.5rem] top-0 z-0 grid h-32 grid-cols-4 items-end md:hidden"
             aria-hidden="true"
           >
-            {homepageNewsletter.mobileAnimals.map((animal) => (
-              <img
-                key={animal.alt}
-                src={animal.src}
-                alt=""
-                width={768}
-                height={768}
+            {newsletter.mobileAnimals.map((animal) => (
+              <HomeImage
+                key={animal.src}
+                image={animal}
                 loading="lazy"
-                decoding="async"
                 className={`h-32 w-full object-contain object-bottom ${animal.rotate}`}
               />
             ))}
@@ -41,15 +39,11 @@ export function NewsletterSection() {
             className="pointer-events-none absolute inset-y-0 -left-36 z-0 hidden w-72 md:block"
             aria-hidden="true"
           >
-            {homepageNewsletter.leftAnimals.map((animal) => (
-              <img
-                key={animal.alt}
-                src={animal.src}
-                alt=""
-                width={768}
-                height={768}
+            {newsletter.leftAnimals.map((animal) => (
+              <HomeImage
+                key={animal.src}
+                image={animal}
                 loading="lazy"
-                decoding="async"
                 className={`absolute right-0 h-64 w-64 object-contain object-right ${animal.position}`}
               />
             ))}
@@ -58,15 +52,11 @@ export function NewsletterSection() {
             className="pointer-events-none absolute inset-y-0 -right-36 z-0 hidden w-72 md:block"
             aria-hidden="true"
           >
-            {homepageNewsletter.rightAnimals.map((animal) => (
-              <img
-                key={animal.alt}
-                src={animal.src}
-                alt=""
-                width={768}
-                height={768}
+            {newsletter.rightAnimals.map((animal) => (
+              <HomeImage
+                key={animal.src}
+                image={animal}
                 loading="lazy"
-                decoding="async"
                 className={`absolute left-0 h-64 w-64 object-contain object-left ${animal.position}`}
               />
             ))}
@@ -74,10 +64,10 @@ export function NewsletterSection() {
 
           <div className="relative z-10 border-2 border-headline bg-background p-7 text-center shadow-[10px_10px_0_var(--color-secondary-accent)] md:p-12">
             <h2 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">
-              {homepageNewsletter.title}
+              {newsletter.title}
             </h2>
             <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">
-              {homepageNewsletter.copy}
+              {newsletter.copy}
             </p>
 
             <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" onSubmit={onSubmit}>
@@ -86,7 +76,7 @@ export function NewsletterSection() {
                   htmlFor="newsletter-first-name"
                   className="mb-1 block font-display text-sm font-bold uppercase text-headline"
                 >
-                  First name (required)
+                  {newsletter.firstNameLabel}
                 </label>
                 <input
                   id="newsletter-first-name"
@@ -94,7 +84,7 @@ export function NewsletterSection() {
                   type="text"
                   required
                   autoComplete="given-name"
-                  placeholder="Cheryl"
+                  placeholder={newsletter.firstNamePlaceholder}
                   className={fieldClass}
                 />
               </div>
@@ -103,7 +93,7 @@ export function NewsletterSection() {
                   htmlFor="newsletter-email"
                   className="mb-1 block font-display text-sm font-bold uppercase text-headline"
                 >
-                  Email (required)
+                  {newsletter.emailLabel}
                 </label>
                 <input
                   id="newsletter-email"
@@ -111,7 +101,7 @@ export function NewsletterSection() {
                   type="email"
                   required
                   autoComplete="email"
-                  placeholder="you@example.com"
+                  placeholder={newsletter.emailPlaceholder}
                   className={fieldClass}
                 />
               </div>
@@ -120,7 +110,7 @@ export function NewsletterSection() {
                   htmlFor="newsletter-dob"
                   className="mb-1 block font-display text-sm font-bold uppercase text-headline"
                 >
-                  Date of birth (required)
+                  {newsletter.dateOfBirthLabel}
                 </label>
                 <input
                   id="newsletter-dob"
@@ -131,12 +121,12 @@ export function NewsletterSection() {
                 />
               </div>
               <Button type="submit" className="mt-2 justify-self-center">
-                Sign me up
+                {newsletter.submitLabel}
               </Button>
             </form>
-            {signedUp ? (
+            {signedUp && newsletter.confirmation ? (
               <p className="mt-4 font-accent text-lg italic text-primary-accent">
-                {homepageNewsletter.confirmation}
+                {newsletter.confirmation}
               </p>
             ) : null}
           </div>

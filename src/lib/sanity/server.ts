@@ -8,6 +8,7 @@ import {
   fetchExperienceHub,
   fetchHomepageFaqDocument,
   fetchSiteChromeDocuments,
+  loadHomepageContent,
 } from './fetch'
 
 export const getExperienceBySlugFn = createServerFn({ method: 'GET', strict: false })
@@ -32,6 +33,11 @@ export const getSiteChromeFn = createServerFn({
   const documents = await fetchSiteChromeDocuments()
   return mergeSiteChrome(documents)
 })
+
+export const getHomepageContentFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => loadHomepageContent())
 
 export const getHomepageFaqsFn = createServerFn({
   method: 'GET',

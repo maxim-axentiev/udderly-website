@@ -31,7 +31,15 @@ function viewportColumns() {
   return reviewCarouselColumns(window.innerWidth)
 }
 
-function ReviewCard({ review }: { review: NormalizedReview }) {
+function ReviewCard({
+  review,
+  readFullLabel,
+  showLessLabel,
+}: {
+  review: NormalizedReview
+  readFullLabel: string
+  showLessLabel: string
+}) {
   const [expanded, setExpanded] = useState(false)
   const long = shouldCollapseReview(review.text)
   const visibleText = expanded || !long ? review.text : collapseReviewText(review.text)
@@ -62,7 +70,7 @@ function ReviewCard({ review }: { review: NormalizedReview }) {
             aria-expanded={expanded}
             onClick={() => setExpanded((open) => !open)}
           >
-            {expanded ? 'Show less' : 'Read full review'}
+            {expanded ? showLessLabel : readFullLabel}
           </button>
         ) : null}
       </div>
@@ -110,7 +118,15 @@ function ReviewCard({ review }: { review: NormalizedReview }) {
   )
 }
 
-export function ReviewsCarousel({ reviews }: { reviews: NormalizedReview[] }) {
+export function ReviewsCarousel({
+  reviews,
+  readFullLabel,
+  showLessLabel,
+}: {
+  reviews: NormalizedReview[]
+  readFullLabel: string
+  showLessLabel: string
+}) {
   const labelId = useId()
   const columns = useSyncExternalStore(
     subscribeToViewport,
@@ -186,7 +202,11 @@ export function ReviewsCarousel({ reviews }: { reviews: NormalizedReview[] }) {
           >
             {reviews.map((review) => (
               <div key={review.id} className="min-w-0">
-                <ReviewCard review={review} />
+                <ReviewCard
+                  review={review}
+                  readFullLabel={readFullLabel}
+                  showLessLabel={showLessLabel}
+                />
               </div>
             ))}
           </div>

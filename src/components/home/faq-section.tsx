@@ -1,12 +1,15 @@
 import { PortableTextRenderer } from '@/components/portable-text/portable-text-renderer'
 import type { HomepageFaqItem } from '@/lib/homepage-faqs'
 
+import { useHomepageContent } from './homepage-content-context'
+
 export function FaqSection({ faqs }: { faqs: HomepageFaqItem[] }) {
+  const { faqHeading } = useHomepageContent()
   return (
     <section id="faq" className="bg-background py-20 md:py-28">
       <div className="mx-auto max-w-3xl px-5 md:px-8">
         <h2 className="font-display text-[clamp(2.6rem,7vw,6rem)] font-black uppercase leading-[0.82] text-headline">
-          You have questions. We might have answers.
+          {faqHeading}
         </h2>
         <div className="mt-10 border-t-2 border-headline">
           {faqs.map((faq) => (

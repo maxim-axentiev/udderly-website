@@ -1,3 +1,6 @@
+import type { CmsHomepageDocument } from '@/lib/homepage/cms'
+import { homepageContentOrFixture } from '@/lib/homepage/cms'
+import type { HomepageContent } from '@/lib/homepage/model'
 import type { CmsHomepageFaqsDocument } from '@/lib/homepage-faqs'
 import type { CmsNavigation, CmsSiteSettings, SiteChromeDocuments } from '@/lib/site-chrome'
 
@@ -7,6 +10,7 @@ import {
   experienceHubQuery,
   experienceSitemapSlugsQuery,
   homepageFaqsQuery,
+  homepageQuery,
   navigationQuery,
   siteSettingsQuery,
 } from './queries'
@@ -93,6 +97,22 @@ export async function fetchSiteChromeDocuments(): Promise<SiteChromeDocuments> {
       siteSettings: null,
     }
   }
+}
+
+export async function fetchPublishedHomepage(): Promise<CmsHomepageDocument> {
+  try {
+    const document = await withTimeout(
+      sanityClient.fetch<CmsHomepageDocument>(homepageQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return document ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function loadHomepageContent(): Promise<HomepageContent> {
+  return homepageContentOrFixture(await fetchPublishedHomepage())
 }
 
 export async function fetchHomepageFaqDocument(): Promise<CmsHomepageFaqsDocument> {

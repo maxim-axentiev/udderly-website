@@ -1,15 +1,11 @@
 import { useRef, useState } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
-import { homepageMedia } from '@/content/homepage'
-import { getYoutubeEmbedUrl } from '@/lib/youtube'
-
-const videos = homepageMedia.videos.map((video) => ({
-  ...video,
-  embedUrl: getYoutubeEmbedUrl(video.url),
-}))
+import { useHomepageContent } from './homepage-content-context'
+import { HomeImage } from './homepage-content'
 
 export function MediaCarousel() {
+  const videos = useHomepageContent().media.videos
   const [index, setIndex] = useState(0)
   const touchStart = useRef<number | null>(null)
   const current = videos[index]
@@ -76,7 +72,7 @@ export function MediaCarousel() {
 
       <ul className="mx-auto mt-9 grid max-w-4xl grid-cols-4 place-items-center gap-3 lg:grid-cols-8">
         {videos.map((video, i) => (
-          <li key={video.outlet} className="flex w-full justify-center">
+          <li key={video.id} className="flex w-full justify-center">
             <button
               type="button"
               onClick={() => go(i)}
@@ -88,13 +84,9 @@ export function MediaCarousel() {
                   : 'h-14 max-w-24 opacity-70 hover:opacity-100 sm:h-16 sm:max-w-28'
               }`}
             >
-              <img
-                src={video.logo}
-                alt=""
-                width={480}
-                height={480}
+              <HomeImage
+                image={video.logo}
                 loading="lazy"
-                decoding="async"
                 className="max-h-full max-w-full object-contain"
               />
             </button>
