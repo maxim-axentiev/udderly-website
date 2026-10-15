@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "migrate:homepage-faqs:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/lib/migration/homepage-faqs-preview.ts"
+    "migrate:homepage-faqs:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/lib/migration/homepage-faqs-preview.ts",
+    "migrate:homepage:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning --import ./src/lib/migration/register-homepage-loader.mjs src/lib/migration/homepage-preview.ts"
   },
   "dependencies": {
     "@portabletext/react": "^8.0.1",
