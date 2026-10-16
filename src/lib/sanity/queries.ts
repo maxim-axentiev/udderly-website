@@ -95,6 +95,53 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
 
 export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(slug.current)].slug.current`
 
+export const adoptionOfferingsQuery = `*[_type == "adoptionOffering" && active != false]{
+  _id,
+  title,
+  "slug": slug.current,
+  introduction,
+  availability,
+  "speciesTitle": animal->species->title
+}`
+
+export const adoptionPageQuery = `*[_id == "adoptionPage"][0]{
+  _id,
+  heroIntro,
+  awardsTagline,
+  sponsorParagraphs,
+  animalsIntro,
+  supportParagraphs,
+  seoTitle,
+  seoDescription
+}`
+
+export const animalListingsQuery = `*[_type == "animalListing"]{
+  _id,
+  title,
+  "slug": slug.current,
+  status,
+  priceDisplay,
+  personality,
+  birthHeight,
+  birthWeight,
+  "birthDate": birthDate,
+  sex,
+  genetics,
+  "speciesTitle": species->title
+}`
+
+export const animalsForSalePageQuery = `*[_id == "animalsForSalePage"][0]{
+  _id,
+  heroSupport,
+  intro,
+  soldIntro,
+  prepItems[]{title, copy},
+  waitlistTitle,
+  waitlistCopy,
+  seoTitle,
+  seoDescription
+}`
+
 export const experiencesHubContentQuery = `*[_id == "experiencesHub"][0]{
   _id,
   heading,

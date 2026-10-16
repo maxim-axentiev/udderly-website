@@ -84,6 +84,20 @@ export const animalListing = defineType({
       group: 'details',
     }),
     defineField({
+      name: 'birthHeight',
+      title: 'Height at birth',
+      type: 'string',
+      group: 'details',
+      description: 'Public display text. Leave empty until the farm confirms it.',
+    }),
+    defineField({
+      name: 'birthWeight',
+      title: 'Weight at birth',
+      type: 'string',
+      group: 'details',
+      description: 'Public display text. Leave empty until the farm confirms it.',
+    }),
+    defineField({
       name: 'colour',
       title: 'Colour',
       type: 'string',

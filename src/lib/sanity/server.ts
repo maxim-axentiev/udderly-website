@@ -8,6 +8,10 @@ import {
   fetchExperienceHub,
   fetchHomepageFaqDocument,
   fetchSiteChromeDocuments,
+  fetchAdoptionOfferings,
+  fetchAdoptionPageDocument,
+  fetchAnimalListings,
+  fetchAnimalsForSalePageDocument,
   loadExperiencesHubContent,
   loadHomepageContent,
 } from './fetch'
@@ -38,6 +42,28 @@ export const getSiteChromeFn = createServerFn({
 }).handler(async () => {
   const documents = await fetchSiteChromeDocuments()
   return mergeSiteChrome(documents)
+})
+
+export const getAdoptionPageFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => {
+  const [page, offerings] = await Promise.all([
+    fetchAdoptionPageDocument(),
+    fetchAdoptionOfferings(),
+  ])
+  return { page, offerings }
+})
+
+export const getAnimalsForSalePageFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => {
+  const [page, listings] = await Promise.all([
+    fetchAnimalsForSalePageDocument(),
+    fetchAnimalListings(),
+  ])
+  return { page, listings }
 })
 
 export const getHomepageContentFn = createServerFn({

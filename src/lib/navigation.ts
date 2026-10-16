@@ -2,7 +2,8 @@ export const primaryNav = [
   { label: 'Experiences', href: '/experiences' },
   { label: 'Meet the Herd', href: '/meet-the-herd' },
   { label: 'Stay', href: '/stay' },
-  { label: 'Adopt', href: '/adopt' },
+  { label: 'Adopt an Animal', href: '/adopt-an-animal' },
+  { label: 'Animals for Sale', href: '/animals-for-sale' },
   { label: 'Corporate', href: '/corporate' },
   { label: 'Our Farm', href: '/our-farm' },
 ] as const

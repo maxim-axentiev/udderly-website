@@ -14,6 +14,10 @@ import {
   experienceBySlugQuery,
   experienceHubQuery,
   experienceSitemapSlugsQuery,
+  adoptionOfferingsQuery,
+  adoptionPageQuery,
+  animalListingsQuery,
+  animalsForSalePageQuery,
   experiencesHubContentQuery,
   homepageFaqsQuery,
   homepageQuery,
@@ -135,6 +139,96 @@ export async function fetchPublishedHomepage(): Promise<CmsHomepageDocument> {
 
 export async function loadHomepageContent(): Promise<HomepageContent> {
   return homepageContentOrFixture(await fetchPublishedHomepage())
+}
+
+export async function fetchAdoptionPageDocument(): Promise<Record<string, unknown> | null> {
+  try {
+    return (
+      (await withTimeout(
+        sanityClient.fetch<Record<string, unknown> | null>(adoptionPageQuery),
+        CHROME_FETCH_TIMEOUT_MS,
+      )) ?? null
+    )
+  } catch {
+    return null
+  }
+}
+
+export async function fetchAdoptionOfferings(): Promise<
+  Array<{
+    title?: string | null
+    slug?: string | null
+    introduction?: string | null
+    availability?: string | null
+    speciesTitle?: string | null
+  }>
+> {
+  try {
+    const offerings = await withTimeout(
+      sanityClient.fetch<Array<Record<string, unknown>> | null>(adoptionOfferingsQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return (offerings ?? []) as Array<{
+      title?: string | null
+      slug?: string | null
+      introduction?: string | null
+      availability?: string | null
+      speciesTitle?: string | null
+    }>
+  } catch {
+    return []
+  }
+}
+
+export async function fetchAnimalsForSalePageDocument(): Promise<Record<string, unknown> | null> {
+  try {
+    return (
+      (await withTimeout(
+        sanityClient.fetch<Record<string, unknown> | null>(animalsForSalePageQuery),
+        CHROME_FETCH_TIMEOUT_MS,
+      )) ?? null
+    )
+  } catch {
+    return null
+  }
+}
+
+export async function fetchAnimalListings(): Promise<
+  Array<{
+    title?: string | null
+    slug?: string | null
+    status?: string | null
+    priceDisplay?: string | null
+    personality?: string | null
+    speciesTitle?: string | null
+    birthHeight?: string | null
+    birthWeight?: string | null
+    birthDate?: string | null
+    sex?: string | null
+    genetics?: string | null
+  }>
+> {
+  try {
+    const listings = await withTimeout(
+      sanityClient.fetch<Array<Record<string, unknown>> | null>(animalListingsQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return (listings ?? []) as Array<{
+      title?: string | null
+      slug?: string | null
+      status?: string | null
+      priceDisplay?: string | null
+      personality?: string | null
+      speciesTitle?: string | null
+      birthHeight?: string | null
+      birthWeight?: string | null
+      birthDate?: string | null
+      sex?: string | null
+      genetics?: string | null
+    }>
+  } catch {
+    return []
+  }
 }
 
 export async function fetchHomepageFaqDocument(): Promise<CmsHomepageFaqsDocument> {

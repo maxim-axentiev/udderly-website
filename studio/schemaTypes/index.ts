@@ -44,6 +44,8 @@ import {richTextSection} from './sections/richTextSection'
 import {testimonialsSection} from './sections/testimonialsSection'
 import {urbortGrid} from './sections/urbortGrid'
 import {videoEmbed} from './sections/videoEmbed'
+import {adoptionPage} from './singletons/adoptionPage'
+import {animalsForSalePage} from './singletons/animalsForSalePage'
 import {experiencesHub} from './singletons/experiencesHub'
 import {farmSounds} from './singletons/farmSounds'
 import {homepage} from './singletons/homepage'
@@ -70,6 +72,8 @@ export const schemaTypes = [
   farmSounds,
   homepage,
   experiencesHub,
+  adoptionPage,
+  animalsForSalePage,
   seo,
   altImage,
   portableText,

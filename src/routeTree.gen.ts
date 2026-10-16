@@ -16,6 +16,10 @@ import { Route as HealthRouteImport } from './routes/health'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TowerOfGoatsDiscoveryTrailRouteImport } from './routes/tower-of-goats-discovery-trail'
+import { Route as AdoptAnAnimalIndexRouteImport } from './routes/adopt-an-animal/index'
+import { Route as AdoptAnAnimalSlugRouteImport } from './routes/adopt-an-animal/$slug'
+import { Route as AnimalsForSaleIndexRouteImport } from './routes/animals-for-sale/index'
+import { Route as AnimalsForSaleSlugRouteImport } from './routes/animals-for-sale/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,6 +57,26 @@ const TowerOfGoatsDiscoveryTrailRoute =
     path: '/tower-of-goats-discovery-trail',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdoptAnAnimalIndexRoute = AdoptAnAnimalIndexRouteImport.update({
+  id: '/adopt-an-animal/',
+  path: '/adopt-an-animal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdoptAnAnimalSlugRoute = AdoptAnAnimalSlugRouteImport.update({
+  id: '/adopt-an-animal/$slug',
+  path: '/adopt-an-animal/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimalsForSaleIndexRoute = AnimalsForSaleIndexRouteImport.update({
+  id: '/animals-for-sale/',
+  path: '/animals-for-sale/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimalsForSaleSlugRoute = AnimalsForSaleSlugRouteImport.update({
+  id: '/animals-for-sale/$slug',
+  path: '/animals-for-sale/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -62,6 +86,10 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
+  '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
+  '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
+  '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
+  '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -71,6 +99,10 @@ export interface FileRoutesByTo {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
+  '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
+  '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
+  '/adopt-an-animal': typeof AdoptAnAnimalIndexRoute
+  '/animals-for-sale': typeof AnimalsForSaleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -81,6 +113,10 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
+  '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
+  '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
+  '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
+  '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -92,6 +128,10 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/tower-of-goats-discovery-trail'
+    | '/adopt-an-animal/$slug'
+    | '/animals-for-sale/$slug'
+    | '/adopt-an-animal/'
+    | '/animals-for-sale/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -101,6 +141,10 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/tower-of-goats-discovery-trail'
+    | '/adopt-an-animal/$slug'
+    | '/animals-for-sale/$slug'
+    | '/adopt-an-animal'
+    | '/animals-for-sale'
   id:
     | '__root__'
     | '/'
@@ -110,6 +154,10 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/tower-of-goats-discovery-trail'
+    | '/adopt-an-animal/$slug'
+    | '/animals-for-sale/$slug'
+    | '/adopt-an-animal/'
+    | '/animals-for-sale/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -120,6 +168,10 @@ export interface RootRouteChildren {
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TowerOfGoatsDiscoveryTrailRoute: typeof TowerOfGoatsDiscoveryTrailRoute
+  AdoptAnAnimalSlugRoute: typeof AdoptAnAnimalSlugRoute
+  AnimalsForSaleSlugRoute: typeof AnimalsForSaleSlugRoute
+  AdoptAnAnimalIndexRoute: typeof AdoptAnAnimalIndexRoute
+  AnimalsForSaleIndexRoute: typeof AnimalsForSaleIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -173,6 +225,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TowerOfGoatsDiscoveryTrailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/adopt-an-animal/': {
+      id: '/adopt-an-animal/'
+      path: '/adopt-an-animal'
+      fullPath: '/adopt-an-animal/'
+      preLoaderRoute: typeof AdoptAnAnimalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/adopt-an-animal/$slug': {
+      id: '/adopt-an-animal/$slug'
+      path: '/adopt-an-animal/$slug'
+      fullPath: '/adopt-an-animal/$slug'
+      preLoaderRoute: typeof AdoptAnAnimalSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/animals-for-sale/': {
+      id: '/animals-for-sale/'
+      path: '/animals-for-sale'
+      fullPath: '/animals-for-sale/'
+      preLoaderRoute: typeof AnimalsForSaleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/animals-for-sale/$slug': {
+      id: '/animals-for-sale/$slug'
+      path: '/animals-for-sale/$slug'
+      fullPath: '/animals-for-sale/$slug'
+      preLoaderRoute: typeof AnimalsForSaleSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -184,6 +264,10 @@ const rootRouteChildren: RootRouteChildren = {
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TowerOfGoatsDiscoveryTrailRoute: TowerOfGoatsDiscoveryTrailRoute,
+  AdoptAnAnimalSlugRoute: AdoptAnAnimalSlugRoute,
+  AnimalsForSaleSlugRoute: AnimalsForSaleSlugRoute,
+  AdoptAnAnimalIndexRoute: AdoptAnAnimalIndexRoute,
+  AnimalsForSaleIndexRoute: AnimalsForSaleIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

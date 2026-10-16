@@ -14,6 +14,8 @@ describe('sitemap foundation', () => {
       '/',
       '/experiences',
       '/tower-of-goats-discovery-trail',
+      '/adopt-an-animal',
+      '/animals-for-sale',
     ])
     expect(isSitemapPathExcluded('/health')).toBe(true)
     expect(isSitemapPathExcluded('/')).toBe(false)

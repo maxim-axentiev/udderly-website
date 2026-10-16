@@ -73,7 +73,23 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .title('Take One Home')
             .items([
+              S.listItem()
+                .title('Adopt an Animal page')
+                .id(SINGLETON_IDS.adoptionPage)
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document().schemaType('adoptionPage').documentId(SINGLETON_IDS.adoptionPage),
+                ),
               S.documentTypeListItem('adoptionOffering').title('Adoption Offerings'),
+              S.listItem()
+                .title('Animals for Sale page')
+                .id(SINGLETON_IDS.animalsForSalePage)
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document()
+                    .schemaType('animalsForSalePage')
+                    .documentId(SINGLETON_IDS.animalsForSalePage),
+                ),
               S.documentTypeListItem('animalListing').title('Animals for Sale'),
             ]),
         ),

@@ -38,6 +38,16 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      path: '/adopt-an-animal',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      path: '/animals-for-sale',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
   ]
 }
 

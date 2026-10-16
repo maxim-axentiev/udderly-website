@@ -13,6 +13,7 @@ export const RESERVED_SLUGS = [
   'meet-the-herd',
   'stay',
   'adopt',
+  'adopt-an-animal',
   'corporate',
   'our-farm',
   'animals-for-sale',
