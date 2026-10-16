@@ -8,6 +8,7 @@ import {
   fetchExperienceHub,
   fetchHomepageFaqDocument,
   fetchSiteChromeDocuments,
+  loadExperiencesHubContent,
   loadHomepageContent,
 } from './fetch'
 
@@ -25,6 +26,11 @@ export const getExperienceHubFn = createServerFn({
   method: 'GET',
   strict: false,
 }).handler(async () => fetchExperienceHub())
+
+export const getExperiencesHubContentFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => loadExperiencesHubContent())
 
 export const getSiteChromeFn = createServerFn({
   method: 'GET',

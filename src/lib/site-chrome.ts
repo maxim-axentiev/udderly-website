@@ -1,4 +1,4 @@
-import { experiencePath } from '@/lib/experiences/paths'
+import { documentPath } from '@/lib/routes/paths'
 import {
   bookCta as fallbackBookCta,
   footerLegalNav as fallbackLegalNav,
@@ -114,11 +114,7 @@ export function documentHref(
   type: string | null | undefined,
   slug: string | null | undefined,
 ): string | undefined {
-  if (!type || !slug) {
-    return undefined
-  }
-
-  return experiencePath(slug)
+  return documentPath(type, slug)
 }
 
 export function resolveCmsLink(link: CmsLink | null | undefined): ChromeLink | undefined {

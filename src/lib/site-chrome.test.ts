@@ -89,7 +89,7 @@ describe('site chrome CMS mapping', () => {
             link: {
               label: 'Visit us',
               linkType: 'internal',
-              internalLink: { _type: 'page', slug: 'contact' },
+              internalLink: { _type: 'experience', slug: 'farm-visit' },
             },
           },
         ],
@@ -110,7 +110,7 @@ describe('site chrome CMS mapping', () => {
       },
     })
 
-    expect(chrome.footerNav).toEqual([{ label: 'Visit us', href: '/contact' }])
+    expect(chrome.footerNav).toEqual([{ label: 'Visit us', href: '/farm-visit' }])
     expect(chrome.email).toBe('hello@example.com')
     expect(chrome.phone).toBe('519-555-0100')
     expect(chrome.locationLine).toBe('123 Farm Lane · Ayr, ON · Canada')
@@ -144,9 +144,9 @@ describe('site chrome CMS mapping', () => {
           },
           {
             link: {
-              label: 'Cookies Policy',
+              label: 'Cow day',
               linkType: 'internal',
-              internalLink: { _type: 'page', slug: 'cookies' },
+              internalLink: { _type: 'experience', slug: 'mini-highland-cow-experience' },
             },
           },
         ],
@@ -156,14 +156,14 @@ describe('site chrome CMS mapping', () => {
         bookingCta: {
           label: 'Book a visit',
           linkType: 'internal',
-          internalLink: { _type: 'page', slug: 'experiences' },
+          internalLink: { _type: 'experience', slug: 'goat-yoga' },
         },
       },
     })
 
     expect(chrome.bookCta).toEqual({
       label: 'Book a visit',
-      href: '/experiences',
+      href: '/goat-yoga',
     })
     expect(chrome.tagline).toBe('Come Do Something Udderly Ridiculous')
     expect(chrome.legalNav).toEqual([
@@ -172,8 +172,7 @@ describe('site chrome CMS mapping', () => {
         href: 'https://example.com/privacy',
         openInNewTab: true,
       },
-      { label: 'Terms of Service', href: '/terms' },
-      { label: 'Cookies Policy', href: '/cookies' },
+      { label: 'Cow day', href: '/mini-highland-cow-experience' },
     ])
   })
 
@@ -249,7 +248,7 @@ describe('site chrome CMS mapping', () => {
             link: {
               label: 'Visit',
               linkType: 'internal',
-              internalLink: { _type: 'page', slug: 'experiences' },
+              internalLink: { _type: 'experience', slug: 'visit-the-farm' },
             },
             children: [
               {
@@ -302,6 +301,55 @@ describe('CMS link resolution', () => {
         linkType: 'external',
       }),
     ).toBeUndefined()
+  })
+
+  it('drops unimplemented document links and keeps the local navigation fallback', () => {
+    expect(documentHref('page', 'contact')).toBeUndefined()
+    expect(documentHref('page', 'terms')).toBeUndefined()
+    expect(documentHref('animal', 'clara')).toBeUndefined()
+    expect(documentHref('animalListing', 'mini-highland-calf-june')).toBeUndefined()
+    expect(documentHref('adoptionOffering', 'adopt-clara')).toBeUndefined()
+    expect(documentHref('corporateProgram', 'beyond-engagement')).toBeUndefined()
+    expect(documentHref('urbortArticle', 'worlds-first-cow-wedding')).toBeUndefined()
+    expect(documentHref('experience', 'experiences')).toBeUndefined()
+    expect(documentHref('promotion', 'spring-offer')).toBeUndefined()
+
+    const chrome = mergeSiteChrome({
+      navigation: {
+        headerItems: [
+          {
+            link: {
+              label: 'Meet the Herd',
+              linkType: 'internal',
+              internalLink: { _type: 'page', slug: 'meet-the-herd' },
+            },
+          },
+        ],
+        footerItems: [
+          {
+            link: {
+              label: 'Adopt',
+              linkType: 'internal',
+              internalLink: { _type: 'adoptionOffering', slug: 'adopt-clara' },
+            },
+          },
+        ],
+        legalItems: [
+          {
+            link: {
+              label: 'Terms',
+              linkType: 'internal',
+              internalLink: { _type: 'page', slug: 'terms' },
+            },
+          },
+        ],
+      },
+    })
+
+    expect(chrome.primaryNav).toEqual(primaryNav.map((item) => ({ ...item })))
+    expect(chrome.footerNav).toEqual(footerNav.map((item) => ({ ...item })))
+    expect(chrome.legalNav).toEqual(footerLegalNav.map((item) => ({ ...item })))
+    expect(chrome.bookCta).toEqual({ ...bookCta })
   })
 
   it('keeps an external new-tab flag only when it is set', () => {

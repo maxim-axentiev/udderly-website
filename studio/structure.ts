@@ -6,6 +6,7 @@ import {
   CogIcon,
   ComposeIcon,
   DocumentIcon,
+  DocumentTextIcon,
   HeartIcon,
   ListIcon,
   MenuIcon,
@@ -38,6 +39,16 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .title('Visit')
             .items([
+              S.listItem()
+                .title('Experiences hub')
+                .id(SINGLETON_IDS.experiencesHub)
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document()
+                    .schemaType('experiencesHub')
+                    .documentId(SINGLETON_IDS.experiencesHub)
+                    .title('Experiences hub'),
+                ),
               S.documentTypeListItem('experience').title('Experiences'),
               S.documentTypeListItem('corporateProgram').title('Corporate Programs'),
             ]),

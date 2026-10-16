@@ -1,3 +1,8 @@
+import {
+  experiencesHubOrFallback,
+  type CmsExperiencesHubDocument,
+  type ExperiencesHubContent,
+} from '@/lib/experiences/hub'
 import type { CmsHomepageDocument } from '@/lib/homepage/cms'
 import { homepageContentOrFixture } from '@/lib/homepage/cms'
 import type { HomepageContent } from '@/lib/homepage/model'
@@ -9,6 +14,7 @@ import {
   experienceBySlugQuery,
   experienceHubQuery,
   experienceSitemapSlugsQuery,
+  experiencesHubContentQuery,
   homepageFaqsQuery,
   homepageQuery,
   navigationQuery,
@@ -63,6 +69,22 @@ export async function fetchExperienceHub(): Promise<ExperienceCardData[]> {
   return (experiences ?? []).filter(
     (experience) => experience.slug && experience.title,
   )
+}
+
+export async function fetchPublishedExperiencesHub(): Promise<CmsExperiencesHubDocument> {
+  try {
+    const document = await withTimeout(
+      sanityClient.fetch<CmsExperiencesHubDocument>(experiencesHubContentQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return document ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function loadExperiencesHubContent(): Promise<ExperiencesHubContent> {
+  return experiencesHubOrFallback(await fetchPublishedExperiencesHub())
 }
 
 export async function fetchExperienceSitemapSlugs(): Promise<string[]> {

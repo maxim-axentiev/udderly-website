@@ -94,6 +94,18 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
 
 export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(slug.current)].slug.current`
 
+export const experiencesHubContentQuery = `*[_id == "experiencesHub"][0]{
+  _id,
+  heading,
+  intro,
+  emptyHeading,
+  emptyMessage,
+  seoTitle,
+  seoDescription,
+  ogTitle,
+  ogDescription
+}`
+
 const cmsLink = `{
   label,
   linkType,
