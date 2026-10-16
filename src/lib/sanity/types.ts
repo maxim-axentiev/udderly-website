@@ -102,6 +102,7 @@ export type ExperienceCardData = {
   season: string | null
   sessionType: string | null
   ageGuidance: string | null
+  bookingUrl: string | null
   heroImage: SanityImage
   animalSpecies: Array<{ title: string | null }> | null
 }

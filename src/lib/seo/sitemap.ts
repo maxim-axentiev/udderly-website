@@ -33,6 +33,11 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    {
+      path: '/tower-of-goats-discovery-trail',
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ]
 }
 

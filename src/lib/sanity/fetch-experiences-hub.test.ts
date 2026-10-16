@@ -66,6 +66,7 @@ describe('experiences hub fetch', () => {
     ])
     expect(sanityClient.fetch).toHaveBeenCalledWith(experienceHubQuery)
     expect(experienceHubQuery).toContain('_type == "experience"')
+    expect(experienceHubQuery).toContain('bookingUrl')
     expect(experienceHubQuery).not.toContain('experiencesHub')
   })
 })

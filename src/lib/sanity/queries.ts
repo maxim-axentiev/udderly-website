@@ -88,6 +88,7 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
   season,
   sessionType,
   ageGuidance,
+  bookingUrl,
   heroImage ${altImage},
   animalSpecies[]->{ title }
 }`

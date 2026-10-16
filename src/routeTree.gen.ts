@@ -15,6 +15,7 @@ import { Route as ExperiencesRouteImport } from './routes/experiences'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TowerOfGoatsDiscoveryTrailRouteImport } from './routes/tower-of-goats-discovery-trail'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,12 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TowerOfGoatsDiscoveryTrailRoute =
+  TowerOfGoatsDiscoveryTrailRouteImport.update({
+    id: '/tower-of-goats-discovery-trail',
+    path: '/tower-of-goats-discovery-trail',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +80,27 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/$' | '/experiences' | '/health' | '/robots.txt' | '/sitemap.xml'
+    | '/'
+    | '/$'
+    | '/experiences'
+    | '/health'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/tower-of-goats-discovery-trail'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$' | '/experiences' | '/health' | '/robots.txt' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/$'
+    | '/experiences'
+    | '/health'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/tower-of-goats-discovery-trail'
   id:
     | '__root__'
     | '/'
@@ -86,6 +109,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/tower-of-goats-discovery-trail'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +119,7 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TowerOfGoatsDiscoveryTrailRoute: typeof TowerOfGoatsDiscoveryTrailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tower-of-goats-discovery-trail': {
+      id: '/tower-of-goats-discovery-trail'
+      path: '/tower-of-goats-discovery-trail'
+      fullPath: '/tower-of-goats-discovery-trail'
+      preLoaderRoute: typeof TowerOfGoatsDiscoveryTrailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,6 +183,7 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TowerOfGoatsDiscoveryTrailRoute: TowerOfGoatsDiscoveryTrailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

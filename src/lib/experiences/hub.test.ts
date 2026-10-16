@@ -37,6 +37,7 @@ function card(slug: string): ExperienceCardData {
     season: null,
     sessionType: null,
     ageGuidance: null,
+    bookingUrl: null,
     heroImage: null,
     animalSpecies: null,
   }

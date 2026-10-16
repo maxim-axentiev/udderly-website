@@ -9,6 +9,7 @@
 
 export const RESERVED_SLUGS = [
   'experiences',
+  'tower-of-goats-discovery-trail',
   'meet-the-herd',
   'stay',
   'adopt',
