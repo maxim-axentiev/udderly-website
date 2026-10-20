@@ -5,6 +5,7 @@ import { mergeSiteChrome } from '@/lib/site-chrome'
 
 import {
   fetchExperienceBySlug,
+  fetchExperienceFoundation,
   fetchExperienceHub,
   fetchHomepageFaqDocument,
   fetchSiteChromeDocuments,
@@ -26,6 +27,11 @@ export const getExperienceBySlugFn = createServerFn({ method: 'GET', strict: fal
     return data
   })
   .handler(async ({ data }) => fetchExperienceBySlug(data))
+
+export const getExperienceFoundationFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => fetchExperienceFoundation())
 
 export const getExperienceHubFn = createServerFn({
   method: 'GET',

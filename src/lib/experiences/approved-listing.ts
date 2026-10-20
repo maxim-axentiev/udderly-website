@@ -1,6 +1,8 @@
 import { documentPath } from '@/lib/routes/paths'
 import type { ExperienceCardData } from '@/lib/sanity/types'
 
+import { publicExperienceSlug } from './public-paths'
+
 export const EXPERIENCES_HERO = {
   headingLead: 'Udderly Ridiculous',
   headingAccent: 'Farm Experiences',
@@ -87,6 +89,55 @@ export function isFarmHoppingListing(input: {
   return title.includes('farm hopping') || slug.includes('farm-hopping')
 }
 
+const FAREHARBOR_SHORTNAME = 'udderlyridiculousfarmlife'
+
+export type BookingSource = {
+  bookingUrl?: string | null
+  bookingVerified?: boolean | null
+  bookingProvider?: string | null
+  fareharborItemId?: string | null
+  fareharborFlowId?: string | null
+}
+
+export type PublicBooking = {
+  href?: string
+  overlay: boolean
+}
+
+/**
+ * A booking action is shown only after an editor marks that exact link verified.
+ * FareHarbor item IDs are used only when the editor entered digits. This does
+ * not invent an item ID or turn on a stored URL by itself.
+ */
+export function resolvePublicBooking(source: BookingSource | null | undefined): PublicBooking {
+  if (source?.bookingVerified !== true) {
+    return { overlay: false }
+  }
+
+  if (source.bookingProvider === 'fareharbor') {
+    const itemId = source.fareharborItemId?.trim() ?? ''
+    if (!/^\d{3,}$/.test(itemId)) {
+      return { overlay: false }
+    }
+    const flow = source.fareharborFlowId?.trim() ?? ''
+    const flowQuery = /^\d{3,}$/.test(flow) ? `&flow=${flow}` : ''
+    return {
+      href: `https://fareharbor.com/embeds/book/${FAREHARBOR_SHORTNAME}/items/${itemId}/?full-items=yes${flowQuery}`,
+      overlay: true,
+    }
+  }
+
+  const href = publicBookingUrl(source.bookingUrl)
+  if (!href) {
+    return { overlay: false }
+  }
+
+  return {
+    href,
+    overlay: href.startsWith('https://fareharbor.com/embeds/book/'),
+  }
+}
+
 /** A booking action is allowed only for an absolute http(s) URL from Sanity. */
 export function publicBookingUrl(url: string | null | undefined): string | undefined {
   const trimmed = url?.trim() ?? ''
@@ -138,8 +189,8 @@ export function buildApprovedExperienceListing(
       description: optionalText(match?.shortDescription),
       priceDisplay: optionalText(match?.priceDisplay),
       duration: optionalText(match?.duration),
-      href: match ? documentPath('experience', match.slug) : undefined,
-      bookingUrl: match ? publicBookingUrl(match.bookingUrl) : undefined,
+      href: match ? documentPath('experience', publicExperienceSlug(match.slug)) : undefined,
+      bookingUrl: match ? resolvePublicBooking(match).href : undefined,
     }
   })
 
@@ -151,8 +202,8 @@ export function buildApprovedExperienceListing(
       description: optionalText(card.shortDescription),
       priceDisplay: optionalText(card.priceDisplay),
       duration: optionalText(card.duration),
-      href: documentPath('experience', card.slug),
-      bookingUrl: publicBookingUrl(card.bookingUrl),
+      href: documentPath('experience', publicExperienceSlug(card.slug)),
+      bookingUrl: resolvePublicBooking(card).href,
     }))
 
   return [...approved, ...extras]

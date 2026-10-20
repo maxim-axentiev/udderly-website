@@ -8,6 +8,7 @@ import { resolveExperienceDetail } from '@/lib/experiences/detail'
 import { TOWER_OF_GOATS_TITLE } from '@/lib/experiences/tower-of-goats'
 import { experienceBySlugQuery, experienceHubQuery } from '@/lib/sanity/queries'
 import type { ExperiencePageData } from '@/lib/sanity/types'
+import { experienceSlugAliases, publicExperienceSlug } from '@/lib/experiences/public-paths'
 import { routableExperienceSlug } from '@/lib/routes/paths'
 import { buildRobotsTxt } from '@/lib/seo/robots'
 
@@ -59,7 +60,11 @@ function htmlFor(page: ExperiencePageData) {
 
 describe('experience detail resolution', () => {
   it('keeps the published query on published, active experiences', () => {
+    expect(experienceBySlugQuery).toContain('slug.current in $slugs')
     expect(experienceBySlugQuery).toContain('active != false')
+    expect(experienceBySlugQuery).toContain('bookingVerified')
+    expect(experienceBySlugQuery).toContain('reviewsApproved')
+    expect(experienceBySlugQuery).not.toContain('relatedExperiences')
     expect(experienceBySlugQuery).toContain('seasonLabel')
     expect(experienceBySlugQuery).toContain('practicalTips')
     expect(experienceBySlugQuery).toContain('instructor')
@@ -196,6 +201,8 @@ describe('experience detail resolution', () => {
     const page = resolveExperienceDetail(experience({
       title: 'Goat Cuddles',
       slug: 'goat-cuddles',
+      bookingVerified: true,
+      bookingProvider: 'external',
       bookingUrl: 'https://example.com/book',
       priceDisplay: 'Test only $1',
       practicalTips: ['Wear clothes you can spare.', 'Placeholder tip. Ignore this.'],
@@ -241,6 +248,7 @@ describe('experience detail resolution', () => {
       practicalHeading: 'Before you visit\nRead this.',
       practicalTips: ['Mats are on the lawn.'],
       instructor: { heading: 'Meet your yoga instructor.', body: 'A real instructor bio.' },
+      reviewsApproved: true,
       testimonials: [{ _id: '1', quote: 'A real guest note.', guestName: 'Sam', source: null, sourceUrl: null, image: null }],
       animals: [{ _id: 'a', name: 'Pekoe', slug: 'pekoe', shortIntro: 'Shoelace inspector.', funFact: null, status: 'active', speciesTitle: 'Goat', profileImage: null }],
       welfareNote: 'The animals choose whether to join.',
@@ -307,6 +315,7 @@ describe('experience detail resolution', () => {
     const html = htmlFor(experience({
       title: 'Goat Cuddles',
       slug: 'goat-cuddles',
+      reviewsApproved: true,
       testimonials: [{ _id: '1', quote, guestName: 'Sam', source: null, sourceUrl: null, image: null }],
     }))
 
@@ -314,5 +323,126 @@ describe('experience detail resolution', () => {
     expect(html).toContain('aria-expanded="false"')
     expect(html).not.toContain(quote)
     expect(html).not.toContain('Five out of five')
+  })
+
+  it('hides reviews until they are explicitly approved', () => {
+    const page = resolveExperienceDetail(experience({
+      title: 'Goat Cuddles',
+      slug: 'goat-cuddles',
+      testimonials: [{ _id: '1', quote: 'A real guest note.', guestName: 'Sam', source: null, sourceUrl: null, image: null }],
+    }), images)
+
+    expect(page.reviews).toEqual([])
+  })
+
+  it('keeps an unverified booking URL off the page and builds a verified FareHarbor overlay', () => {
+    const stored = resolveExperienceDetail(experience({
+      title: 'Goat Cuddles',
+      slug: 'goat-cuddles',
+      bookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/?full-items=yes&flow=573099',
+    }), images)
+    const missingItem = resolveExperienceDetail(experience({
+      title: 'Goat Cuddles',
+      slug: 'goat-cuddles',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      bookingUrl: 'https://example.com/should-not-be-used',
+    }), images)
+    const overlay = resolveExperienceDetail(experience({
+      title: 'Goat Cuddles',
+      slug: 'goat-cuddles',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      fareharborItemId: '336824',
+      fareharborFlowId: '573099',
+    }), images)
+    const html = htmlFor(experience({
+      title: 'Goat Cuddles',
+      slug: 'goat-cuddles',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      fareharborItemId: '336824',
+    }))
+
+    expect(stored.bookingUrl).toBeUndefined()
+    expect(missingItem.bookingUrl).toBeUndefined()
+    expect(overlay.bookingUrl).toBe('https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/?full-items=yes&flow=573099')
+    expect(overlay.bookingOverlay).toBe(true)
+    expect(html).toContain('fareharbor.com/embeds/api/v1/?autolightframe=yes')
+    expect(html).toContain('href="https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/?full-items=yes"')
+  })
+
+  it('shows several ticket lines, an editable accent, and hides empty optional sections', () => {
+    const page = resolveExperienceDetail(experience({
+      title: 'Taste of Farm Life (Family Friendly)',
+      slug: 'taste-of-farm-life-family-friendly',
+      titleAccent: '(Family Friendly)',
+      priceOptions: [
+        { label: 'Adult', price: 'Confirmed later' },
+        { label: 'Placeholder child', price: 'Placeholder price' },
+      ],
+    }), images)
+    const html = htmlFor(experience({
+      title: 'Taste of Farm Life (Family Friendly)',
+      slug: 'taste-of-farm-life-family-friendly',
+      titleAccent: '(Family Friendly)',
+      priceOptions: [{ label: 'Adult', price: 'Confirmed later' }],
+    }))
+
+    expect(page.titleLead).toBe('Taste of Farm Life')
+    expect(page.titleAccent).toBe('(Family Friendly)')
+    expect(page.details[0]?.lines).toEqual(['Adult: Confirmed later'])
+    expect(page.faqs).toEqual([])
+    expect(page.animals).toEqual([])
+    expect(html).not.toContain('id="faqs"')
+    expect(html).not.toContain('id="meet-the-animals"')
+    expect(html).not.toContain('id="reviews"')
+  })
+
+  it('shows Limited Time on the two approved experiences and lets an editor hide it', () => {
+    const baby = resolveExperienceDetail(experience({
+      title: 'Baby Goat Playtime & Snuggles',
+      slug: 'baby-goat-playtime-and-snuggles',
+    }), images)
+    const hidden = resolveExperienceDetail(experience({
+      title: 'Baby Goat Playtime & Snuggles',
+      slug: 'baby-goat-playtime-and-snuggles',
+      badge: 'none',
+    }), images)
+    const html = htmlFor(experience({
+      title: 'Mini Highland Calf Meet & Greet',
+      slug: 'mini-highland-calf-meet-and-greet',
+    }))
+
+    expect(baby.badge).toBe('limited')
+    expect(hidden.badge).toBeUndefined()
+    expect(html).toContain('Limited Time')
+  })
+
+  it('adds shared welfare copy and resolves the approved donkey paths', () => {
+    const page = resolveExperienceDetail(experience({
+      title: 'Private Miniature Donkey Lunch Picnic',
+      slug: 'private-miniature-donkey-lunch-picnic',
+      welfareNote: 'This picnic adds a short rest for the donkeys.',
+    }), images, {
+      experienceWelfareBody: 'The herd gets real rest between visits.',
+      experienceAwardsTagline: 'A verified recognition line.',
+    })
+
+    expect(page.welfare?.paragraphs).toEqual([
+      'The herd gets real rest between visits.',
+      'This picnic adds a short rest for the donkeys.',
+    ])
+    expect(page.welfare?.image).toBeUndefined()
+    expect(page.awardsTagline).toBe('A verified recognition line.')
+    expect(publicExperienceSlug('private-miniature-donkey-lunch-picnic')).toBe('miniature-donkey-lunch-picnic')
+    expect(publicExperienceSlug('private-miniature-donkey-sunset-picnic')).toBe('miniature-donkey-sunset-picnic')
+    expect(experienceSlugAliases('miniature-donkey-lunch-picnic')).toEqual([
+      'miniature-donkey-lunch-picnic',
+      'private-miniature-donkey-lunch-picnic',
+    ])
+    expect(routableExperienceSlug('miniature-donkey-lunch-picnic')).toBe('miniature-donkey-lunch-picnic')
+    expect(routableExperienceSlug('private-miniature-donkey-lunch-picnic')).toBe('private-miniature-donkey-lunch-picnic')
+    expect(routableExperienceSlug('tower-of-goats-discovery-trail')).toBeUndefined()
   })
 })

@@ -9,24 +9,34 @@ import { towerOfGoatsLocation } from '@/lib/experiences/tower-of-goats'
 
 const REVIEW_LIMIT = 190
 
-function Lines({ lead, accent, className }: { lead: string; accent?: string; className: string }) {
+function Lines({
+  lead,
+  accent,
+  className,
+  accentClassName = 'text-stroke',
+}: {
+  lead: string
+  accent?: string
+  className: string
+  accentClassName?: string
+}) {
   return (
     <h2 className={className}>
       {lead}
       {accent ? (
         <>
           <br />
-          <span className="text-stroke">{accent}</span>
+          <span className={accentClassName}>{accent}</span>
         </>
       ) : null}
     </h2>
   )
 }
 
-function BookLink({ href, label }: { href?: string; label: string }) {
+function BookLink({ href, label, overlay }: { href?: string; label: string; overlay?: boolean }) {
   if (!href) return null
   return (
-    <ButtonLink href={href} external size="lg" className="mt-8">
+    <ButtonLink href={href} external={!overlay} openInNewTab={overlay ? false : undefined} size="lg" className="mt-8">
       {label}
     </ButtonLink>
   )
@@ -188,6 +198,13 @@ export function ExperienceDetail({
   const showPractical = Boolean(
     page.tips.length || page.visitorInfo || page.accessibilityInfo || page.cancellation,
   )
+  const awardsToShow = page.awardImages.length
+    ? page.awardImages.map((image) => ({ key: image.src, src: image.src, alt: image.alt }))
+    : awards.map((award) => ({
+        key: award.year,
+        src: award.src,
+        alt: `TripAdvisor Travellers' Choice Award ${award.year}`,
+      }))
 
   return (
     <>
@@ -197,6 +214,16 @@ export function ExperienceDetail({
         ) : null}
         <div className="absolute inset-0 -z-10 bg-headline/65" aria-hidden="true" />
         <Container width="brand" className="max-w-4xl py-24 text-center md:py-32">
+          {page.badge === 'limited' ? (
+            <p className="mb-6">
+              <span className="inline-block -rotate-3 rounded-full border-2 border-background bg-primary-accent px-3 py-1 font-display text-xs font-black uppercase text-primary-foreground">
+                Limited Time
+              </span>
+            </p>
+          ) : null}
+          {page.badge === 'signature' ? (
+            <p className="mb-6 font-accent text-xl italic text-secondary-accent">Ontario&apos;s Southwest Signature Experience</p>
+          ) : null}
           <h1 className="font-display text-[clamp(2.6rem,8vw,7rem)] font-black uppercase leading-[0.82] text-background">
             {page.titleLead ? `${page.titleLead} ` : ''}
             <span className="text-secondary-accent">{page.titleAccent}</span>
@@ -205,21 +232,24 @@ export function ExperienceDetail({
         </Container>
       </section>
 
+      {page.showAwards ? (
       <section aria-label="TripAdvisor awards" className="border-y-2 border-headline bg-farm-beige py-6">
         <Container width="brand" className="flex max-w-[1500px] flex-col items-center gap-5 md:flex-row md:justify-between">
           <div className="text-center md:max-w-[24rem] md:text-left">
-            <p className="font-display text-lg font-black uppercase leading-tight text-headline">TripAdvisor Travellers&apos; Choice</p>
+            <p className="font-display text-lg font-black uppercase leading-tight text-headline">{page.awardsTitle}</p>
             <p className="mt-1 text-sm font-semibold">{page.awardsTagline}</p>
           </div>
           <ul className="grid w-full max-w-72 grid-cols-2 place-items-center gap-5 md:flex md:w-auto md:max-w-none md:gap-7">
-            {awards.map((award, index) => (
-              <li key={award.year} className={index % 2 === 0 ? '-rotate-3' : 'rotate-3'}>
-                <img src={award.src} alt={`TripAdvisor Travellers' Choice Award ${award.year}`} width={1080} height={1080} loading="lazy" className="size-28 rounded-full border-2 border-headline object-cover shadow-[3px_3px_0_var(--color-headline)] md:size-24" />
+            {awardsToShow.map((award, index) => (
+              <li key={award.key} className={index % 2 === 0 ? '-rotate-3' : 'rotate-3'}>
+                <img src={award.src} alt={award.alt} width={1080} height={1080} loading="lazy" className="size-28 rounded-full border-2 border-headline object-cover shadow-[3px_3px_0_var(--color-headline)] md:size-24" />
               </li>
             ))}
           </ul>
         </Container>
       </section>
+      ) : null}
+      {page.bookingOverlay ? <script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async /> : null}
 
       {showIntroduction ? (
         <section id="experience-introduction" className="scroll-mt-20 overflow-hidden bg-background py-20 md:py-28">
@@ -235,7 +265,7 @@ export function ExperienceDetail({
                     <PortableTextRenderer value={page.description} />
                   </div>
                 ) : null}
-                <BookLink href={page.bookingUrl} label={page.bookingLabel} />
+                <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
               </div>
             </div>
             {page.details.length ? (
@@ -245,7 +275,9 @@ export function ExperienceDetail({
                   {page.details.map((detail, index) => (
                     <li key={detail.label} className={`border-2 border-headline bg-background p-4 shadow-[6px_6px_0_var(--color-headline)] ${index % 2 === 0 ? '-rotate-1' : 'rotate-1'}`}>
                       <span className="font-display text-sm font-black uppercase tracking-wide text-primary-accent">{detail.label}</span>
-                      <span className="mt-1 block font-display text-xl font-black uppercase leading-tight text-headline">{detail.value}</span>
+                      <span className="mt-1 block font-display text-xl font-black uppercase leading-tight text-headline">
+                        {detail.lines.map((line) => <span key={line} className="block">{line}</span>)}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -295,7 +327,27 @@ export function ExperienceDetail({
               ) : null}
             </div>
             <div className="mt-12 flex justify-center">
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} />
+              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {page.faqs.length ? (
+        <section id="faqs" className="bg-background py-20 md:py-28">
+          <Container width="brand" className="max-w-3xl">
+            <h2 className="font-display text-[clamp(2.4rem,6vw,4.5rem)] font-black uppercase leading-[0.85] text-headline">{page.faqsHeading}</h2>
+            <div className="mt-8 divide-y-2 divide-headline border-2 border-headline bg-background">
+              {page.faqs.map((faq) => (
+                <details key={faq.id} className="group p-5">
+                  <summary className="cursor-pointer list-none font-display text-xl font-black uppercase text-headline">
+                    {faq.question}
+                  </summary>
+                  <div className="pt-3 text-base leading-relaxed">
+                    <PortableTextRenderer value={faq.answer} />
+                  </div>
+                </details>
+              ))}
             </div>
           </Container>
         </section>
@@ -313,7 +365,7 @@ export function ExperienceDetail({
               </ScrollCarousel>
             </div>
             <div className="mt-10 flex justify-center">
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} />
+              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
             </div>
           </Container>
         </section>
@@ -323,9 +375,7 @@ export function ExperienceDetail({
         <section id="meet-the-animals" className="overflow-hidden bg-background py-20 md:py-28">
           <Container width="brand" className="max-w-[1500px]">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <h2 className="font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
-                Meet some of<br /><span className="text-primary-accent">the animals.</span>
-              </h2>
+              <Lines lead={page.animalsHeading.lead} accent={page.animalsHeading.accent} accentClassName="text-primary-accent" className="font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline" />
               <p className="max-w-md border-l-4 border-primary-accent pl-5 text-lg font-semibold">{page.animalsIntro}</p>
             </div>
             <div className="mt-14">
@@ -348,7 +398,11 @@ export function ExperienceDetail({
       {page.instructor ? (
         <section id="your-instructor" className="bg-farm-beige py-20 md:py-28">
           <Container width="brand" className="grid max-w-[1300px] items-center gap-14 lg:grid-cols-2">
-            {page.instructor.image ? <Photo image={page.instructor.image} className="aspect-[4/5] w-full border-2 border-headline object-cover" /> : null}
+            {page.instructor.images.length > 1 ? (
+              <Gallery images={page.instructor.images} />
+            ) : page.instructor.images[0] ? (
+              <Photo image={page.instructor.images[0]} className="aspect-[4/5] w-full border-2 border-headline object-cover" />
+            ) : null}
             <div>
               <p className="font-accent text-xl italic text-primary-accent">Your teacher for the hour</p>
               <h2 className="mt-3 font-display text-[clamp(2.6rem,6vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">{page.instructor.heading}</h2>
@@ -374,7 +428,7 @@ export function ExperienceDetail({
                   <PortableTextRenderer value={page.welfare.policy.content} />
                 </div>
               ) : null}
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} />
+              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
             </div>
           </Container>
         </section>
@@ -388,7 +442,7 @@ export function ExperienceDetail({
               <Lines lead={page.signature.lead} accent={page.signature.accent} className="mt-3 font-display text-[clamp(2.6rem,6vw,5.4rem)] font-black uppercase leading-[0.82] text-headline" />
               {page.signature.paragraphs.map((paragraph) => <p key={paragraph} className="mt-6 max-w-xl text-base leading-relaxed md:text-lg">{paragraph}</p>)}
               {page.signature.href ? <ButtonLink href={page.signature.href} external className="mt-8">Ontario&apos;s Southwest</ButtonLink> : null}
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} />
+              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
             </div>
             {page.signature.image ? <Photo image={page.signature.image} className="mx-auto h-auto w-full max-w-sm" /> : null}
           </Container>
@@ -404,7 +458,7 @@ export function ExperienceDetail({
               {page.feast.paragraphs.map((paragraph, index) => (
                 <p key={paragraph} className={`${index === 0 ? 'mt-6' : 'mt-4'} max-w-xl text-base leading-relaxed md:text-lg`}>{paragraph}</p>
               ))}
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} />
+              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
             </div>
             {page.feast.image && page.feast.href ? (
               <a href={page.feast.href} target="_blank" rel="noreferrer" className="order-1 mx-auto block w-full max-w-sm lg:order-2">

@@ -15,8 +15,8 @@ import goatIcon2 from '@/assets/herd/goat-icon-2.jpg'
 import donkeyPicnic from '@/assets/herd/donkey-picnic.jpg'
 import highlandHero from '@/assets/herd/highland-hero.jpg'
 import { routableExperienceSlug } from '@/lib/routes/paths'
-import { getExperienceBySlugFn } from '@/lib/sanity/server'
-import type { ExperiencePageData } from '@/lib/sanity/types'
+import { getExperienceBySlugFn, getExperienceFoundationFn } from '@/lib/sanity/server'
+import type { ExperienceFoundation, ExperiencePageData } from '@/lib/sanity/types'
 import { createExperienceHead } from '@/lib/seo/experience-head'
 
 const detailImages = {
@@ -50,9 +50,10 @@ export const Route = createFileRoute('/$')({
       })
     }
 
-    const experience = (await getExperienceBySlugFn({
-      data: slug,
-    })) as ExperiencePageData | null
+    const [experience, foundation] = await Promise.all([
+      getExperienceBySlugFn({ data: slug }) as Promise<ExperiencePageData | null>,
+      getExperienceFoundationFn() as Promise<ExperienceFoundation>,
+    ])
 
     if (!experience) {
       throw notFound({
@@ -62,7 +63,7 @@ export const Route = createFileRoute('/$')({
       })
     }
 
-    return { experience }
+    return { experience, foundation }
   },
   head: ({ loaderData }) => {
     if (!loaderData?.experience) {
@@ -75,7 +76,7 @@ export const Route = createFileRoute('/$')({
 })
 
 function ExperienceCatchAllPage() {
-  const { experience } = Route.useLoaderData()
+  const { experience, foundation } = Route.useLoaderData()
 
-  return <ExperienceTemplate experience={experience} images={detailImages} awards={detailAwards} />
+  return <ExperienceTemplate experience={experience} images={detailImages} awards={detailAwards} foundation={foundation} />
 }

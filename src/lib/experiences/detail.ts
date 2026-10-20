@@ -1,6 +1,7 @@
 import { cmsImageUrl, isSanityImage } from '@/lib/sanity/image'
 import type {
   AnimalCardData,
+  ExperienceFoundation,
   ExperiencePageData,
   PolicyContent,
   PortableTextContent,
@@ -8,7 +9,8 @@ import type {
   TestimonialItem,
 } from '@/lib/sanity/types'
 
-import { FEAST_ON, publicBookingUrl } from './approved-listing'
+import { FEAST_ON, publicBookingUrl, resolvePublicBooking } from './approved-listing'
+import { LIMITED_TIME_EXPERIENCE_SLUGS, publicExperienceSlug } from './public-paths'
 import type { HubImageKey } from './hub-page'
 
 /**
@@ -31,8 +33,10 @@ export type ExperienceDetailModel = {
   introduction?: { lead: string; accent?: string }
   description?: PortableTextContent
   gallery: DetailPicture[]
-  details: Array<{ label: string; value: string }>
+  badge?: 'limited' | 'signature'
+  details: Array<{ label: string; value: string; lines: string[] }>
   bookingUrl?: string
+  bookingOverlay: boolean
   bookingLabel: string
   practical?: { lead: string; accent?: string }
   tips: string[]
@@ -41,9 +45,12 @@ export type ExperienceDetailModel = {
   cancellation?: NonNullable<PolicyContent>
   reviewsHeading: string
   reviews: Array<{ quote: string; name: string }>
+  faqsHeading: string
+  faqs: Array<{ id: string; question: string; answer: PortableTextContent }>
+  animalsHeading: { lead: string; accent?: string }
   animalsIntro: string
   animals: Array<{ name: string; lines: string[]; image?: DetailPicture }>
-  instructor?: { heading: string; paragraphs: string[]; image?: DetailPicture }
+  instructor?: { heading: string; paragraphs: string[]; images: DetailPicture[] }
   welfare?: {
     lead: string
     accent?: string
@@ -70,6 +77,9 @@ export type ExperienceDetailModel = {
   newsletter: { title: string; copy: string; unavailable: string }
   location: { headingLead: string; headingAccent: string; note: string }
   awardsTagline: string
+  awardsTitle: string
+  showAwards: boolean
+  awardImages: DetailPicture[]
 }
 
 const SEASON_LABELS: Record<string, string> = {
@@ -135,10 +145,35 @@ function designedLines(value: string | undefined, lead: string, accent: string):
   return { lead: value }
 }
 
-function titleLines(title: string): { lead: string; accent: string } {
-  const words = title.trim().split(/\s+/)
-  if (words.length < 2) return { lead: '', accent: title.trim() }
+function titleLines(title: string, accent: string | undefined): { lead: string; accent: string } {
+  const trimmed = title.trim()
+  if (accent && trimmed.endsWith(accent) && trimmed !== accent) {
+    return { lead: trimmed.slice(0, -accent.length).trim(), accent }
+  }
+  if (accent) return { lead: trimmed, accent }
+  const words = trimmed.split(/\s+/)
+  if (words.length < 2) return { lead: '', accent: trimmed }
   return { lead: words.slice(0, -1).join(' '), accent: words[words.length - 1] }
+}
+
+function experienceBadge(experience: ExperiencePageData): ExperienceDetailModel['badge'] {
+  if (experience.badge === 'none') return undefined
+  if (experience.badge === 'limited' || experience.badge === 'signature') return experience.badge
+  const slug = publicExperienceSlug(experience.slug)
+  if ((LIMITED_TIME_EXPERIENCE_SLUGS as readonly string[]).includes(slug)) return 'limited'
+  return undefined
+}
+
+function priceLines(experience: ExperiencePageData): string[] {
+  const options = (experience.priceOptions ?? []).flatMap((option) => {
+    const price = clean(option?.price, 40)
+    if (!price) return []
+    const label = clean(option?.label, 80)
+    return [label ? `${label}: ${price}` : price]
+  })
+  if (options.length) return options
+  const single = clean(experience.priceDisplay, 80)
+  return single ? [single] : []
 }
 
 function picture(image: SanityImage | undefined, width: number): DetailPicture | undefined {
@@ -217,19 +252,20 @@ function animalCards(
 
 function detailFacts(experience: ExperiencePageData): ExperienceDetailModel['details'] {
   const season = clean(experience.seasonLabel, 80) ?? (experience.season ? SEASON_LABELS[experience.season] : undefined)
-  const pairs: Array<[string, string | undefined]> = [
-    ['Price', clean(experience.priceDisplay, 80)],
-    ['Duration', clean(experience.duration, 80)],
-    ['Capacity', clean(experience.groupSize, 80)],
-    ['Age', clean(experience.ageGuidance, 80)],
-    ['Season', season],
+  const pairs: Array<[string, string[]]> = [
+    ['Price', priceLines(experience)],
+    ['Duration', [clean(experience.duration, 80)].filter((value): value is string => Boolean(value))],
+    ['Capacity', [clean(experience.groupSize, 80)].filter((value): value is string => Boolean(value))],
+    ['Age', [clean(experience.ageGuidance, 80)].filter((value): value is string => Boolean(value))],
+    ['Season', [season].filter((value): value is string => Boolean(value))],
   ]
-  return pairs.flatMap(([label, value]) => (value ? [{ label, value }] : []))
+  return pairs.flatMap(([label, lines]) => (lines.length ? [{ label, value: lines.join('\n'), lines }] : []))
 }
 
 export function resolveExperienceDetail(
   experience: ExperiencePageData,
   images: Partial<Record<DetailImageKey, string>> = {},
+  foundation: ExperienceFoundation = null,
 ): ExperienceDetailModel {
   const slug = experience.slug
   const localGallery = speciesGallery(slug).flatMap((key) => {
@@ -242,33 +278,57 @@ export function resolveExperienceDetail(
   })
   const gallery = cmsGallery.length ? cmsGallery : localGallery
   const hero = picture(experience.heroImage, 1920) ?? gallery[0]
-  const title = titleLines(clean(experience.title, 120) ?? experience.title)
+  const title = titleLines(clean(experience.title, 120) ?? experience.title, clean(experience.titleAccent, 80))
+  const booking = resolvePublicBooking(experience)
   const introduction = clean(experience.introductionHeading, 120)
   const practical = clean(experience.practicalHeading, 120)
   const instructorParagraphs = paragraphs(clean(experience.instructor?.body))
   const instructorHeading = clean(experience.instructor?.heading, 120)
+  const instructorSource = experience.instructor?.gallery?.length
+    ? experience.instructor.gallery
+    : [experience.instructor?.image]
+  const instructorImages = instructorSource.flatMap((image) => {
+    const photo = picture(image, 1200)
+    return photo ? [photo] : []
+  })
   const feastEnabled = experience.feastOn?.enabled === true
   const signatureEnabled = experience.signatureExperience?.enabled === true
   const feastBody = paragraphs(clean(experience.feastOn?.body))
   const feastHeading = clean(experience.feastOn?.heading, 120)
   const signatureBody = paragraphs(clean(experience.signatureExperience?.body))
   const signatureHeading = clean(experience.signatureExperience?.heading, 120)
-  const welfareParagraphs = paragraphs(clean(experience.welfareNote))
+  const welfareParagraphs = [
+    ...paragraphs(clean(foundation?.experienceWelfareBody)),
+    ...paragraphs(clean(experience.welfareNote)),
+  ]
   const welfarePolicy = policyContent(experience.welfarePolicy)
-  const welfareHeading = clean(experience.welfareHeading, 120)
+  const welfareHeading = clean(experience.welfareHeading, 120) ?? clean(foundation?.experienceWelfareHeading, 120)
+  const sharedWelfareImage = picture(foundation?.experienceWelfareImage ?? undefined, 1200)
   const cancellation = policyContent(experience.cancellationPolicy)
+  const awardImages = (foundation?.experienceAwardImages ?? []).flatMap((image) => {
+    const photo = picture(image, 640)
+    return photo ? [photo] : []
+  })
+  const faqs = (experience.faqs ?? []).flatMap((faq) => {
+    const question = clean(faq.question, 180)
+    const answer = usablePortableText(faq.answer)
+    if (!question || !answer) return []
+    return [{ id: faq._id, question, answer }]
+  })
 
   return {
     titleLead: title.lead,
     titleAccent: title.accent,
+    badge: experienceBadge(experience),
     hero,
-    intro: clean(experience.shortDescription, 300),
+    intro: clean(experience.heroIntro, 400) ?? clean(experience.shortDescription, 300),
     introduction: introduction ? designedLines(introduction, introduction, '') : undefined,
     description: usablePortableText(experience.body),
     gallery,
     details: detailFacts(experience),
-    bookingUrl: publicBookingUrl(experience.bookingUrl),
-    bookingLabel: `Book ${clean(experience.title, 120) ?? experience.title}`,
+    bookingUrl: booking.href,
+    bookingOverlay: booking.overlay,
+    bookingLabel: clean(experience.bookingCtaLabel, 80) ?? `Book ${clean(experience.title, 120) ?? experience.title}`,
     practical: practical ? designedLines(practical, practical, '') : undefined,
     tips: (experience.practicalTips ?? []).flatMap((tip) => {
       const value = clean(tip, 240)
@@ -278,14 +338,17 @@ export function resolveExperienceDetail(
     accessibilityInfo: usablePortableText(experience.accessibilityInfo),
     cancellation,
     reviewsHeading: clean(experience.reviewsHeading, 120) ?? 'Reviews',
-    reviews: reviewItems(experience.testimonials),
-    animalsIntro: 'There are a lot more animals than this. These are a few of the personalities who might be part of your visit.',
+    reviews: experience.reviewsApproved === true ? reviewItems(experience.testimonials) : [],
+    faqsHeading: clean(experience.faqsHeading, 80) ?? 'FAQs',
+    faqs,
+    animalsHeading: designedLines(clean(experience.animalsHeading, 120), 'Meet some of', 'the animals.'),
+    animalsIntro: clean(experience.animalsIntro, 300) ?? 'There are a lot more animals than this. These are a few of the personalities who might be part of your visit.',
     animals: animalCards(experience.animals),
-    instructor: instructorHeading || instructorParagraphs.length
+    instructor: instructorHeading || instructorParagraphs.length || instructorImages.length
       ? {
           heading: instructorHeading ?? 'Your instructor',
           paragraphs: instructorParagraphs,
-          image: picture(experience.instructor?.image, 1200),
+          images: instructorImages,
         }
       : undefined,
     welfare: welfareParagraphs.length || welfarePolicy
@@ -293,7 +356,7 @@ export function resolveExperienceDetail(
           ...(welfareHeading ? designedLines(welfareHeading, welfareHeading, '') : { lead: 'Animal care' }),
           paragraphs: welfareParagraphs,
           policy: welfarePolicy,
-          image: speciesKey(slug) === 'goat' ? localPicture('goat-icon-2', images) : undefined,
+          image: sharedWelfareImage ?? (speciesKey(slug) === 'goat' ? localPicture('goat-icon-2', images) : undefined),
         }
       : undefined,
     signature: signatureEnabled
@@ -320,6 +383,9 @@ export function resolveExperienceDetail(
       : undefined,
     newsletter: SHARED_NEWSLETTER,
     location: SHARED_LOCATION,
-    awardsTagline: 'Top 10% of attractions worldwide by Tripadvisor.',
+    awardsTitle: clean(foundation?.experienceAwardsTitle, 80) ?? "TripAdvisor Travellers' Choice",
+    awardsTagline: clean(foundation?.experienceAwardsTagline, 160) ?? 'Top 10% of attractions worldwide by Tripadvisor.',
+    showAwards: foundation?.experienceAwardsEnabled !== false,
+    awardImages,
   }
 }

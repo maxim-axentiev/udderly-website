@@ -3,6 +3,7 @@ import {
   type CmsExperiencesHubDocument,
   type ExperiencesHubContent,
 } from '@/lib/experiences/hub'
+import { experienceSlugAliases, publicExperienceSlug } from '@/lib/experiences/public-paths'
 import type { CmsHomepageDocument } from '@/lib/homepage/cms'
 import { homepageContentOrFixture } from '@/lib/homepage/cms'
 import type { HomepageContent } from '@/lib/homepage/model'
@@ -12,6 +13,7 @@ import type { CmsNavigation, CmsSiteSettings, SiteChromeDocuments } from '@/lib/
 import { sanityClient } from './client'
 import {
   experienceBySlugQuery,
+  experienceFoundationQuery,
   experienceHubQuery,
   experienceSitemapSlugsQuery,
   adoptionOfferingsQuery,
@@ -27,7 +29,7 @@ import {
 import type { PublishedAdoption } from '@/lib/adopt/resolve'
 import type { PublishedListing } from '@/lib/sale/resolve'
 
-import type { ExperienceCardData, ExperiencePageData } from './types'
+import type { ExperienceCardData, ExperienceFoundation, ExperiencePageData } from './types'
 
 const CHROME_FETCH_TIMEOUT_MS = 4000
 
@@ -52,7 +54,7 @@ export async function fetchExperienceBySlug(
 ): Promise<ExperiencePageData | null> {
   const experience = await sanityClient.fetch<ExperiencePageData | null>(
     experienceBySlugQuery,
-    { slug },
+    { slug, slugs: experienceSlugAliases(slug) },
   )
 
   if (!experience?.slug || !experience.title) {
@@ -99,7 +101,15 @@ export async function fetchExperienceSitemapSlugs(): Promise<string[]> {
     experienceSitemapSlugsQuery,
   )
 
-  return (slugs ?? []).filter(Boolean)
+  return [...new Set((slugs ?? []).filter(Boolean).map(publicExperienceSlug))]
+}
+
+export async function fetchExperienceFoundation(): Promise<ExperienceFoundation> {
+  try {
+    return await sanityClient.fetch<ExperienceFoundation>(experienceFoundationQuery)
+  } catch {
+    return null
+  }
 }
 
 export async function fetchSiteChromeDocuments(): Promise<SiteChromeDocuments> {

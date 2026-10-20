@@ -1,9 +1,13 @@
 import { cmsImageUrl } from '@/lib/sanity/image'
 import { createPageHead, type PageHead } from '@/lib/seo/page-head'
 import type { ExperiencePageData } from '@/lib/sanity/types'
+import { publicExperienceSlug } from '@/lib/experiences/public-paths'
 import { SITE_NAME } from '@/lib/site'
 
-export function createExperienceHead(experience: ExperiencePageData): PageHead {
+export function createExperienceHead(
+  experience: ExperiencePageData,
+  env?: Record<string, string | undefined>,
+): PageHead {
   const title = experience.seo?.title?.trim() || `${experience.title} | ${SITE_NAME}`
   const description =
     experience.seo?.description?.trim() ||
@@ -16,9 +20,9 @@ export function createExperienceHead(experience: ExperiencePageData): PageHead {
   return createPageHead({
     title,
     description,
-    path: `/${experience.slug}`,
+    path: `/${publicExperienceSlug(experience.slug)}`,
     imageUrl,
     noindex: Boolean(experience.seo?.noIndex),
     ogType: 'website',
-  })
+  }, env)
 }

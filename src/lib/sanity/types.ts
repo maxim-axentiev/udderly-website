@@ -95,11 +95,29 @@ export type ExperiencePageData = {
   practicalTips?: string[] | null
   visitorInfo: PortableTextContent
   accessibilityInfo: PortableTextContent
+  heroIntro?: string | null
+  titleAccent?: string | null
+  badge?: string | null
+  priceOptions?: Array<{ label?: string | null; price?: string | null }> | null
   bookingUrl: string | null
-  instructor?: { heading?: string | null; body?: string | null; image?: SanityImage } | null
+  bookingVerified?: boolean | null
+  bookingProvider?: string | null
+  fareharborItemId?: string | null
+  fareharborFlowId?: string | null
+  bookingCtaLabel?: string | null
+  instructor?: {
+    heading?: string | null
+    body?: string | null
+    image?: SanityImage
+    gallery?: SanityImage[] | null
+  } | null
   feastOn?: ExperienceStatement
   signatureExperience?: ExperienceStatement
   reviewsHeading?: string | null
+  reviewsApproved?: boolean | null
+  animalsHeading?: string | null
+  animalsIntro?: string | null
+  faqsHeading?: string | null
   welfareHeading?: string | null
   welfareNote?: string | null
   animals: AnimalCardData[] | null
@@ -122,6 +140,20 @@ export type ExperienceCardData = {
   sessionType: string | null
   ageGuidance: string | null
   bookingUrl: string | null
+  bookingVerified?: boolean | null
+  bookingProvider?: string | null
+  fareharborItemId?: string | null
+  fareharborFlowId?: string | null
   heroImage: SanityImage
   animalSpecies: Array<{ title: string | null }> | null
 }
+
+export type ExperienceFoundation = {
+  experienceAwardsEnabled?: boolean | null
+  experienceAwardsTitle?: string | null
+  experienceAwardsTagline?: string | null
+  experienceAwardImages?: SanityImage[] | null
+  experienceWelfareHeading?: string | null
+  experienceWelfareBody?: string | null
+  experienceWelfareImage?: SanityImage | null
+} | null

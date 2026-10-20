@@ -12,13 +12,16 @@ const altImage = `{
   }
 }`
 
-export const experienceBySlugQuery = `*[_type == "experience" && slug.current == $slug && active != false][0]{
+export const experienceBySlugQuery = `*[_type == "experience" && slug.current in $slugs && active != false] | order(select(slug.current == $slug => 0, 1))[0]{
   _id,
   title,
+  titleAccent,
   "slug": slug.current,
   shortDescription,
+  heroIntro,
   introductionHeading,
   body,
+  badge,
   heroImage ${altImage},
   gallery[] ${altImage},
   category,
@@ -27,6 +30,7 @@ export const experienceBySlugQuery = `*[_type == "experience" && slug.current ==
   seasonLabel,
   duration,
   priceDisplay,
+  priceOptions[]{ label, price },
   groupSize,
   sessionType,
   ageGuidance,
@@ -35,10 +39,19 @@ export const experienceBySlugQuery = `*[_type == "experience" && slug.current ==
   visitorInfo,
   accessibilityInfo,
   bookingUrl,
+  bookingVerified,
+  bookingProvider,
+  fareharborItemId,
+  fareharborFlowId,
+  bookingCtaLabel,
+  animalsHeading,
+  animalsIntro,
+  faqsHeading,
   instructor {
     heading,
     body,
-    image ${altImage}
+    image ${altImage},
+    gallery[] ${altImage}
   },
   feastOn { enabled, kicker, heading, body, href },
   signatureExperience {
@@ -50,6 +63,7 @@ export const experienceBySlugQuery = `*[_type == "experience" && slug.current ==
     image ${altImage}
   },
   reviewsHeading,
+  reviewsApproved,
   welfareHeading,
   welfareNote,
   "animals": animals[]->{
@@ -110,11 +124,25 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
   sessionType,
   ageGuidance,
   bookingUrl,
+  bookingVerified,
+  bookingProvider,
+  fareharborItemId,
+  fareharborFlowId,
   heroImage ${altImage},
   animalSpecies[]->{ title }
 }`
 
 export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(slug.current)].slug.current`
+
+export const experienceFoundationQuery = `*[_id == "siteSettings"][0]{
+  experienceAwardsEnabled,
+  experienceAwardsTitle,
+  experienceAwardsTagline,
+  experienceAwardImages[] ${altImage},
+  experienceWelfareHeading,
+  experienceWelfareBody,
+  experienceWelfareImage ${altImage}
+}`
 
 export const adoptionOfferingsQuery = `*[_type == "adoptionOffering"] | order(sortOrder asc, title asc){
   _id,

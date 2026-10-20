@@ -111,6 +111,7 @@ describe('experiences hub page resolution', () => {
         title: 'Goat Cuddles',
         slug: 'goat-cuddles',
         shortDescription: 'A published description.',
+        bookingVerified: true,
         bookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/',
       }),
     ])
@@ -122,6 +123,35 @@ describe('experiences hub page resolution', () => {
     expect(page.cards[2]?.href).toBe('/goat-cuddles')
     expect(page.cards[2]?.description).toBe('A published description.')
     expect(page.cards[2]?.bookingUrl).toContain('https://fareharbor.com/')
+    expect(page.cards[2]?.bookingOverlay).toBe(true)
+  })
+
+  it('keeps an unverified experience booking link off the hub card', () => {
+    const page = resolveExperiencesHubPage({
+      experienceCards: [{ title: 'Goat Cuddles', slug: 'goat-cuddles', sortOrder: 1 }],
+    }, [
+      experience({
+        title: 'Goat Cuddles',
+        slug: 'goat-cuddles',
+        bookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/',
+      }),
+    ])
+
+    expect(page.cards[0]?.href).toBe('/goat-cuddles')
+    expect(page.cards[0]?.bookingUrl).toBeUndefined()
+  })
+
+  it('links a stored private donkey slug to the approved public path', () => {
+    const page = resolveExperiencesHubPage({
+      experienceCards: [{ title: 'Private Miniature Donkey Lunch Picnic', slug: 'private-miniature-donkey-lunch-picnic', sortOrder: 1 }],
+    }, [
+      experience({
+        title: 'Private Miniature Donkey Lunch Picnic',
+        slug: 'private-miniature-donkey-lunch-picnic',
+      }),
+    ])
+
+    expect(page.cards[0]?.href).toBe('/miniature-donkey-lunch-picnic')
   })
 
   it('keeps a card when its image or link is missing', () => {

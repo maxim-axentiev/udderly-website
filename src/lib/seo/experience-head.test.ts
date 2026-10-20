@@ -47,6 +47,19 @@ describe('createExperienceHead', () => {
     })
   })
 
+  it('canonicalizes the stored private donkey slug to the approved path', () => {
+    const head = createExperienceHead({
+      ...experience,
+      title: 'Private Miniature Donkey Lunch Picnic',
+      slug: 'private-miniature-donkey-lunch-picnic',
+    }, { PUBLIC_CANONICAL_ORIGIN: 'https://staging.udderlyridiculousfarmlife.com' })
+
+    expect(head.links).toContainEqual({
+      rel: 'canonical',
+      href: 'https://staging.udderlyridiculousfarmlife.com/miniature-donkey-lunch-picnic',
+    })
+  })
+
   it('does not emit a canonical URL without PUBLIC_CANONICAL_ORIGIN', () => {
     const head = createPageHead(
       {

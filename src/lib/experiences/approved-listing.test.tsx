@@ -117,6 +117,7 @@ describe('approved experiences listing', () => {
         slug: 'goat-cuddles',
         shortDescription: 'Snuggle with playful baby goats in a cozy barn.',
         priceDisplay: '$18 for ages 2-5. $29.50 for ages 6+',
+        bookingVerified: true,
         bookingUrl: FAREHARBOR,
       }),
       card({

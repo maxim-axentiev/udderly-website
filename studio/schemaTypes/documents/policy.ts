@@ -21,7 +21,7 @@ export const policy = defineType({
       name: 'heading',
       title: 'Public heading',
       type: 'string',
-      description: 'Optional heading shown on the website. Leave blank to use the internal name.',
+      description: 'Optional heading shown on the website. Leave blank to use the internal name. Do not publish this policy until the wording is approved.',
     }),
     defineField({
       name: 'policyType',
@@ -34,6 +34,7 @@ export const policy = defineType({
       name: 'content',
       title: 'Policy content',
       type: 'portableText',
+      description: 'Experience pages show this only after the policy itself is published. Draft wording stays off the website.',
       validation: (rule) => rule.required(),
     }),
     activeField('In use'),

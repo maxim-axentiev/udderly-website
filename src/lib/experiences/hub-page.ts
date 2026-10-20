@@ -7,7 +7,9 @@ import {
   TOWER_OF_GOATS_PATH,
   isFarmHoppingListing,
   publicBookingUrl,
+  resolvePublicBooking,
 } from './approved-listing'
+import { experienceSlugAliases, publicExperienceSlug } from './public-paths'
 
 export type HubImageKey =
   | 'hero'
@@ -40,6 +42,7 @@ export type HubExperienceCard = {
   image?: HubPicture
   href?: string
   bookingUrl?: string
+  bookingOverlay?: boolean
 }
 
 export type HubCategory = {
@@ -340,18 +343,26 @@ function records(value: unknown): Record<string, unknown>[] | null {
   return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
 }
 
+function publishedMatch(slug: string | undefined, published: readonly ExperienceCardData[]) {
+  if (!slug) return undefined
+  const keys = new Set(experienceSlugAliases(slug))
+  return published.find((item) => keys.has(item.slug))
+}
+
 function overlayPublished(
   entry: HubExperienceCard,
   published: readonly ExperienceCardData[],
 ): HubExperienceCard {
-  const match = entry.slug ? published.find((item) => item.slug === entry.slug) : undefined
+  const match = publishedMatch(entry.slug, published)
   if (!match) return entry
+  const booking = resolvePublicBooking(match)
   return {
     ...entry,
     title: match.title.trim() || entry.title,
     description: text(match.shortDescription, 500) ?? entry.description,
-    href: `/${match.slug}`,
-    bookingUrl: publicBookingUrl(match.bookingUrl),
+    href: `/${publicExperienceSlug(match.slug)}`,
+    bookingUrl: booking.href,
+    bookingOverlay: booking.overlay,
   }
 }
 
@@ -498,19 +509,24 @@ export function resolveExperiencesHubPage(
   const baseCards = cmsCards
     ? cardsFromCms(cmsCards, visible, publishedSlugs)
     : lovableCards.map((entry) => overlayPublished(entry, visible))
-  const used = new Set(baseCards.map((entry) => entry.slug).filter(Boolean))
+  const used = new Set(baseCards.flatMap((entry) => (entry.slug ? experienceSlugAliases(entry.slug) : [])))
   const extras = cmsCards
     ? []
     : visible
-        .filter((item) => !used.has(item.slug))
-        .map((item) => ({
-          key: item._id,
-          title: item.title.trim(),
-          slug: item.slug,
-          description: text(item.shortDescription, 500),
-          href: `/${item.slug}`,
-          bookingUrl: publicBookingUrl(item.bookingUrl),
-        }))
+        .filter((item) => !experienceSlugAliases(item.slug).some((slug) => used.has(slug)))
+        .map((item) => {
+          const booking = resolvePublicBooking(item)
+          const slug = publicExperienceSlug(item.slug)
+          return {
+            key: item._id,
+            title: item.title.trim(),
+            slug,
+            description: text(item.shortDescription, 500),
+            href: `/${slug}`,
+            bookingUrl: booking.href,
+            bookingOverlay: booking.overlay,
+          }
+        })
 
   const feastFallback: HubStatement = {
     kicker: FEAST_ON.kicker,

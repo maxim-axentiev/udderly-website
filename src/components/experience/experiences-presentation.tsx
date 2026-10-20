@@ -84,6 +84,9 @@ export function ExperiencesPresentation({
 
   return (
     <>
+      {page.cards.some((card) => card.bookingOverlay) ? (
+        <script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async />
+      ) : null}
       <section className="relative isolate flex min-h-[72vh] items-center justify-center overflow-hidden">
         {heroSrc ? (
           <img
@@ -211,7 +214,7 @@ export function ExperiencesPresentation({
                             </ButtonLink>
                           ) : null}
                           {experience.bookingUrl ? (
-                            <ButtonLink href={experience.bookingUrl} external className="w-full">
+                            <ButtonLink href={experience.bookingUrl} external={!experience.bookingOverlay} openInNewTab={experience.bookingOverlay ? false : undefined} className="w-full">
                               Book Experience
                             </ButtonLink>
                           ) : null}
