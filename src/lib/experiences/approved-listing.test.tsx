@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import { ExperiencesPresentation } from '@/components/experience/experiences-presentation'
+import { resolveExperiencesHubPage } from '@/lib/experiences/hub-page'
 import { TowerOfGoatsPage } from '@/components/experience/tower-of-goats-page'
 import {
   APPROVED_EXPERIENCES,
@@ -48,15 +49,34 @@ const towerImages = {
   awards: [{ year: '2026', src: '/award-2026.png' }],
 } as const
 
+const hubImages = {
+  hero: '/hero.png',
+  feast: '/feast.webp',
+  goats: '/goats.webp',
+  glamping: '/glamping.webp',
+  training: '/training.webp',
+  calves: '/calves.webp',
+  'ice-cream': '/ice-cream.webp',
+  'goat-cuddles': '/goat-cuddles.jpg',
+  'highland-hero': '/highland.jpg',
+  'highland-cta': '/highland-cta.jpg',
+  'alpaca-walk': '/alpaca.jpg',
+  'donkey-picnic': '/donkey.jpg',
+} as const
+
+function renderHub(published: ExperienceCardData[] = []) {
+  return renderToStaticMarkup(
+    <ExperiencesPresentation
+      page={resolveExperiencesHubPage(null, published)}
+      images={hubImages}
+      reviewsFeed={{ available: false }}
+    />,
+  )
+}
+
 describe('approved experiences listing', () => {
   it('renders the Lovable hero, experience names, and Feast On section', () => {
-    const html = renderToStaticMarkup(
-      <ExperiencesPresentation
-        heroSrc="/hero.png"
-        feastSrc="/feast.webp"
-        cards={buildApprovedExperienceListing([])}
-      />,
-    )
+    const html = renderHub()
 
     expect(html).toContain(EXPERIENCES_HERO.headingLead)
     expect(html).toContain(EXPERIENCES_HERO.headingAccent)
@@ -67,14 +87,11 @@ describe('approved experiences listing', () => {
     expect(html).not.toContain('Placeholder')
     expect(html).not.toContain('Farm Hopping')
     expect(html).not.toContain('#book')
-    expect(html).not.toContain('#farm-experiences')
+    expect(html).toContain('href="#farm-experiences"')
   })
 
   it('lists the approved names and leaves unpublished experiences without a booking action', () => {
-    const cards = buildApprovedExperienceListing([])
-    const html = renderToStaticMarkup(
-      <ExperiencesPresentation heroSrc="/hero.png" feastSrc="/feast.webp" cards={cards} />,
-    ).replaceAll('&amp;', '&')
+    const html = renderHub().replaceAll('&amp;', '&')
 
     for (const entry of APPROVED_EXPERIENCES) {
       expect(html).toContain(entry.name)
@@ -89,7 +106,7 @@ describe('approved experiences listing', () => {
       true,
     )
 
-    const cards = buildApprovedExperienceListing([
+    const html = renderHub([
       card({
         title: 'The Farm Hopping Experience',
         slug: 'farm-hopping',
@@ -108,10 +125,6 @@ describe('approved experiences listing', () => {
         shortDescription: 'Meet the hives.',
       }),
     ])
-
-    const html = renderToStaticMarkup(
-      <ExperiencesPresentation heroSrc="/hero.png" feastSrc="/feast.webp" cards={cards} />,
-    )
 
     expect(html).not.toContain('Farm Hopping')
     expect(html).toContain('Snuggle with playful baby goats in a cozy barn.')

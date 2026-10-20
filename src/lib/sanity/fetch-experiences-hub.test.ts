@@ -38,7 +38,8 @@ describe('experiences hub fetch', () => {
     expect(sanityClient.fetch).toHaveBeenCalledWith(experiencesHubContentQuery)
     expect(experiencesHubContentQuery).toContain('*[_id == "experiencesHub"][0]')
     expect(experiencesHubContentQuery).not.toContain('drafts.')
-    expect(experiencesHubContentQuery).not.toContain('bookingUrl')
+    expect(experiencesHubContentQuery).not.toContain('_type == "experience"')
+    expect(experiencesHubContentQuery).toContain('experienceCards')
   })
 
   it('returns null when the hub query fails', async () => {

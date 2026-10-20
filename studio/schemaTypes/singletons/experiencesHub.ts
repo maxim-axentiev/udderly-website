@@ -1,10 +1,45 @@
 import {DocumentTextIcon} from '../../lib/icons'
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 
 /**
- * Fixed Experiences hub document. Experience cards stay on experience documents.
- * The website uses this document only when every required field is present.
+ * Fixed Experiences hub document. New section fields are optional so the
+ * published document keeps working when they are absent.
  */
+
+const hubFeatureMember = () =>
+  defineArrayMember({
+    type: 'object',
+    fields: [
+      defineField({name: 'kicker', title: 'Kicker', type: 'string', validation: (rule) => rule.max(40)}),
+      defineField({name: 'title', title: 'Title', type: 'string', validation: (rule) => rule.required().max(120)}),
+      defineField({name: 'copy', title: 'Copy', type: 'text', rows: 4, validation: (rule) => rule.max(800)}),
+      defineField({name: 'season', title: 'Season', type: 'string', validation: (rule) => rule.max(80)}),
+      defineField({name: 'age', title: 'Age', type: 'string', validation: (rule) => rule.max(40)}),
+      defineField({name: 'image', title: 'Image', type: 'altImage'}),
+      defineField({name: 'learnMoreHref', title: 'Learn more link', type: 'string'}),
+      defineField({name: 'ctaLabel', title: 'Button label', type: 'string', validation: (rule) => rule.max(60)}),
+      defineField({name: 'ctaHref', title: 'Button link', type: 'string'}),
+      defineField({name: 'limited', title: 'Limited time', type: 'boolean'}),
+      defineField({name: 'sortOrder', title: 'Display order', type: 'number'}),
+    ],
+    preview: {select: {title: 'title', subtitle: 'kicker'}},
+  })
+
+const hubStatementFields = () => [
+  defineField({name: 'kicker', title: 'Kicker', type: 'string', validation: (rule) => rule.max(80)}),
+  defineField({name: 'heading', title: 'Heading', type: 'string', validation: (rule) => rule.max(120)}),
+  defineField({name: 'body', title: 'Body', type: 'text', rows: 5, validation: (rule) => rule.max(800)}),
+  defineField({name: 'href', title: 'Link', type: 'url'}),
+  defineField({name: 'image', title: 'Image', type: 'altImage'}),
+]
+
+const hubIntroFields = () => [
+  defineField({name: 'kicker', title: 'Kicker', type: 'string', validation: (rule) => rule.max(80)}),
+  defineField({name: 'heading', title: 'Heading', type: 'string', validation: (rule) => rule.max(120)}),
+  defineField({name: 'headingLead', title: 'Heading first line', type: 'string', validation: (rule) => rule.max(80)}),
+  defineField({name: 'headingAccent', title: 'Heading second line', type: 'string', validation: (rule) => rule.max(80)}),
+  defineField({name: 'copy', title: 'Introduction', type: 'text', rows: 4, validation: (rule) => rule.max(800)}),
+]
 
 export const experiencesHub = defineType({
   name: 'experiencesHub',
@@ -23,7 +58,7 @@ export const experiencesHub = defineType({
       title: 'Page heading',
       type: 'string',
       group: 'content',
-      description: 'The large heading at the top of the Experiences page.',
+      description: 'Kept for the existing page record. The visible hero uses Hero first line when that field is set.',
       validation: (rule) => rule.required().max(80),
     }),
     defineField({
@@ -33,7 +68,7 @@ export const experiencesHub = defineType({
       rows: 4,
       group: 'content',
       description:
-        'The paragraph under the heading. Filters are not on the page yet, so do not promise filters or booking here.',
+        'Kept for the existing page record. The visible hero paragraph uses Hero supporting text when that field is set.',
       validation: (rule) => rule.required().max(500),
     }),
     defineField({
@@ -42,7 +77,7 @@ export const experiencesHub = defineType({
       type: 'string',
       group: 'content',
       description:
-        'The short line inside the box visitors see when no experiences are published. The box is hidden once an experience is published.',
+        'Shown only when the farm experience card list is published as empty.',
       validation: (rule) => rule.required().max(80),
     }),
     defineField({
@@ -88,6 +123,186 @@ export const experiencesHub = defineType({
       group: 'seo',
       description: 'The description shown when someone shares the Experiences page.',
       validation: (rule) => rule.required().max(200),
+    }),
+    defineField({
+      name: 'heroLead',
+      title: 'Hero first line',
+      type: 'string',
+      group: 'content',
+      description: 'Optional. Leave empty to keep “Udderly Ridiculous”.',
+      validation: (rule) => rule.max(40),
+    }),
+    defineField({
+      name: 'heroAccent',
+      title: 'Hero second line',
+      type: 'string',
+      group: 'content',
+      description: 'Optional. Leave empty to keep “Farm Experiences”.',
+      validation: (rule) => rule.max(40),
+    }),
+    defineField({
+      name: 'heroSupporting',
+      title: 'Hero supporting text',
+      type: 'text',
+      rows: 3,
+      group: 'content',
+      description: 'Optional text under the hero heading.',
+      validation: (rule) => rule.max(300),
+    }),
+    defineField({
+      name: 'heroImage',
+      title: 'Hero image',
+      type: 'altImage',
+      group: 'content',
+      description: 'Optional. Leave empty to keep the current hero photograph.',
+    }),
+    defineField({
+      name: 'categoryIntro',
+      title: 'Category chooser introduction',
+      type: 'object',
+      group: 'content',
+      fields: hubIntroFields(),
+    }),
+    defineField({
+      name: 'categories',
+      title: 'Category chooser',
+      type: 'array',
+      group: 'content',
+      description: 'Leave this unset to keep the current four categories. Publish an empty list to hide the chooser.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'title', title: 'Title', type: 'string', validation: (rule) => rule.required().max(80)}),
+            defineField({name: 'note', title: 'Note', type: 'string', validation: (rule) => rule.max(80)}),
+            defineField({name: 'href', title: 'Link', type: 'string', description: 'An on-page anchor such as #farm-stays, or an existing internal path.'}),
+            defineField({name: 'image', title: 'Image', type: 'altImage'}),
+            defineField({name: 'sortOrder', title: 'Display order', type: 'number'}),
+          ],
+          preview: {select: {title: 'title', subtitle: 'note'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'farmExperiencesIntro',
+      title: 'Farm experiences introduction',
+      type: 'object',
+      group: 'content',
+      fields: hubIntroFields(),
+    }),
+    defineField({
+      name: 'experienceCards',
+      title: 'Farm experience cards',
+      type: 'array',
+      group: 'content',
+      description: 'Leave this unset to keep the current experience cards. Publish an empty list to remove them. Farm Hopping is never shown.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({name: 'title', title: 'Name', type: 'string', validation: (rule) => rule.required().max(120)}),
+            defineField({name: 'slug', title: 'Experience slug', type: 'string', description: 'Used for /{slug} only when that experience is published.'}),
+            defineField({name: 'description', title: 'Description', type: 'text', rows: 3, validation: (rule) => rule.max(500)}),
+            defineField({name: 'season', title: 'Season', type: 'string', validation: (rule) => rule.max(80)}),
+            defineField({name: 'age', title: 'Age', type: 'string', validation: (rule) => rule.max(40)}),
+            defineField({name: 'badge', title: 'Badge', type: 'string', options: {list: ['none', 'limited', 'signature']}}),
+            defineField({name: 'image', title: 'Image', type: 'altImage'}),
+            defineField({name: 'learnMoreHref', title: 'Learn more link', type: 'string'}),
+            defineField({name: 'bookingUrl', title: 'Booking link', type: 'url', description: 'Only an absolute https booking page. Leave empty until the destination is verified.'}),
+            defineField({name: 'sortOrder', title: 'Display order', type: 'number'}),
+          ],
+          preview: {select: {title: 'title', subtitle: 'season'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'staysIntro',
+      title: 'Farm stays introduction',
+      type: 'object',
+      group: 'content',
+      fields: hubIntroFields(),
+    }),
+    defineField({
+      name: 'stays',
+      title: 'Farm stays',
+      type: 'array',
+      group: 'content',
+      description: 'Leave unset to keep Farm Glamping. Do not add Farm Hopping.',
+      of: [hubFeatureMember()],
+    }),
+    defineField({
+      name: 'giftsIntro',
+      title: 'Gifts introduction',
+      type: 'object',
+      group: 'content',
+      fields: hubIntroFields(),
+    }),
+    defineField({
+      name: 'gifts',
+      title: 'Gifts',
+      type: 'array',
+      group: 'content',
+      description: 'Leave unset to keep the current gift cards.',
+      of: [hubFeatureMember()],
+    }),
+    defineField({
+      name: 'programsIntro',
+      title: 'Business programs introduction',
+      type: 'object',
+      group: 'content',
+      fields: hubIntroFields(),
+    }),
+    defineField({
+      name: 'programs',
+      title: 'Business programs',
+      type: 'array',
+      group: 'content',
+      description: 'Leave unset to keep the current corporate cards.',
+      of: [hubFeatureMember()],
+    }),
+    defineField({
+      name: 'rainbow',
+      title: 'Rainbow Registered',
+      type: 'object',
+      group: 'content',
+      fields: hubStatementFields(),
+    }),
+    defineField({
+      name: 'feastOn',
+      title: 'Feast On',
+      type: 'object',
+      group: 'content',
+      fields: hubStatementFields(),
+    }),
+    defineField({
+      name: 'newsletterTitle',
+      title: 'Newsletter heading',
+      type: 'string',
+      group: 'content',
+      validation: (rule) => rule.max(80),
+    }),
+    defineField({
+      name: 'newsletterCopy',
+      title: 'Newsletter text',
+      type: 'text',
+      rows: 3,
+      group: 'content',
+      validation: (rule) => rule.max(400),
+    }),
+    defineField({
+      name: 'locationHeading',
+      title: 'Location heading',
+      type: 'string',
+      group: 'content',
+      validation: (rule) => rule.max(80),
+    }),
+    defineField({
+      name: 'locationNote',
+      title: 'Location note',
+      type: 'text',
+      rows: 3,
+      group: 'content',
+      validation: (rule) => rule.max(240),
     }),
   ],
   preview: {

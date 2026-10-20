@@ -227,7 +227,27 @@ export const experiencesHubContentQuery = `*[_id == "experiencesHub"][0]{
   seoTitle,
   seoDescription,
   ogTitle,
-  ogDescription
+  ogDescription,
+  heroLead,
+  heroAccent,
+  heroSupporting,
+  heroImage ${altImage},
+  categoryIntro{headingLead, headingAccent, copy},
+  categories[]{title, note, href, image ${altImage}, sortOrder},
+  farmExperiencesIntro{heading, copy},
+  experienceCards[]{title, slug, description, season, age, badge, image ${altImage}, learnMoreHref, bookingUrl, sortOrder},
+  staysIntro{kicker, heading, copy},
+  stays[]{kicker, title, copy, season, age, image ${altImage}, learnMoreHref, ctaLabel, ctaHref, limited, sortOrder},
+  giftsIntro{headingLead, headingAccent, copy},
+  gifts[]{kicker, title, copy, season, age, image ${altImage}, learnMoreHref, ctaLabel, ctaHref, limited, sortOrder},
+  programsIntro{headingLead, headingAccent, copy},
+  programs[]{kicker, title, copy, image ${altImage}, learnMoreHref, ctaLabel, ctaHref, sortOrder},
+  rainbow{kicker, heading, body, href, image ${altImage}},
+  feastOn{kicker, heading, body, href, image ${altImage}},
+  newsletterTitle,
+  newsletterCopy,
+  locationHeading,
+  locationNote
 }`
 
 const cmsLink = `{

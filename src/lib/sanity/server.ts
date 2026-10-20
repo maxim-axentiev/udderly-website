@@ -12,6 +12,7 @@ import {
   fetchAdoptionPageDocument,
   fetchAnimalListings,
   fetchAnimalsForSalePageDocument,
+  fetchPublishedExperiencesHub,
   loadExperiencesHubContent,
   loadHomepageContent,
 } from './fetch'
@@ -35,6 +36,11 @@ export const getExperiencesHubContentFn = createServerFn({
   method: 'GET',
   strict: false,
 }).handler(async () => loadExperiencesHubContent())
+
+export const getExperiencesHubDocumentFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => fetchPublishedExperiencesHub())
 
 export const getSiteChromeFn = createServerFn({
   method: 'GET',
