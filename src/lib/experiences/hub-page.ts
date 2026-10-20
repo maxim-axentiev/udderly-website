@@ -371,6 +371,8 @@ function cardsFromCms(
     seen.add(key)
     const badge: HubExperienceCard['badge'] =
       row.badge === 'limited' || row.badge === 'signature' ? row.badge : undefined
+    const image = picture(row.image, 1280)
+    const local = image ? undefined : localExperience(slug, title)
     return [{
       key,
       title,
@@ -379,14 +381,20 @@ function cardsFromCms(
       season: text(row.season, 80),
       age: text(row.age, 40),
       badge,
-      image: picture(row.image, 1280),
+      image,
+      imageKey: local?.imageKey,
+      imageAlt: image?.alt ?? local?.imageAlt,
       href: safeHubHref(row.learnMoreHref, publishedSlugs) ?? (slug && publishedSlugs.has(slug) ? `/${slug}` : undefined),
       bookingUrl: publicBookingUrl(typeof row.bookingUrl === 'string' ? row.bookingUrl : undefined),
     }]
   }).map((entry) => overlayPublished(entry, published))
 }
 
-function featuresFromCms(value: unknown, publishedSlugs: ReadonlySet<string>): HubFeature[] | null {
+function featuresFromCms(
+  value: unknown,
+  publishedSlugs: ReadonlySet<string>,
+  group: 'stays' | 'gifts' | 'programs',
+): HubFeature[] | null {
   const rows = records(value)
   if (!rows) return null
   const seen = new Set<string>()
@@ -395,6 +403,7 @@ function featuresFromCms(value: unknown, publishedSlugs: ReadonlySet<string>): H
     if (!title || isFarmHoppingListing({ title, slug: title })) return []
     if (seen.has(title)) return []
     seen.add(title)
+    const image = picture(row.image, 1280)
     return [{
       key: title,
       kicker: text(row.kicker, 40),
@@ -402,7 +411,8 @@ function featuresFromCms(value: unknown, publishedSlugs: ReadonlySet<string>): H
       copy: text(row.copy, 800),
       season: text(row.season, 80),
       age: text(row.age, 40),
-      image: picture(row.image, 1280),
+      image,
+      imageKey: image ? undefined : localFeatureImage(title, group),
       learnMoreHref: safeHubHref(row.learnMoreHref, publishedSlugs),
       ctaLabel: text(row.ctaLabel, 60),
       ctaHref: safeHubHref(row.ctaHref, publishedSlugs),
@@ -418,11 +428,16 @@ function categoriesFromCms(value: unknown, publishedSlugs: ReadonlySet<string>):
     const title = text(row.title, 80)
     const href = safeHubHref(row.href, publishedSlugs)
     if (!title || !href) return []
+    const image = picture(row.image, 1024)
+    const local = image
+      ? undefined
+      : fallbackPage.categories.find((item) => item.href === href || item.title === title)
     return [{
       title,
       note: text(row.note, 80) ?? '',
       href,
-      image: picture(row.image, 1024),
+      image,
+      imageKey: local?.imageKey,
     }]
   })
 }
@@ -432,16 +447,42 @@ function fieldText(value: unknown, key: string, max: number): string | undefined
   return text((value as Record<string, unknown>)[key], max)
 }
 
+function designedLines(
+  value: string | undefined,
+  lead: string,
+  accent: string,
+): { lead: string; accent: string } {
+  if (!value) return { lead, accent }
+  const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+  if (lines.length >= 2) return { lead: lines[0], accent: lines.slice(1).join(' ') }
+  const joined = `${lead} ${accent}`.replace(/\s+/g, ' ').trim()
+  if (value.replace(/\s+/g, ' ').trim() === joined) return { lead, accent }
+  return { lead: value, accent: '' }
+}
+
+function splitParagraphs(body: string): string[] {
+  return body.split(/\n+/).map((paragraph) => paragraph.trim()).filter(Boolean)
+}
+
+function localExperience(slug?: string, title?: string): HubExperienceCard | undefined {
+  return lovableCards.find((card) => (slug && card.slug === slug) || card.title === title)
+}
+
+function localFeatureImage(title: string, group: 'stays' | 'gifts' | 'programs'): HubImageKey | undefined {
+  return fallbackPage[group].find((item) => item.title === title)?.imageKey
+}
+
 function statementFromCms(value: unknown, fallback: HubStatement): HubStatement {
   if (!value || typeof value !== 'object') return fallback
   const row = value as Record<string, unknown>
   const body = text(row.body, 800)
+  const lines = designedLines(text(row.heading, 120), fallback.heading, fallback.headingAccent ?? '')
   return {
     ...fallback,
     kicker: text(row.kicker, 80) ?? fallback.kicker,
-    heading: text(row.heading, 120) ?? fallback.heading,
-    headingAccent: text(row.heading, 120) ? undefined : fallback.headingAccent,
-    paragraphs: body ? [body] : fallback.paragraphs,
+    heading: lines.lead,
+    headingAccent: lines.accent || undefined,
+    paragraphs: body ? splitParagraphs(body) : fallback.paragraphs,
     href: publicBookingUrl(typeof row.href === 'string' ? row.href : undefined) ?? fallback.href,
     image: picture(row.image, 1200) ?? fallback.image,
   }
@@ -503,19 +544,19 @@ export function resolveExperiencesHubPage(
       heading: fieldText(document?.staysIntro, 'heading', 120) ?? fallbackPage.staysIntro.heading,
       copy: fieldText(document?.staysIntro, 'copy', 800) ?? fallbackPage.staysIntro.copy,
     },
-    stays: featuresFromCms(document?.stays, publishedSlugs) ?? fallbackPage.stays,
+    stays: featuresFromCms(document?.stays, publishedSlugs, 'stays') ?? fallbackPage.stays,
     giftsIntro: {
       headingLead: fieldText(document?.giftsIntro, 'headingLead', 80) ?? fallbackPage.giftsIntro.headingLead,
       headingAccent: fieldText(document?.giftsIntro, 'headingAccent', 80) ?? fallbackPage.giftsIntro.headingAccent,
       copy: fieldText(document?.giftsIntro, 'copy', 800) ?? fallbackPage.giftsIntro.copy,
     },
-    gifts: featuresFromCms(document?.gifts, publishedSlugs) ?? fallbackPage.gifts,
+    gifts: featuresFromCms(document?.gifts, publishedSlugs, 'gifts') ?? fallbackPage.gifts,
     programsIntro: {
       headingLead: fieldText(document?.programsIntro, 'headingLead', 80) ?? fallbackPage.programsIntro.headingLead,
       headingAccent: fieldText(document?.programsIntro, 'headingAccent', 80) ?? fallbackPage.programsIntro.headingAccent,
       copy: fieldText(document?.programsIntro, 'copy', 800) ?? fallbackPage.programsIntro.copy,
     },
-    programs: featuresFromCms(document?.programs, publishedSlugs) ?? fallbackPage.programs,
+    programs: featuresFromCms(document?.programs, publishedSlugs, 'programs') ?? fallbackPage.programs,
     rainbow: statementFromCms(document?.rainbow, fallbackPage.rainbow),
     feast: statementFromCms(document?.feastOn, feastFallback),
     newsletter: {
@@ -523,11 +564,18 @@ export function resolveExperiencesHubPage(
       copy: text(document?.newsletterCopy, 400) ?? fallbackPage.newsletter.copy,
       unavailable: fallbackPage.newsletter.unavailable,
     },
-    location: {
-      headingLead: text(document?.locationHeading, 80) ?? fallbackPage.location.headingLead,
-      headingAccent: text(document?.locationHeading, 80) ? '' : fallbackPage.location.headingAccent,
-      note: text(document?.locationNote, 240) ?? fallbackPage.location.note,
-    },
+    location: (() => {
+      const lines = designedLines(
+        text(document?.locationHeading, 80),
+        fallbackPage.location.headingLead,
+        fallbackPage.location.headingAccent,
+      )
+      return {
+        headingLead: lines.lead,
+        headingAccent: lines.accent,
+        note: text(document?.locationNote, 240) ?? fallbackPage.location.note,
+      }
+    })(),
     emptyHeading: text(document?.emptyHeading, 80) ?? '',
     emptyMessage: text(document?.emptyMessage, 500) ?? '',
   }

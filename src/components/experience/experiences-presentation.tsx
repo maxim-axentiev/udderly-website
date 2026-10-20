@@ -380,8 +380,8 @@ export function ExperiencesPresentation({
                 </>
               ) : null}
             </h2>
-            {page.feast.paragraphs.map((paragraph) => (
-              <p key={paragraph} className="mt-6 max-w-xl text-base leading-relaxed md:text-lg">{paragraph}</p>
+            {page.feast.paragraphs.map((paragraph, index) => (
+              <p key={paragraph} className={`${index === 0 ? 'mt-6' : 'mt-4'} max-w-xl text-base leading-relaxed md:text-lg`}>{paragraph}</p>
             ))}
           </div>
           {page.feast.href ? (

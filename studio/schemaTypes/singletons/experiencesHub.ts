@@ -27,8 +27,22 @@ const hubFeatureMember = () =>
 
 const hubStatementFields = () => [
   defineField({name: 'kicker', title: 'Kicker', type: 'string', validation: (rule) => rule.max(80)}),
-  defineField({name: 'heading', title: 'Heading', type: 'string', validation: (rule) => rule.max(120)}),
-  defineField({name: 'body', title: 'Body', type: 'text', rows: 5, validation: (rule) => rule.max(800)}),
+  defineField({
+    name: 'heading',
+    title: 'Heading',
+    type: 'text',
+    rows: 2,
+    description: 'Put the second heading line on its own line.',
+    validation: (rule) => rule.max(120),
+  }),
+  defineField({
+    name: 'body',
+    title: 'Body',
+    type: 'text',
+    rows: 5,
+    description: 'Separate paragraphs with a blank line.',
+    validation: (rule) => rule.max(800),
+  }),
   defineField({name: 'href', title: 'Link', type: 'url'}),
   defineField({name: 'image', title: 'Image', type: 'altImage'}),
 ]
@@ -292,8 +306,10 @@ export const experiencesHub = defineType({
     defineField({
       name: 'locationHeading',
       title: 'Location heading',
-      type: 'string',
+      type: 'text',
+      rows: 2,
       group: 'content',
+      description: 'Put the emphasized second line on its own line.',
       validation: (rule) => rule.max(80),
     }),
     defineField({
