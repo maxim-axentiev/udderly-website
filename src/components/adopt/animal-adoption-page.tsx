@@ -1,22 +1,20 @@
 import type { ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
-import {
-  GOLD_PRICE,
-  SILVER_PRICE,
-  goldItems,
-  importantInfo,
-  silverItems,
-  type AdoptionAnimal,
-} from '@/lib/adopt/content'
+import type { AdoptionAnimal } from '@/lib/adopt/content'
+import { fillName, type AdoptionDetail, type AdoptionPageCopy, type AdoptionPackageView } from '@/lib/adopt/resolve'
 
 export function AnimalAdoptionPage({
   animal,
+  copy,
+  detail,
   images,
   newsletter,
 }: {
   animal: AdoptionAnimal
+  copy: AdoptionPageCopy
+  detail: AdoptionDetail
   images: { hero: string; gallery: readonly string[]; support: string }
   newsletter?: ReactNode
 }) {
@@ -43,7 +41,7 @@ export function AnimalAdoptionPage({
             Adopt <span className="text-secondary-accent">{animal.name}</span>
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">
-            {animal.tagline}
+            {detail.tagline}
           </p>
         </Container>
       </section>
@@ -51,11 +49,18 @@ export function AnimalAdoptionPage({
       <section className="bg-background py-20 md:py-28">
         <Container width="brand" className="grid max-w-[1400px] items-start gap-14 lg:grid-cols-[1.05fr_1fr]">
           <ul className="grid grid-cols-2 gap-3">
-            {galleryAlts.map((alt, index) => (
-              <li key={alt} className="overflow-hidden border-2 border-headline">
+            {(detail.gallery.length
+              ? detail.gallery.map((image) => ({ key: image.src, src: image.src, alt: image.alt }))
+              : galleryAlts.map((alt, index) => ({
+                  key: alt,
+                  src: images.gallery[index] ?? images.gallery[0] ?? '',
+                  alt,
+                }))
+            ).map((image) => (
+              <li key={image.key} className="overflow-hidden border-2 border-headline">
                 <img
-                  src={images.gallery[index] ?? images.gallery[0]}
-                  alt={alt}
+                  src={image.src}
+                  alt={image.alt}
                   width={1024}
                   height={1024}
                   loading="lazy"
@@ -66,20 +71,15 @@ export function AnimalAdoptionPage({
           </ul>
           <div>
             <h2 className="font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
-              Meet
+              {copy.meetLead}
               <br />
               <span className="text-stroke">{animal.name}.</span>
             </h2>
-            <p className="mt-6 text-base leading-relaxed md:text-lg">
-              Placeholder description. {animal.name} is a full personality in animal form — opinions, eyebrows, and a
-              personal vendetta against any gate that dares stay closed. {animal.name} investigates every pocket like it
-              might contain a snack and has never met a human worth ignoring.
-            </p>
-            <p className="mt-4 text-base leading-relaxed md:text-lg">
-              Placeholder description. By adopting {animal.name}, you are not just sponsoring an animal — you are joining
-              the extended herd. You will get updates on the latest schemes, photos of the best side (it is all of
-              them), and the quiet pride of being noticed.
-            </p>
+            {detail.story.map((paragraph) => (
+              <p key={paragraph} className="mt-6 text-base leading-relaxed first:mt-6 md:text-lg">
+                {paragraph}
+              </p>
+            ))}
           </div>
         </Container>
       </section>
@@ -87,36 +87,23 @@ export function AnimalAdoptionPage({
       <section className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1200px]">
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
-            Pick your
+            {copy.packageLead}
             <br />
-            <span className="text-primary-accent">package.</span>
+            <span className="text-primary-accent">{copy.packageAccent}</span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed">
-            {animal.showGold
-              ? `Two ways to support ${animal.name}. Both come with bragging rights.`
-              : `One simple way to support ${animal.name}. Bragging rights included.`}
+            {fillName(detail.packages.length > 1 ? copy.packageIntroGold : copy.packageIntroSingle, animal.name)}
           </p>
-          <div className={`mt-14 grid gap-8 ${animal.showGold ? 'lg:grid-cols-2' : 'mx-auto max-w-xl'}`}>
-            <PackageCard
-              animalName={animal.name}
-              name="Silver"
-              kicker="Silver Pail"
-              tagline="The classic farm supporter."
-              price={SILVER_PRICE}
-              items={silverItems(animal.name)}
-              tone="bg-farm-silver"
-            />
-            {animal.showGold ? (
+          <div className={`mt-14 grid gap-8 ${detail.packages.length > 1 ? 'lg:grid-cols-2' : 'mx-auto max-w-xl'}`}>
+            {detail.packages.map((pkg, index) => (
               <PackageCard
+                key={pkg.name}
                 animalName={animal.name}
-                name="Gold"
-                kicker="Gold Hay Bale"
-                tagline="The royal treatment."
-                price={GOLD_PRICE}
-                items={goldItems(animal.name)}
-                tone="bg-farm-gold"
+                adoptLabel={copy.adoptButtonLabel}
+                pkg={pkg}
+                tone={index === 0 ? 'bg-farm-silver' : 'bg-farm-gold'}
               />
-            ) : null}
+            ))}
           </div>
         </Container>
       </section>
@@ -124,12 +111,12 @@ export function AnimalAdoptionPage({
       <section className="bg-background py-20 md:py-28">
         <Container width="brand" className="max-w-3xl">
           <h2 className="text-center font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.8] text-headline">
-            The fine
+            {copy.finePrintLead}
             <br />
-            print.
+            {copy.finePrintAccent}
           </h2>
           <ul className="mt-12 -rotate-1 space-y-5 border-2 border-headline bg-background p-7 shadow-[12px_12px_0_var(--color-secondary-accent)] md:p-10">
-            {importantInfo(animal.name).map((item) => (
+            {detail.terms.map((item) => (
               <li key={item} className="flex items-start gap-4 text-base leading-relaxed md:text-lg">
                 <span
                   aria-hidden="true"
@@ -148,20 +135,16 @@ export function AnimalAdoptionPage({
         <Container width="brand" className="grid max-w-[1300px] items-center gap-8 lg:grid-cols-2 lg:gap-14">
           <div>
             <h2 className="font-display text-[clamp(2.8rem,8vw,6rem)] font-black uppercase leading-[0.78] text-headline">
-              Your adoption
+              {copy.detailSupportLead}
               <br />
-              keeps {animal.name} thriving.
+              {fillName(copy.detailSupportAccent, animal.name)}
             </h2>
             <div className="mt-8 border-2 border-headline bg-background p-7 shadow-[12px_12px_0_var(--color-headline)] md:p-9">
-              <p className="text-base leading-relaxed md:text-lg">
-                Placeholder description. Every adoption directly funds high-quality feed, clean bedding, routine
-                veterinary care, enrichment toys, and the occasional celebratory snack. It also helps us rescue and
-                rehabilitate new animals who need a safe place to land.
-              </p>
-              <p className="mt-4 text-base leading-relaxed md:text-lg">
-                Placeholder description. This is not a one-time gift — it is a year-long partnership that keeps{' '}
-                {animal.name} happy, healthy, and appropriately ridiculous.
-              </p>
+              {detail.support.map((paragraph) => (
+                <p key={paragraph} className="mt-4 text-base leading-relaxed first:mt-0 md:text-lg">
+                  {paragraph}
+                </p>
+              ))}
             </div>
           </div>
           <img
@@ -181,34 +164,29 @@ export function AnimalAdoptionPage({
 
 function PackageCard({
   animalName,
-  name,
-  kicker,
-  tagline,
-  price,
-  items,
+  adoptLabel,
+  pkg,
   tone,
 }: {
   animalName: string
-  name: string
-  kicker: string
-  tagline: string
-  price: string
-  items: readonly string[]
+  adoptLabel: string
+  pkg: AdoptionPackageView
   tone: string
 }) {
+  const label = `${adoptLabel} ${animalName} — ${pkg.name}`
   return (
     <article className={`relative flex flex-col border-2 border-headline p-1 shadow-[12px_12px_0_var(--color-headline)] ${tone}`}>
       <p className="absolute -top-5 left-1/2 -translate-x-1/2 rounded-full border-2 border-headline bg-background px-4 py-1 font-display text-sm font-black uppercase text-headline">
-        {kicker}
+        {pkg.kicker}
       </p>
       <div className="flex flex-1 flex-col p-6 pt-8 md:p-8 md:pt-10">
         <div className="text-center">
-          <h3 className="font-display text-5xl font-black uppercase text-headline md:text-6xl">{name}</h3>
-          <p className="mt-2 font-accent text-lg italic">{tagline}</p>
-          <p className="mt-4 font-display text-6xl font-black text-headline md:text-7xl">{price}</p>
+          <h3 className="font-display text-5xl font-black uppercase text-headline md:text-6xl">{pkg.name}</h3>
+          {pkg.subtitle ? <p className="mt-2 font-accent text-lg italic">{pkg.subtitle}</p> : null}
+          <p className="mt-4 font-display text-6xl font-black text-headline md:text-7xl">{pkg.price}</p>
         </div>
         <ul className="mt-8 flex-1 space-y-4">
-          {items.map((item) => (
+          {pkg.items.map((item) => (
             <li key={item} className="flex items-start gap-3 text-base leading-relaxed">
               <span aria-hidden="true" className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-headline bg-background text-sm">
                 ✓
@@ -217,9 +195,15 @@ function PackageCard({
             </li>
           ))}
         </ul>
-        <Button type="button" aria-disabled="true" size="lg" className="mt-8 w-full">
-          Adopt {animalName} — {name}
-        </Button>
+        {pkg.checkoutUrl ? (
+          <ButtonLink href={pkg.checkoutUrl} external size="lg" className="mt-8 w-full">
+            {label}
+          </ButtonLink>
+        ) : (
+          <Button type="button" aria-disabled="true" size="lg" className="mt-8 w-full">
+            {label}
+          </Button>
+        )}
       </div>
     </article>
   )

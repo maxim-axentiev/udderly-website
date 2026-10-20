@@ -17,6 +17,24 @@ export function slugField(source = 'title', group?: FieldGroup) {
   })
 }
 
+/** Path, in-page anchor, or absolute http(s) URL. Empty is allowed. */
+export function optionalPublicHrefRule(value: unknown) {
+  if (value == null || value === '') return true
+  if (typeof value !== 'string') {
+    return 'Enter a path, an in-page link, or a full https:// URL.'
+  }
+  const href = value.trim()
+  if (href.startsWith('#') && href.length > 1 && !/\s/.test(href)) return true
+  if (href.startsWith('/') && !href.startsWith('//') && !/\s/.test(href)) return true
+  try {
+    const url = new URL(href)
+    if (url.protocol === 'http:' || url.protocol === 'https:') return true
+  } catch {
+    return 'Enter a path starting with /, an in-page link starting with #, or a full https:// URL.'
+  }
+  return 'Enter a path starting with /, an in-page link starting with #, or a full https:// URL.'
+}
+
 export function orderRankField(description?: string, group?: FieldGroup) {
   return defineField({
     name: 'sortOrder',

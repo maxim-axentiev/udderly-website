@@ -10,10 +10,9 @@ import {
   COW_PLACEMENT,
   GOAT_POLICY,
   PRICE_PLACEHOLDER,
-  SALE_PAGE,
   SPECIES_LABEL,
 } from '@/lib/sale/content'
-import type { SaleCard } from '@/lib/sale/resolve'
+import type { SaleCard, SalePageCopy } from '@/lib/sale/resolve'
 import { WaitlistSection } from './waitlist-form'
 
 const inputClass =
@@ -23,12 +22,19 @@ const labelClass = 'font-display text-sm font-black uppercase tracking-wide text
 export function SaleAnimalPage({
   animal,
   images,
+  copy,
 }: {
   animal: SaleCard
   images: { portrait: string; dam: string; sire: string; chart: string }
+  copy: SalePageCopy
 }) {
   const isCow = animal.species === 'cow'
   const label = animal.speciesTitle || SPECIES_LABEL[animal.species]
+  const portrait = animal.images[0]?.src ?? images.portrait
+  const portraitAlt = animal.images[0]?.alt ?? `${animal.name}, ${label}`
+  const placementIntro = animal.placementIntro || COW_PLACEMENT
+  const placementItems =
+    animal.placementItems ?? (animal.species === 'goat' ? GOAT_POLICY : ALPACA_POLICY)
   const facts = COW_FACTS.map(([name, fallback]) => {
     if (name === 'Birthdate' && animal.birthDate) return [name, animal.birthDate] as const
     if (name === 'Height at birth' && animal.birthHeight) return [name, animal.birthHeight] as const
@@ -38,7 +44,6 @@ export function SaleAnimalPage({
     return [name, fallback] as const
   })
   const price = animal.priceDisplay || PRICE_PLACEHOLDER
-  const policies = animal.species === 'goat' ? GOAT_POLICY : ALPACA_POLICY
 
   return (
     <>
@@ -51,7 +56,15 @@ export function SaleAnimalPage({
             {animal.name}
           </h1>
           <p className="mt-7 inline-block -rotate-2 bg-primary-accent px-5 py-2 font-accent text-2xl italic text-primary-foreground md:text-3xl">
-            {isCow ? "…and I'm a Mini Highland Cow" : animal.species === 'goat' ? "…and we're Miniature Goats" : "…and we're Alpacas"}
+            {animal.speciesTitle
+              ? isCow
+                ? `…and I'm a ${animal.speciesTitle}`
+                : `…and we're ${animal.speciesTitle}`
+              : isCow
+                ? "…and I'm a Mini Highland Cow"
+                : animal.species === 'goat'
+                  ? "…and we're Miniature Goats"
+                  : "…and we're Alpacas"}
           </p>
         </Container>
       </section>
@@ -68,13 +81,13 @@ export function SaleAnimalPage({
             </p>
             {animal.sold ? null : (
               <ButtonLink href="#contact" size="lg" className="mt-8">
-                Contact Us to Buy
+                {copy.buyButtonLabel}
               </ButtonLink>
             )}
           </div>
           <img
-            src={images.portrait}
-            alt={`${animal.name}, ${label}`}
+            src={portrait}
+            alt={portraitAlt}
             width={1280}
             height={960}
             loading="lazy"
@@ -86,7 +99,7 @@ export function SaleAnimalPage({
       <section className="bg-farm-blue py-20 md:py-28">
         <Container width="brand" className="max-w-[1300px]">
           <article className="grid gap-8 border-2 border-headline bg-background p-5 shadow-[14px_14px_0_var(--color-headline)] md:p-8 lg:grid-cols-[1fr_1.3fr]">
-            <img src={images.portrait} alt={animal.name} width={1024} height={1024} loading="lazy" className="aspect-square w-full border-2 border-headline object-cover" />
+            <img src={portrait} alt={portraitAlt} width={1024} height={1024} loading="lazy" className="aspect-square w-full border-2 border-headline object-cover" />
             <div>
               <div className="flex flex-wrap items-start justify-between gap-6">
                 <h2 className="font-display text-[clamp(2rem,4.5vw,3.6rem)] font-black uppercase leading-[0.85] text-headline">
@@ -137,8 +150,12 @@ export function SaleAnimalPage({
                   <img src={src} alt={`${animal.name}'s ${role.toLowerCase()}`} width={1024} height={768} loading="lazy" className="aspect-[4/3] w-full object-cover" />
                   <figcaption className="p-4">
                     <p className="font-display text-4xl font-black uppercase text-primary-accent">{role}</p>
-                    <p className="mt-2 font-display text-xl font-black uppercase text-headline">Name: Placeholder</p>
-                    <p className="text-base">Height: Placeholder</p>
+                    <p className="mt-2 font-display text-xl font-black uppercase text-headline">
+                      Name: {role === 'Dam' ? animal.parentDamName || 'Placeholder' : animal.parentSireName || 'Placeholder'}
+                    </p>
+                    <p className="text-base">
+                      Height: {role === 'Dam' ? animal.parentDamHeight || 'Placeholder' : animal.parentSireHeight || 'Placeholder'}
+                    </p>
                   </figcaption>
                 </figure>
               ))}
@@ -156,13 +173,16 @@ export function SaleAnimalPage({
             <div className="mt-12 grid gap-10 lg:grid-cols-2">
               <article className="border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
                 <h3 className="font-display text-2xl font-black uppercase text-headline">Placement policy</h3>
-                <p className="mt-4 text-base leading-relaxed">{COW_PLACEMENT}</p>
+                <p className="mt-4 text-base leading-relaxed">{placementIntro}</p>
               </article>
               <article className="border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
                 <h3 className="font-display text-2xl font-black uppercase text-headline">Size chart</h3>
                 <img
-                  src={images.chart}
-                  alt="Size chart comparing standard cattle, mid-size miniature cattle, miniature cattle and micro miniature cattle heights"
+                  src={animal.sizeChart?.src ?? images.chart}
+                  alt={
+                    animal.sizeChart?.alt ??
+                    'Size chart comparing standard cattle, mid-size miniature cattle, miniature cattle and micro miniature cattle heights'
+                  }
                   className="mt-4 w-full border-2 border-headline object-contain"
                   loading="lazy"
                 />
@@ -170,7 +190,7 @@ export function SaleAnimalPage({
             </div>
           ) : (
             <ul className="mt-12 space-y-4 border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
-              {policies.map((item) => (
+              {placementItems.map((item) => (
                 <li key={item} className="flex gap-3 text-base leading-relaxed md:text-lg">
                   <span aria-hidden="true">✓</span>
                   <span>{item}</span>
@@ -181,20 +201,31 @@ export function SaleAnimalPage({
         </Container>
       </section>
 
-      {animal.sold ? null : <ContactForm name={animal.name} />}
-      <WaitlistSection title={SALE_PAGE.detailWaitlistTitle} copy={SALE_PAGE.detailWaitlistCopy} />
+      {animal.sold ? null : (
+        <ContactForm
+          heading={copy.contactHeading.replaceAll('{name}', animal.name)}
+          buttonLabel={copy.contactButtonLabel}
+        />
+      )}
+      <WaitlistSection title={copy.detailWaitlistTitle} copy={copy.detailWaitlistCopy} />
       <LocationBlock />
     </>
   )
 }
 
-function ContactForm({ name }: { name: string }) {
+function ContactForm({
+  heading,
+  buttonLabel,
+}: {
+  heading: string
+  buttonLabel: string
+}) {
   const [sent, setSent] = useState(false)
   return (
     <section id="contact" className="scroll-mt-20 bg-farm-beige py-20 md:py-28">
       <Container width="brand" className="max-w-[1000px]">
         <h2 className="font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
-          Ask about {name}
+          {heading}
         </h2>
         <form
           onSubmit={(event) => {
@@ -219,7 +250,7 @@ function ContactForm({ name }: { name: string }) {
           </div>
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <Button type="submit" size="lg">
-              Send Message
+              {buttonLabel}
             </Button>
             <p aria-live="polite" className="font-accent text-lg italic text-primary-accent">
               {sent ? CONTACT_DEMO_MESSAGE : ''}

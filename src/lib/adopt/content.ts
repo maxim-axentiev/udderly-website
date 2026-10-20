@@ -12,6 +12,7 @@ export const ADOPT_PAGE = {
   intro:
     'Take a piece of the farm home with you — symbolically, of course. Our adoption program helps cover food, shelter, enrichment, and the occasional fancy hat for the animals who make every visit ridiculous.',
   heroAlt: 'Visitors enjoying time with animals at Udderly Ridiculous Farm Life',
+  awardsTitle: "TripAdvisor Travellers' Choice",
   awardsTagline: 'Top 10% of attractions worldwide by Tripadvisor.',
   sponsorLead: 'Sponsor a',
   sponsorAccent: 'ridiculous life.',
@@ -31,6 +32,18 @@ export const ADOPT_PAGE = {
     'Placeholder description. This is not a one-time gift — it is a year-long partnership that keeps the herd happy, healthy, and appropriately ridiculous.',
   ],
   supportButton: 'See all animals available for adoption',
+  supportButtonHref: '#available-animals',
+  learnMoreLabel: 'Learn More',
+  adoptButtonLabel: 'Adopt',
+  meetLead: 'Meet',
+  packageLead: 'Pick your',
+  packageAccent: 'package.',
+  packageIntroGold: 'Two ways to support {name}. Both come with bragging rights.',
+  packageIntroSingle: 'One simple way to support {name}. Bragging rights included.',
+  finePrintLead: 'The fine',
+  finePrintAccent: 'print.',
+  detailSupportLead: 'Your adoption',
+  detailSupportAccent: 'keeps {name} thriving.',
   supportImageAlt: 'Marshmallow the goat being held by a visitor',
 } as const
 
@@ -129,6 +142,20 @@ export function silverItems(name: string): string[] {
 
 export function goldItems(name: string): string[] {
   return [...silverItems(name), `A 15m Zoom call with ${name}`]
+}
+
+export function adoptionStory(name: string): string[] {
+  return [
+    `Placeholder description. ${name} is a full personality in animal form — opinions, eyebrows, and a personal vendetta against any gate that dares stay closed. ${name} investigates every pocket like it might contain a snack and has never met a human worth ignoring.`,
+    `Placeholder description. By adopting ${name}, you are not just sponsoring an animal — you are joining the extended herd. You will get updates on the latest schemes, photos of the best side (it is all of them), and the quiet pride of being noticed.`,
+  ]
+}
+
+export function adoptionSupportCopy(name: string): string[] {
+  return [
+    'Placeholder description. Every adoption directly funds high-quality feed, clean bedding, routine veterinary care, enrichment toys, and the occasional celebratory snack. It also helps us rescue and rehabilitate new animals who need a safe place to land.',
+    `Placeholder description. This is not a one-time gift — it is a year-long partnership that keeps ${name} happy, healthy, and appropriately ridiculous.`,
+  ]
 }
 
 export function importantInfo(name: string): string[] {

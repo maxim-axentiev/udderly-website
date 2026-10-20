@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { Button, ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
-import { ADOPT_PAGE } from '@/lib/adopt/content'
 import type { AdoptionCard } from '@/lib/adopt/resolve'
 import type { AdoptionPageCopy } from '@/lib/adopt/resolve'
 
@@ -29,8 +28,8 @@ export function AdoptPage({
     <>
       <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden">
         <img
-          src={images.hero}
-          alt={ADOPT_PAGE.heroAlt}
+          src={copy.heroImage?.src ?? images.hero}
+          alt={copy.heroImage?.alt ?? 'Visitors enjoying time with animals at Udderly Ridiculous Farm Life'}
           width={1920}
           height={1080}
           fetchPriority="high"
@@ -39,7 +38,7 @@ export function AdoptPage({
         <div className="absolute inset-0 -z-10 bg-headline/65" aria-hidden="true" />
         <Container width="brand" className="max-w-4xl py-24 text-center md:py-32">
           <h1 className="font-display text-[clamp(2.6rem,8vw,7rem)] font-black uppercase leading-[0.82] text-background">
-            {ADOPT_PAGE.heroLead} <span className="text-secondary-accent">{ADOPT_PAGE.heroAccent}</span>
+            {copy.heroLead} <span className="text-secondary-accent">{copy.heroAccent}</span>
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">
             {copy.intro}
@@ -51,16 +50,23 @@ export function AdoptPage({
         <Container width="brand" className="flex flex-col items-center gap-5 md:flex-row md:justify-between">
           <div className="text-center md:max-w-[24rem] md:text-left">
             <p className="font-display text-lg font-black uppercase leading-tight text-headline">
-              TripAdvisor Travellers&apos; Choice
+              {copy.awardsTitle}
             </p>
             <p className="mt-1 text-sm font-semibold">{copy.awardsTagline}</p>
           </div>
           <ul className="grid w-full max-w-72 grid-cols-2 place-items-center gap-5 md:flex md:w-auto md:max-w-none md:gap-7">
-            {images.awards.map((award) => (
-              <li key={award.year}>
+            {(copy.awardImages.length
+              ? copy.awardImages.map((award) => ({ key: award.src, src: award.src, alt: award.alt }))
+              : images.awards.map((award) => ({
+                  key: award.year,
+                  src: award.src,
+                  alt: `TripAdvisor Travellers' Choice Award ${award.year}`,
+                }))
+            ).map((award) => (
+              <li key={award.key}>
                 <img
                   src={award.src}
-                  alt={`TripAdvisor Travellers' Choice Award ${award.year}`}
+                  alt={award.alt}
                   width={1080}
                   height={1080}
                   loading="lazy"
@@ -75,8 +81,8 @@ export function AdoptPage({
       <section className="overflow-hidden bg-background py-20 md:py-28">
         <Container width="brand" className="grid max-w-[1400px] items-start gap-14 lg:grid-cols-[1.05fr_1fr]">
           <img
-            src={images.sponsor}
-            alt={ADOPT_PAGE.sponsorImageAlt}
+            src={copy.sponsorImage?.src ?? images.sponsor}
+            alt={copy.sponsorImage?.alt ?? 'Biscuit the goat standing on a straw bale in the barn'}
             width={1024}
             height={1024}
             loading="lazy"
@@ -84,9 +90,9 @@ export function AdoptPage({
           />
           <div>
             <h2 className="font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
-              {ADOPT_PAGE.sponsorLead}
+              {copy.sponsorLead}
               <br />
-              <span className="text-stroke">{ADOPT_PAGE.sponsorAccent}</span>
+              <span className="text-stroke">{copy.sponsorAccent}</span>
             </h2>
             {copy.sponsorParagraphs.map((paragraph) => (
               <p key={paragraph} className="mt-6 text-base leading-relaxed md:text-lg">
@@ -94,7 +100,7 @@ export function AdoptPage({
               </p>
             ))}
             <p className="mt-6 inline-block border-l-4 border-primary-accent pl-5 font-display text-lg font-black uppercase text-headline">
-              {ADOPT_PAGE.sponsorNote}
+              {copy.sponsorNote}
             </p>
           </div>
         </Container>
@@ -103,7 +109,7 @@ export function AdoptPage({
       <section id="available-animals" className="scroll-mt-20 overflow-hidden bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
-            {ADOPT_PAGE.animalsHeading}
+            {copy.animalsHeading}
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed">{copy.animalsIntro}</p>
           <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,8 +119,8 @@ export function AdoptPage({
                   className={`flex h-full flex-col border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)] ${index % 2 === 0 ? '-rotate-1' : 'rotate-1'}`}
                 >
                   <img
-                    src={images.cards[animal.imageKey]}
-                    alt={animal.alt}
+                    src={animal.portrait?.src ?? images.cards[animal.imageKey]}
+                    alt={animal.portrait?.alt ?? animal.alt}
                     width={1024}
                     height={1024}
                     loading="lazy"
@@ -127,10 +133,10 @@ export function AdoptPage({
                     <p className="mt-2 flex-1 font-accent text-lg italic leading-snug">{animal.blurb}</p>
                     <div className="mt-5 flex flex-wrap gap-3">
                       <ButtonLink href={animal.href} variant="outline">
-                        Learn More
+                        {copy.learnMoreLabel}
                       </ButtonLink>
                       <Button type="button" aria-disabled="true">
-                        Adopt {animal.name}
+                        {copy.adoptButtonLabel} {animal.name}
                       </Button>
                     </div>
                   </div>
@@ -146,9 +152,9 @@ export function AdoptPage({
         <Container width="brand" className="grid max-w-[1300px] items-center gap-8 lg:grid-cols-2 lg:gap-14">
           <div>
             <h2 className="font-display text-[clamp(2.8rem,8vw,6rem)] font-black uppercase leading-[0.78] text-headline">
-              {ADOPT_PAGE.supportLead}
+              {copy.supportLead}
               <br />
-              {ADOPT_PAGE.supportAccent}
+              {copy.supportAccent}
             </h2>
             <div className="mt-8 flex flex-col border-2 border-headline bg-background p-7 text-left shadow-[12px_12px_0_var(--color-headline)] md:p-9">
               {copy.supportParagraphs.map((paragraph) => (
@@ -156,14 +162,14 @@ export function AdoptPage({
                   {paragraph}
                 </p>
               ))}
-              <ButtonLink href="#available-animals" size="lg" className="mt-8 self-start">
-                {ADOPT_PAGE.supportButton}
+              <ButtonLink href={copy.supportButtonHref} size="lg" className="mt-8 self-start">
+                {copy.supportButton}
               </ButtonLink>
             </div>
           </div>
           <img
-            src={images.support}
-            alt={ADOPT_PAGE.supportImageAlt}
+            src={copy.supportImage?.src ?? images.support}
+            alt={copy.supportImage?.alt ?? 'Marshmallow the goat being held by a visitor'}
             width={1024}
             height={1024}
             loading="lazy"

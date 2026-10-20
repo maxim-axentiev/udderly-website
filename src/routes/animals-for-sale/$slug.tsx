@@ -10,7 +10,7 @@ import alpacaWalk from '@/assets/herd/alpaca-walk.jpg'
 import goatIcon2 from '@/assets/herd/goat-icon-2.jpg'
 import { SITE_NAME } from '@/lib/site'
 import { SPECIES_LABEL } from '@/lib/sale/content'
-import { findSaleAnimal } from '@/lib/sale/resolve'
+import { findSaleAnimal, resolveSalePageCopy } from '@/lib/sale/resolve'
 import type { PublishedListing } from '@/lib/sale/resolve'
 import { getAnimalsForSalePageFn } from '@/lib/sanity/server'
 import { createPageHead } from '@/lib/seo/page-head'
@@ -26,22 +26,27 @@ const portraits = {
 
 export const Route = createFileRoute('/animals-for-sale/$slug')({
   loader: async ({ params }) => {
-    const data = (await getAnimalsForSalePageFn()) as { listings: PublishedListing[] }
+    const data = (await getAnimalsForSalePageFn()) as {
+      page: Record<string, unknown> | null
+      listings: PublishedListing[]
+    }
     const animal = findSaleAnimal(params.slug, data.listings ?? [])
     if (!animal) {
       throw notFound({
         headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
       })
     }
-    return { animal }
+    return { animal, copy: resolveSalePageCopy(data.page) }
   },
   head: ({ loaderData }) => {
     const animal = loaderData?.animal
     if (!animal) return {}
-    const label = SPECIES_LABEL[animal.species]
+    const label = animal.speciesTitle || SPECIES_LABEL[animal.species]
     return createPageHead({
-      title: `${animal.name} — ${label} | ${SITE_NAME}`,
-      description: `Meet ${animal.name}, ${animal.species === 'cow' ? 'a mini Highland cow' : label.toLowerCase()} raised on our Ontario farm${animal.sold ? ' (now sold)' : ' and looking for a new home'}.`,
+      title: animal.seoTitle ?? `${animal.name} — ${label} | ${SITE_NAME}`,
+      description:
+        animal.seoDescription ??
+        `Meet ${animal.name}, ${animal.species === 'cow' ? 'a mini Highland cow' : label.toLowerCase()} raised on our Ontario farm${animal.sold ? ' (now sold)' : ' and looking for a new home'}.`,
       path: `/animals-for-sale/${animal.slug}`,
     })
   },
@@ -49,10 +54,11 @@ export const Route = createFileRoute('/animals-for-sale/$slug')({
 })
 
 function SaleAnimalRoute() {
-  const { animal } = Route.useLoaderData()
+  const { animal, copy } = Route.useLoaderData()
   return (
     <SaleAnimalPage
       animal={animal}
+      copy={copy}
       images={{
         portrait: portraits[animal.imageKey],
         dam: highlandHero,

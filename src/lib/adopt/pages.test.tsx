@@ -4,14 +4,16 @@ import { describe, expect, it } from 'vitest'
 import { AdoptPage } from '@/components/adopt/adopt-page'
 import { AnimalAdoptionPage } from '@/components/adopt/animal-adoption-page'
 import { AnimalsForSalePage } from '@/components/sale/animals-for-sale-page'
-import { ADOPTION_ANIMALS } from '@/lib/adopt/content'
-import { buildAdoptionCards, resolveAdoptionPageCopy } from '@/lib/adopt/resolve'
+import { ADOPTION_ANIMALS, ADOPT_PAGE } from '@/lib/adopt/content'
+import { buildAdoptionCards, findAdoptionAnimal, resolveAdoptionDetail, resolveAdoptionPageCopy } from '@/lib/adopt/resolve'
 import { primaryNav } from '@/lib/navigation'
 import { RESERVED_SLUGS, routableExperienceSlug } from '@/lib/routes/paths'
 import { redirects } from '@/lib/seo/redirects'
 import { FUTURE_INTERNAL_REDIRECTS } from '@/lib/seo/future-redirects'
 import { FOR_SALE, SOLD } from '@/lib/sale/content'
-import { buildSaleLists, resolveSalePageCopy } from '@/lib/sale/resolve'
+import { buildSaleLists, findSaleAnimal, resolveSalePageCopy } from '@/lib/sale/resolve'
+import { sanityClient } from '@/lib/sanity/client'
+import { adoptionOfferingsQuery, animalListingsQuery } from '@/lib/sanity/queries'
 
 const images = {
   hero: '/hero.webp',
@@ -69,6 +71,8 @@ describe('adopt an animal', () => {
     const html = renderToStaticMarkup(
       <AnimalAdoptionPage
         animal={chicken!}
+        copy={resolveAdoptionPageCopy(null)}
+        detail={resolveAdoptionDetail(chicken!)}
         images={{ hero: '/hero.webp', gallery: ['/a.jpg'], support: '/b.jpg' }}
       />,
     )
@@ -123,6 +127,132 @@ describe('animals for sale', () => {
   it('keeps Lovable page copy until the Sanity document is complete', () => {
     expect(resolveSalePageCopy({ intro: 'Only one field' }).source).toBe('fallback')
     expect(resolveAdoptionPageCopy(null).source).toBe('fallback')
+  })
+})
+
+function completeAdoptionPage(overrides: Record<string, unknown> = {}) {
+  return {
+    heroLead: ADOPT_PAGE.heroLead,
+    heroAccent: ADOPT_PAGE.heroAccent,
+    heroIntro: 'Editors can change this introduction.',
+    awardsTitle: ADOPT_PAGE.awardsTitle,
+    awardsTagline: ADOPT_PAGE.awardsTagline,
+    sponsorLead: ADOPT_PAGE.sponsorLead,
+    sponsorAccent: ADOPT_PAGE.sponsorAccent,
+    sponsorParagraphs: [...ADOPT_PAGE.sponsorParagraphs],
+    sponsorNote: ADOPT_PAGE.sponsorNote,
+    animalsHeading: 'Meet the herd.',
+    animalsIntro: ADOPT_PAGE.animalsIntro,
+    learnMoreLabel: 'See more',
+    adoptButtonLabel: ADOPT_PAGE.adoptButtonLabel,
+    supportLead: ADOPT_PAGE.supportLead,
+    supportAccent: ADOPT_PAGE.supportAccent,
+    supportParagraphs: [...ADOPT_PAGE.supportParagraphs],
+    supportButtonLabel: ADOPT_PAGE.supportButton,
+    meetLead: ADOPT_PAGE.meetLead,
+    packageLead: ADOPT_PAGE.packageLead,
+    packageAccent: ADOPT_PAGE.packageAccent,
+    packageIntroGold: ADOPT_PAGE.packageIntroGold,
+    packageIntroSingle: ADOPT_PAGE.packageIntroSingle,
+    finePrintLead: ADOPT_PAGE.finePrintLead,
+    finePrintAccent: ADOPT_PAGE.finePrintAccent,
+    detailSupportLead: ADOPT_PAGE.detailSupportLead,
+    detailSupportAccent: ADOPT_PAGE.detailSupportAccent,
+    seoTitle: 'Adopt an Animal | Udderly Ridiculous Farm Life',
+    seoDescription: ADOPT_PAGE.intro,
+    ...overrides,
+  }
+}
+
+describe('sanity editability', () => {
+  it('keeps offerings and listings when animal or species references are missing', () => {
+    const cards = buildAdoptionCards([{ slug: 'sassafras', introduction: 'Chief of snacks.' }])
+    expect(cards).toHaveLength(7)
+    expect(cards.find((card) => card.slug === 'sassafras')?.speciesNote).toBeUndefined()
+    expect(cards.find((card) => card.slug === 'clara')?.name).toBe('Clara')
+
+    const clara = buildAdoptionCards([{ slug: 'clara', speciesTitle: 'Mini Highland Cattle', introduction: 'Hello' }])
+    expect(clara.find((card) => card.slug === 'clara')?.speciesNote).toBeUndefined()
+
+    const listing = findSaleAnimal('copperpot-puff-elton-john', [{ slug: 'copperpot-puff-elton-john', personality: 'One card.' }])
+    expect(listing?.name).toBe('Copperpot, Puff & Elton John')
+    expect(listing?.species).toBe('alpaca')
+    expect(listing?.speciesTitle).toBeUndefined()
+    expect(listing?.source).toBe('sanity')
+  })
+
+  it('replaces complete page copy and keeps Lovable copy when the document is incomplete', () => {
+    const replaced = resolveAdoptionPageCopy(completeAdoptionPage())
+    expect(replaced.source).toBe('sanity')
+    expect(replaced.animalsHeading).toBe('Meet the herd.')
+    expect(replaced.learnMoreLabel).toBe('See more')
+    expect(resolveAdoptionPageCopy({ heroIntro: ADOPT_PAGE.intro }).source).toBe('fallback')
+    expect(resolveAdoptionPageCopy({ heroIntro: ADOPT_PAGE.intro }).intro).toBe(ADOPT_PAGE.intro)
+  })
+
+  it('keeps the approved introduction when it is stored as the SEO description', () => {
+    expect(ADOPT_PAGE.intro.length).toBeGreaterThan(200)
+    expect(ADOPT_PAGE.intro.length).toBeLessThanOrEqual(320)
+    const copy = resolveAdoptionPageCopy(completeAdoptionPage())
+    expect(copy.seoSource).toBe('sanity')
+    expect(copy.seoDescription).toBe(ADOPT_PAGE.intro)
+    expect(copy.intro).toBe('Editors can change this introduction.')
+  })
+
+  it('keeps valid page copy when the SEO description is too long', () => {
+    const copy = resolveAdoptionPageCopy(completeAdoptionPage({ seoDescription: 'x'.repeat(321) }))
+    expect(copy.source).toBe('sanity')
+    expect(copy.intro).toBe('Editors can change this introduction.')
+    expect(copy.seoSource).toBe('fallback')
+    expect(copy.seoDescription).toBe(ADOPT_PAGE.intro)
+  })
+
+  it('shows package display text without turning on checkout', () => {
+    const clara = findAdoptionAnimal('clara')!
+    const detail = resolveAdoptionDetail(clara, [{
+      slug: 'clara',
+      packages: [{
+        name: 'Silver',
+        kicker: 'Silver Pail',
+        priceDisplay: '$35',
+        includes: ['Digital certificate of adoption'],
+        checkoutUrl: 'pay-later',
+      }],
+    }])
+    expect(detail.packages).toHaveLength(1)
+    expect(detail.packages[0]?.price).toBe('$35')
+    expect(detail.packages[0]?.checkoutUrl).toBeUndefined()
+    const html = renderToStaticMarkup(
+      <AnimalAdoptionPage
+        animal={clara}
+        copy={resolveAdoptionPageCopy(null)}
+        detail={detail}
+        images={{ hero: '/hero.webp', gallery: ['/a.jpg'], support: '/b.jpg' }}
+      />,
+    )
+    expect(html).toContain('$35')
+    expect(html).toContain('aria-disabled="true"')
+    expect(html).not.toContain('pay-later')
+  })
+
+  it('leaves unknown animal facts empty', () => {
+    const animal = findSaleAnimal('macintosh', [{ slug: 'macintosh', priceDisplay: '$X,XXX' }])
+    expect(animal?.birthDate).toBeUndefined()
+    expect(animal?.birthHeight).toBeUndefined()
+    expect(animal?.birthWeight).toBeUndefined()
+    expect(animal?.sex).toBeUndefined()
+    expect(animal?.genetics).toBeUndefined()
+    expect(animal?.parentDamName).toBeUndefined()
+    expect(animal?.priceDisplay).toBe('$X,XXX')
+    expect(animal?.images).toEqual([])
+  })
+
+  it('reads published documents only', () => {
+    expect(sanityClient.config().perspective).toBe('published')
+    expect(adoptionOfferingsQuery).not.toContain('drafts.')
+    expect(animalListingsQuery).not.toContain('drafts.')
+    expect(adoptionOfferingsQuery).toContain('animal->species->title')
+    expect(animalListingsQuery).toContain('species->title')
   })
 })
 

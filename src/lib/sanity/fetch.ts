@@ -24,6 +24,9 @@ import {
   navigationQuery,
   siteSettingsQuery,
 } from './queries'
+import type { PublishedAdoption } from '@/lib/adopt/resolve'
+import type { PublishedListing } from '@/lib/sale/resolve'
+
 import type { ExperienceCardData, ExperiencePageData } from './types'
 
 const CHROME_FETCH_TIMEOUT_MS = 4000
@@ -154,27 +157,13 @@ export async function fetchAdoptionPageDocument(): Promise<Record<string, unknow
   }
 }
 
-export async function fetchAdoptionOfferings(): Promise<
-  Array<{
-    title?: string | null
-    slug?: string | null
-    introduction?: string | null
-    availability?: string | null
-    speciesTitle?: string | null
-  }>
-> {
+export async function fetchAdoptionOfferings(): Promise<PublishedAdoption[]> {
   try {
     const offerings = await withTimeout(
-      sanityClient.fetch<Array<Record<string, unknown>> | null>(adoptionOfferingsQuery),
+      sanityClient.fetch<PublishedAdoption[] | null>(adoptionOfferingsQuery),
       CHROME_FETCH_TIMEOUT_MS,
     )
-    return (offerings ?? []) as Array<{
-      title?: string | null
-      slug?: string | null
-      introduction?: string | null
-      availability?: string | null
-      speciesTitle?: string | null
-    }>
+    return offerings ?? []
   } catch {
     return []
   }
@@ -193,39 +182,13 @@ export async function fetchAnimalsForSalePageDocument(): Promise<Record<string, 
   }
 }
 
-export async function fetchAnimalListings(): Promise<
-  Array<{
-    title?: string | null
-    slug?: string | null
-    status?: string | null
-    priceDisplay?: string | null
-    personality?: string | null
-    speciesTitle?: string | null
-    birthHeight?: string | null
-    birthWeight?: string | null
-    birthDate?: string | null
-    sex?: string | null
-    genetics?: string | null
-  }>
-> {
+export async function fetchAnimalListings(): Promise<PublishedListing[]> {
   try {
     const listings = await withTimeout(
-      sanityClient.fetch<Array<Record<string, unknown>> | null>(animalListingsQuery),
+      sanityClient.fetch<PublishedListing[] | null>(animalListingsQuery),
       CHROME_FETCH_TIMEOUT_MS,
     )
-    return (listings ?? []) as Array<{
-      title?: string | null
-      slug?: string | null
-      status?: string | null
-      priceDisplay?: string | null
-      personality?: string | null
-      speciesTitle?: string | null
-      birthHeight?: string | null
-      birthWeight?: string | null
-      birthDate?: string | null
-      sex?: string | null
-      genetics?: string | null
-    }>
+    return listings ?? []
   } catch {
     return []
   }
