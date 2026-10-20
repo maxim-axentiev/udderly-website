@@ -64,25 +64,44 @@ export type ExperienceSeo = {
   image: SanityImage
 } | null
 
+export type ExperienceStatement = {
+  enabled?: boolean | null
+  kicker?: string | null
+  heading?: string | null
+  body?: string | null
+  href?: string | null
+  image?: SanityImage
+} | null
+
 export type ExperiencePageData = {
   _id: string
   title: string
   slug: string
   shortDescription: string | null
+  introductionHeading?: string | null
   body: PortableTextContent
   heroImage: SanityImage
   gallery: SanityImage[] | null
   category: string | null
   animalSpecies: Array<{ title: string | null; slug: string | null }> | null
   season: string | null
+  seasonLabel?: string | null
   duration: string | null
   priceDisplay: string | null
   groupSize: string | null
   sessionType: string | null
   ageGuidance: string | null
+  practicalHeading?: string | null
+  practicalTips?: string[] | null
   visitorInfo: PortableTextContent
   accessibilityInfo: PortableTextContent
   bookingUrl: string | null
+  instructor?: { heading?: string | null; body?: string | null; image?: SanityImage } | null
+  feastOn?: ExperienceStatement
+  signatureExperience?: ExperienceStatement
+  reviewsHeading?: string | null
+  welfareHeading?: string | null
+  welfareNote?: string | null
   animals: AnimalCardData[] | null
   faqs: FaqItem[] | null
   testimonials: TestimonialItem[] | null
