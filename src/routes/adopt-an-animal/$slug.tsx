@@ -13,15 +13,19 @@ import { createPageHead } from '@/lib/seo/page-head'
 
 export const Route = createFileRoute('/adopt-an-animal/$slug')({
   loader: async ({ params }) => {
-    const animal = findAdoptionAnimal(params.slug)
+    const data = (await getAdoptionPageFn()) as {
+      page: Record<string, unknown> | null
+      offerings: PublishedAdoption[]
+    }
+    const animal = findAdoptionAnimal(
+      params.slug,
+      data.offerings ?? [],
+      data.page?.manageCollection === true,
+    )
     if (!animal) {
       throw notFound({
         headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
       })
-    }
-    const data = (await getAdoptionPageFn()) as {
-      page: Record<string, unknown> | null
-      offerings: PublishedAdoption[]
     }
     const detail = resolveAdoptionDetail(animal, data.offerings ?? [])
     return {

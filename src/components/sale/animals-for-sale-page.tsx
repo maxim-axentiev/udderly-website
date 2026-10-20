@@ -85,6 +85,9 @@ export function AnimalsForSalePage({
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
             {copy.availableHeading}
           </h2>
+          {available.length === 0 && sold.length === 0 ? (
+            <p className="mt-14 text-center text-lg">There are no animals in this list right now.</p>
+          ) : null}
           <ul className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {available.map((animal, index) => (
               <SaleCardView key={animal.slug} animal={animal} index={index} images={images} learnMoreLabel={copy.learnMoreLabel} />
@@ -153,14 +156,18 @@ function SaleCardView({
         className={`flex h-full flex-col border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)] ${index % 2 ? 'rotate-1' : '-rotate-1'}`}
       >
         <div className="relative overflow-hidden border-2 border-headline">
+          {animal.images[0]?.src || animal.imageKey ? (
           <img
-            src={animal.images[0]?.src ?? images[animal.imageKey]}
+            src={animal.images[0]?.src ?? (animal.imageKey ? images[animal.imageKey] : '')}
             alt={animal.images[0]?.alt ?? animal.name}
             width={1024}
             height={1024}
             loading="lazy"
             className={`aspect-square w-full object-cover ${animal.sold ? 'grayscale' : ''}`}
           />
+          ) : (
+            <div className="aspect-square w-full bg-farm-beige" />
+          )}
           {animal.sold ? (
             <div className="pointer-events-none absolute inset-x-0 bottom-[12%] flex justify-center" aria-hidden="true">
               <span className="-rotate-12 border-4 border-headline bg-secondary-accent px-8 py-2 font-display text-4xl font-black uppercase text-headline">

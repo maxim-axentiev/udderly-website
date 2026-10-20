@@ -9,6 +9,7 @@ import {
   SOLD,
   salePath,
   type SaleAnimal,
+  type SaleSpecies,
 } from './content'
 
 export type PresentationImage = { src: string; alt: string }
@@ -25,8 +26,12 @@ export type PublishedListing = {
   title?: string | null
   slug?: string | null
   status?: string | null
+  sortOrder?: number | null
+  active?: boolean | null
+  detailsProfile?: string | null
   priceDisplay?: string | null
   personality?: string | null
+  groupDescription?: string | null
   speciesTitle?: string | null
   birthHeight?: string | null
   birthWeight?: string | null
@@ -44,11 +49,14 @@ export type PublishedListing = {
   seo?: { title?: string | null; description?: string | null } | null
 }
 
-export type SaleCard = SaleAnimal & {
+export type SaleCard = Omit<SaleAnimal, 'imageKey' | 'species'> & {
+  species: SaleSpecies | 'other'
+  imageKey?: SaleAnimal['imageKey']
   href: string
   source: 'fallback' | 'sanity'
   priceDisplay?: string
   personality?: string
+  groupDescription?: string
   speciesTitle?: string
   birthDate?: string
   birthHeight?: string
@@ -113,7 +121,8 @@ function cardFrom(animal: SaleAnimal, published: readonly PublishedListing[]): S
     parentSireName: optionalText(match?.parentSireName, 80),
     parentSireHeight: optionalText(match?.parentSireHeight, 40),
     sizeChart: presentationImage(match?.sizeChart, 1600),
-    seoTitle: optionalText(match?.seo?.title, 70),
+    seoTitle: optionalText(match?.seo?.title, 120),
+    groupDescription: optionalText(match?.groupDescription, 800),
     seoDescription: optionalText(match?.seo?.description, 320),
   }
 }
@@ -131,12 +140,103 @@ function optionalItems(value: string[] | null | undefined, maxItems: number, max
   return items
 }
 
-export function buildSaleLists(published: readonly PublishedListing[] = []): {
+const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+export type CollectionOptions = { manageCollection?: boolean }
+
+function knownSale(slug: string): SaleAnimal | undefined {
+  return ALL_SALE_ANIMALS.find((animal) => animal.slug === slug)
+}
+
+function byOrder(left: PublishedListing, right: PublishedListing) {
+  const leftOrder = typeof left.sortOrder === 'number' ? left.sortOrder : Number.MAX_SAFE_INTEGER
+  const rightOrder = typeof right.sortOrder === 'number' ? right.sortOrder : Number.MAX_SAFE_INTEGER
+  if (leftOrder !== rightOrder) return leftOrder - rightOrder
+  return (left.title ?? '').localeCompare(right.title ?? '', 'en')
+}
+
+function listingSpecies(entry: PublishedListing, known: SaleAnimal | undefined): SaleSpecies | 'other' {
+  if (entry.detailsProfile === 'cattle') return 'cow'
+  const title = entry.speciesTitle?.trim() ?? ''
+  if (/goat/i.test(title)) return 'goat'
+  if (/alpaca/i.test(title)) return 'alpaca'
+  if (/highland/i.test(title)) return 'cow'
+  return known?.species ?? 'other'
+}
+
+function visibleListings(published: readonly PublishedListing[]): PublishedListing[] {
+  const seen = new Set<string>()
+  return [...published].sort(byOrder).flatMap((entry) => {
+    if (entry.active === false) return []
+    const slug = entry.slug?.trim() ?? ''
+    const known = knownSale(slug)
+    const title = entry.title?.trim() || known?.name || ''
+    if (!slug || !PUBLIC_SLUG.test(slug) || !title || seen.has(slug)) return []
+    seen.add(slug)
+    return [{ ...entry, slug, title }]
+  })
+}
+
+function listingToCard(entry: PublishedListing): SaleCard {
+  const slug = entry.slug?.trim() ?? ''
+  const known = knownSale(slug)
+  const name = entry.title?.trim() || known?.name || ''
+  const status = entry.status?.trim()
+  let sold = known?.sold ?? false
+  let groupingNote: string | undefined
+  if (status === 'sold' || status === 'available') {
+    sold = status === 'sold'
+    if (known && sold !== known.sold) {
+      groupingNote = `${name} is shown as ${sold ? 'sold' : 'available'} because the published listing says ${status}.`
+    }
+  } else if (status) {
+    sold = false
+    groupingNote = `${name} is listed with the available animals. Published status “${status}” is not an available/sold value.`
+  }
+  return {
+    name,
+    slug,
+    species: listingSpecies(entry, known),
+    sold,
+    imageKey: known?.imageKey,
+    href: salePath(slug),
+    source: 'sanity',
+    personality: entry.personality?.trim() || undefined,
+    groupDescription: optionalText(entry.groupDescription, 800),
+    priceDisplay: entry.priceDisplay?.trim() || undefined,
+    speciesTitle: entry.speciesTitle?.trim() || undefined,
+    birthDate: entry.birthDate?.trim() || undefined,
+    birthHeight: entry.birthHeight?.trim() || undefined,
+    birthWeight: entry.birthWeight?.trim() || undefined,
+    sex: entry.sex?.trim() || undefined,
+    genetics: entry.genetics?.trim() || undefined,
+    groupingNote,
+    images: (entry.images ?? [])
+      .map((image) => presentationImage(image, 1280))
+      .filter((image): image is PresentationImage => Boolean(image)),
+    placementIntro: optionalText(entry.placementIntro, 800),
+    placementItems: optionalItems(entry.placementItems, 8, 500),
+    parentDamName: optionalText(entry.parentDamName, 80),
+    parentDamHeight: optionalText(entry.parentDamHeight, 40),
+    parentSireName: optionalText(entry.parentSireName, 80),
+    parentSireHeight: optionalText(entry.parentSireHeight, 40),
+    sizeChart: presentationImage(entry.sizeChart, 1600),
+    seoTitle: optionalText(entry.seo?.title, 120),
+    seoDescription: optionalText(entry.seo?.description, 320),
+  }
+}
+
+export function buildSaleLists(
+  published: readonly PublishedListing[] = [],
+  options: CollectionOptions = {},
+): {
   available: SaleCard[]
   sold: SaleCard[]
   intro: string
 } {
-  const cards = ALL_SALE_ANIMALS.map((animal) => cardFrom(animal, published))
+  const cards = published.length === 0 && options.manageCollection !== true
+    ? ALL_SALE_ANIMALS.map((animal) => cardFrom(animal, published))
+    : visibleListings(published).map(listingToCard)
   return {
     available: cards.filter((card) => !card.sold),
     sold: cards.filter((card) => card.sold),
@@ -144,9 +244,17 @@ export function buildSaleLists(published: readonly PublishedListing[] = []): {
   }
 }
 
-export function findSaleAnimal(slug: string, published: readonly PublishedListing[] = []): SaleCard | undefined {
-  const animal = ALL_SALE_ANIMALS.find((entry) => entry.slug === slug)
-  return animal ? cardFrom(animal, published) : undefined
+export function findSaleAnimal(
+  slug: string,
+  published: readonly PublishedListing[] = [],
+  manageCollection = false,
+): SaleCard | undefined {
+  if (published.length === 0 && !manageCollection) {
+    const animal = knownSale(slug)
+    return animal ? cardFrom(animal, published) : undefined
+  }
+  const match = visibleListings(published).find((entry) => entry.slug === slug)
+  return match ? listingToCard(match) : undefined
 }
 
 export const lovableAvailableNames = FOR_SALE.map((animal) => animal.name)

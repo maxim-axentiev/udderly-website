@@ -14,6 +14,8 @@ import { FOR_SALE, SOLD } from '@/lib/sale/content'
 import { buildSaleLists, findSaleAnimal, resolveSalePageCopy } from '@/lib/sale/resolve'
 import { sanityClient } from '@/lib/sanity/client'
 import { adoptionOfferingsQuery, animalListingsQuery } from '@/lib/sanity/queries'
+import { buildRobotsTxt } from '@/lib/seo/robots'
+import { SaleAnimalPage } from '@/components/sale/sale-animal-page'
 
 const images = {
   hero: '/hero.webp',
@@ -49,13 +51,15 @@ describe('adopt an animal', () => {
     expect(html).toContain('Placeholder description.')
   })
 
-  it('uses a published introduction without dropping the other names', () => {
+  it('uses a published introduction and lists only the published offering', () => {
     const cards = buildAdoptionCards([
-      { slug: 'stanley', introduction: 'Stanley prefers the fancy hay.', speciesTitle: 'Goat' },
+      { slug: 'stanley', title: 'Stanley', introduction: 'Stanley prefers the fancy hay.', speciesTitle: 'Goat' },
     ])
-    expect(cards.find((card) => card.slug === 'stanley')?.blurb).toBe('Stanley prefers the fancy hay.')
-    expect(cards.find((card) => card.slug === 'stanley')?.source).toBe('sanity')
-    expect(cards.map((card) => card.name)).toEqual(ADOPTION_ANIMALS.map((animal) => animal.name))
+    expect(cards).toHaveLength(1)
+    expect(cards[0]?.blurb).toBe('Stanley prefers the fancy hay.')
+    expect(cards[0]?.source).toBe('sanity')
+    expect(cards[0]?.name).toBe('Stanley')
+    expect(cards.map((card) => card.slug)).not.toContain('clara')
   })
 
   it('keeps Clara labeled as a Mini Highland cow when a published species disagrees', () => {
@@ -167,9 +171,10 @@ function completeAdoptionPage(overrides: Record<string, unknown> = {}) {
 describe('sanity editability', () => {
   it('keeps offerings and listings when animal or species references are missing', () => {
     const cards = buildAdoptionCards([{ slug: 'sassafras', introduction: 'Chief of snacks.' }])
-    expect(cards).toHaveLength(7)
-    expect(cards.find((card) => card.slug === 'sassafras')?.speciesNote).toBeUndefined()
-    expect(cards.find((card) => card.slug === 'clara')?.name).toBe('Clara')
+    expect(cards).toHaveLength(1)
+    expect(cards[0]?.name).toBe('Sassafras')
+    expect(cards[0]?.speciesNote).toBeUndefined()
+    expect(cards.map((card) => card.slug)).not.toContain('clara')
 
     const clara = buildAdoptionCards([{ slug: 'clara', speciesTitle: 'Mini Highland Cattle', introduction: 'Hello' }])
     expect(clara.find((card) => card.slug === 'clara')?.speciesNote).toBeUndefined()
@@ -253,6 +258,147 @@ describe('sanity editability', () => {
     expect(animalListingsQuery).not.toContain('drafts.')
     expect(adoptionOfferingsQuery).toContain('animal->species->title')
     expect(animalListingsQuery).toContain('species->title')
+    expect(adoptionOfferingsQuery).toContain('sortOrder asc')
+    expect(animalListingsQuery).toContain('groupDescription')
+    expect(buildRobotsTxt()).toBe('User-agent: *\nDisallow: /\n')
+  })
+
+  it('keeps the Lovable cards only while no published collection exists', () => {
+    expect(buildAdoptionCards().map((card) => card.slug)).toEqual(ADOPTION_ANIMALS.map((animal) => animal.slug))
+    expect(buildSaleLists().available).toHaveLength(5)
+    expect(buildSaleLists().sold).toHaveLength(12)
+    expect(findAdoptionAnimal('clara')?.source).toBe('fallback')
+    expect(findSaleAnimal('pekoe-rooibos-matcha')?.slug).toBe('pekoe-rooibos-matcha')
+    expect(findSaleAnimal('copperpot-puff-elton-john')?.slug).toBe('copperpot-puff-elton-john')
+  })
+
+  it('lists a newly published animal and hides one that is not published', () => {
+    const cards = buildAdoptionCards([
+      { title: 'Biscuit', slug: 'biscuit', introduction: 'A new friend.', sortOrder: 2 },
+      { title: 'Stanley', slug: 'stanley', sortOrder: 0 },
+      { title: 'Stanley', slug: 'stanley', introduction: 'Duplicate.', sortOrder: 1 },
+      { title: 'Hidden', slug: 'Not A Slug' },
+      { title: 'Paused', slug: 'paused', active: false },
+    ])
+    expect(cards.map((card) => card.slug)).toEqual(['stanley', 'biscuit'])
+    expect(cards[0]?.href).toBe('/adopt-an-animal/stanley')
+    expect(cards[1]?.href).toBe('/adopt-an-animal/biscuit')
+    expect(cards[1]?.imageKey).toBeUndefined()
+    expect(findAdoptionAnimal('biscuit', [
+      { title: 'Biscuit', slug: 'biscuit', introduction: 'A new friend.' },
+    ])?.name).toBe('Biscuit')
+    expect(findAdoptionAnimal('clara', [
+      { title: 'Biscuit', slug: 'biscuit' },
+    ])).toBeUndefined()
+  })
+
+  it('leaves the collection empty after the editor takes it over and unpublishes every animal', () => {
+    expect(buildAdoptionCards([], { manageCollection: true })).toEqual([])
+    expect(buildAdoptionCards([{ title: 'Clara', slug: 'clara', availability: 'unavailable' }])).toEqual([])
+    expect(buildAdoptionCards([{ title: 'Clara', slug: 'clara', active: false }])).toEqual([])
+    expect(buildSaleLists([{ title: 'June', slug: 'june', active: false, status: 'available' }]).available).toEqual([])
+    expect(findAdoptionAnimal('clara', [], true)).toBeUndefined()
+    const lists = buildSaleLists([], { manageCollection: true })
+    expect(lists.available).toEqual([])
+    expect(lists.sold).toEqual([])
+    expect(findSaleAnimal('macintosh', [], true)).toBeUndefined()
+    const html = renderToStaticMarkup(
+      <AdoptPage copy={resolveAdoptionPageCopy(null)} cards={[]} images={images} />,
+    )
+    expect(html).toContain('There are no animals in this list right now.')
+    expect(html).not.toContain('Clara')
+  })
+
+  it('groups published listings by status and keeps cattle layout without a species reference', () => {
+    const lists = buildSaleLists([
+      { title: 'June', slug: 'june', status: 'sold', priceDisplay: 'Contact the farm', sortOrder: 2 },
+      { title: 'Joe', slug: 'joe', status: 'reserved', sortOrder: 1, detailsProfile: 'cattle' },
+      { title: 'Biscuit', slug: 'biscuit', status: 'available', sortOrder: 0 },
+      { title: 'Biscuit', slug: 'biscuit', status: 'sold', sortOrder: 3 },
+      { slug: 'paused', title: 'Paused', active: false, status: 'available' },
+    ])
+    expect(lists.available.map((animal) => animal.slug)).toEqual(['biscuit', 'joe'])
+    expect(lists.sold.map((animal) => animal.slug)).toEqual(['june'])
+    expect(lists.available.find((animal) => animal.slug === 'joe')?.species).toBe('cow')
+    expect(lists.available.find((animal) => animal.slug === 'joe')?.groupingNote).toContain('reserved')
+    expect(lists.available.find((animal) => animal.slug === 'biscuit')?.species).toBe('other')
+    expect(lists.available.find((animal) => animal.slug === 'biscuit')?.imageKey).toBeUndefined()
+    expect(lists.sold.map((animal) => animal.slug)).not.toContain('pekoe-rooibos-matcha')
+    expect(lists.available.map((animal) => animal.slug)).not.toContain('copperpot-puff-elton-john')
+  })
+
+  it('renders a new listing without borrowing another photo or a goat policy', () => {
+    const animal = findSaleAnimal('biscuit', [{
+      title: 'Biscuit',
+      slug: 'biscuit',
+      status: 'available',
+      personality: 'Biscuit likes the sunny pen.',
+      seo: { title: 'B'.repeat(72), description: 'A short description.' },
+    }])!
+    expect(animal.images).toEqual([])
+    expect(animal.seoTitle).toHaveLength(72)
+    expect(animal.personality).toBe('Biscuit likes the sunny pen.')
+    expect(animal.groupDescription).toBeUndefined()
+    const html = renderToStaticMarkup(
+      <SaleAnimalPage
+        animal={animal}
+        copy={resolveSalePageCopy(null)}
+        images={{ portrait: '', dam: '/dam.jpg', sire: '/sire.jpg', chart: '/chart.webp' }}
+      />,
+    )
+    expect(html).toContain('Biscuit likes the sunny pen.')
+    expect(html).toContain('Biscuit')
+    expect(html).not.toContain('Write about all of')
+    expect(html).not.toContain('Must be adopted in pairs')
+    expect(html).not.toContain('/dam.jpg')
+    expect(html).not.toContain('src=""')
+  })
+
+  it('keeps an overlong listing title from dropping the description', () => {
+    const animal = findSaleAnimal('june', [{
+      slug: 'june',
+      title: 'June',
+      personality: 'June stays in the story.',
+      groupDescription: 'The pair stays together.',
+      seo: { title: 'T'.repeat(121), description: 'June is still described.' },
+    }])
+    expect(animal?.seoTitle).toBeUndefined()
+    expect(animal?.seoDescription).toBe('June is still described.')
+    expect(animal?.personality).toBe('June stays in the story.')
+    expect(animal?.groupDescription).toBe('The pair stays together.')
+    const copy = resolveAdoptionPageCopy(completeAdoptionPage({ seoTitle: 'T'.repeat(71) }))
+    expect(copy.source).toBe('sanity')
+    expect(copy.intro).toBe('Editors can change this introduction.')
+    expect(copy.seoSource).toBe('fallback')
+  })
+
+  it('uses the editable group description and the Lovable paragraph when that field is empty', () => {
+    const edited = findSaleAnimal('pekoe-rooibos-matcha', [{
+      slug: 'pekoe-rooibos-matcha',
+      title: 'Pekoe, Rooibos & Matcha',
+      status: 'sold',
+      groupDescription: 'Three goats, one listing.',
+    }])
+    expect(edited?.species).toBe('goat')
+    const html = renderToStaticMarkup(
+      <SaleAnimalPage
+        animal={edited!}
+        copy={resolveSalePageCopy(null)}
+        images={{ portrait: '/goat.jpg', dam: '/dam.jpg', sire: '/sire.jpg', chart: '/chart.webp' }}
+      />,
+    )
+    expect(html).toContain('Three goats, one listing.')
+    expect(html).not.toContain('Write about all of Pekoe, Rooibos & Matcha')
+
+    const fallback = findSaleAnimal('pekoe-rooibos-matcha')!
+    const fallbackHtml = renderToStaticMarkup(
+      <SaleAnimalPage
+        animal={fallback}
+        copy={resolveSalePageCopy(null)}
+        images={{ portrait: '/goat.jpg', dam: '/dam.jpg', sire: '/sire.jpg', chart: '/chart.webp' }}
+      />,
+    )
+    expect(fallbackHtml).toContain('Write about all of Pekoe, Rooibos &amp; Matcha')
   })
 })
 

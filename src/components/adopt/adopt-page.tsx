@@ -9,7 +9,7 @@ export type AdoptImages = {
   hero: string
   sponsor: string
   support: string
-  cards: Record<AdoptionCard['imageKey'], string>
+  cards: Record<NonNullable<AdoptionCard['imageKey']>, string>
   awards: readonly { year: string; src: string }[]
 }
 
@@ -112,20 +112,29 @@ export function AdoptPage({
             {copy.animalsHeading}
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed">{copy.animalsIntro}</p>
+          {cards.length === 0 ? (
+            <p className="mt-14 text-center text-lg">There are no animals in this list right now.</p>
+          ) : null}
           <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {cards.map((animal, index) => (
+            {cards.map((animal, index) => {
+              const photo = animal.portrait?.src ?? (animal.imageKey ? images.cards[animal.imageKey] : undefined)
+              return (
               <li key={animal.slug}>
                 <article
                   className={`flex h-full flex-col border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)] ${index % 2 === 0 ? '-rotate-1' : 'rotate-1'}`}
                 >
-                  <img
-                    src={animal.portrait?.src ?? images.cards[animal.imageKey]}
-                    alt={animal.portrait?.alt ?? animal.alt}
-                    width={1024}
-                    height={1024}
-                    loading="lazy"
-                    className="aspect-square w-full border-2 border-headline object-cover"
-                  />
+                  {photo ? (
+                    <img
+                      src={photo}
+                      alt={animal.portrait?.alt ?? animal.alt}
+                      width={1024}
+                      height={1024}
+                      loading="lazy"
+                      className="aspect-square w-full border-2 border-headline object-cover"
+                    />
+                  ) : (
+                    <div className="aspect-square w-full border-2 border-headline bg-farm-beige" />
+                  )}
                   <div className="flex flex-1 flex-col p-4">
                     <h3 className="font-display text-4xl font-black uppercase leading-none text-headline">
                       {animal.name}
@@ -142,7 +151,8 @@ export function AdoptPage({
                   </div>
                 </article>
               </li>
-            ))}
+              )
+            })}
           </ul>
         </Container>
       </section>

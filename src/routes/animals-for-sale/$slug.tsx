@@ -30,7 +30,11 @@ export const Route = createFileRoute('/animals-for-sale/$slug')({
       page: Record<string, unknown> | null
       listings: PublishedListing[]
     }
-    const animal = findSaleAnimal(params.slug, data.listings ?? [])
+    const animal = findSaleAnimal(
+      params.slug,
+      data.listings ?? [],
+      data.page?.manageCollection === true,
+    )
     if (!animal) {
       throw notFound({
         headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
@@ -41,12 +45,16 @@ export const Route = createFileRoute('/animals-for-sale/$slug')({
   head: ({ loaderData }) => {
     const animal = loaderData?.animal
     if (!animal) return {}
-    const label = animal.speciesTitle || SPECIES_LABEL[animal.species]
+    const label = animal.speciesTitle || (animal.species === 'other' ? undefined : SPECIES_LABEL[animal.species])
     return createPageHead({
-      title: animal.seoTitle ?? `${animal.name} — ${label} | ${SITE_NAME}`,
+      title: animal.seoTitle ?? (label ? `${animal.name} — ${label} | ${SITE_NAME}` : `${animal.name} | ${SITE_NAME}`),
       description:
         animal.seoDescription ??
-        `Meet ${animal.name}, ${animal.species === 'cow' ? 'a mini Highland cow' : label.toLowerCase()} raised on our Ontario farm${animal.sold ? ' (now sold)' : ' and looking for a new home'}.`,
+        (animal.species === 'cow'
+          ? `Meet ${animal.name}, a mini Highland cow raised on our Ontario farm${animal.sold ? ' (now sold)' : ' and looking for a new home'}.`
+          : label
+            ? `Meet ${animal.name}, ${label.toLowerCase()} raised on our Ontario farm${animal.sold ? ' (now sold)' : ' and looking for a new home'}.`
+            : `Meet ${animal.name} at ${SITE_NAME}${animal.sold ? ' (now sold)' : ''}.`),
       path: `/animals-for-sale/${animal.slug}`,
     })
   },
@@ -60,7 +68,7 @@ function SaleAnimalRoute() {
       animal={animal}
       copy={copy}
       images={{
-        portrait: portraits[animal.imageKey],
+        portrait: animal.imageKey ? portraits[animal.imageKey] : '',
         dam: highlandHero,
         sire: highlandCta,
         chart,

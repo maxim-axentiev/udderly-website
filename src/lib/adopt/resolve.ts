@@ -31,6 +31,8 @@ export type PublishedAdoption = {
   slug?: string | null
   introduction?: string | null
   availability?: string | null
+  sortOrder?: number | null
+  active?: boolean | null
   speciesTitle?: string | null
   tagline?: string | null
   storyParagraphs?: string[] | null
@@ -72,7 +74,8 @@ export function presentationImage(
   return { src, alt }
 }
 
-export type AdoptionCard = AdoptionAnimal & {
+export type AdoptionCard = Omit<AdoptionAnimal, 'imageKey'> & {
+  imageKey?: AdoptionAnimal['imageKey']
   href: string
   blurb: string
   source: 'fallback' | 'sanity'
@@ -80,33 +83,90 @@ export type AdoptionCard = AdoptionAnimal & {
   portrait?: PresentationImage
 }
 
+export type CollectionOptions = { manageCollection?: boolean }
+
 const CLARA_SPECIES = 'Mini Highland cow'
+const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const SEO_TITLE_MAX = 120
 
-export function buildAdoptionCards(
-  published: readonly PublishedAdoption[] = [],
-): AdoptionCard[] {
-  return ADOPTION_ANIMALS.map((animal) => {
-    const match = published.find((entry) => entry.slug?.trim() === animal.slug)
-    const introduction = match?.introduction?.trim()
-    const species = match?.speciesTitle?.trim()
-    const speciesNote =
-      animal.slug === 'clara' && species && !/highland/i.test(species)
-        ? `${animal.name} is a ${CLARA_SPECIES}. Published species “${species}” is not used on this card.`
-        : undefined
+function knownAdoption(slug: string): AdoptionAnimal | undefined {
+  return ADOPTION_ANIMALS.find((animal) => animal.slug === slug)
+}
 
-    return {
-      ...animal,
-      href: adoptionPath(animal.slug),
-      blurb: introduction || ADOPT_PAGE.cardBlurb,
-      source: introduction ? 'sanity' : 'fallback',
-      speciesNote,
-      portrait: presentationImage(match?.cardImage, 1024),
-    }
+function byOrder(left: { sortOrder?: number | null; title?: string | null }, right: { sortOrder?: number | null; title?: string | null }) {
+  const leftOrder = typeof left.sortOrder === 'number' ? left.sortOrder : Number.MAX_SAFE_INTEGER
+  const rightOrder = typeof right.sortOrder === 'number' ? right.sortOrder : Number.MAX_SAFE_INTEGER
+  if (leftOrder !== rightOrder) return leftOrder - rightOrder
+  return (left.title ?? '').localeCompare(right.title ?? '', 'en')
+}
+
+function visibleOfferings(published: readonly PublishedAdoption[]): PublishedAdoption[] {
+  const seen = new Set<string>()
+  return [...published].sort(byOrder).flatMap((entry) => {
+    if (entry.active === false || entry.availability === 'unavailable') return []
+    const slug = entry.slug?.trim() ?? ''
+    const known = knownAdoption(slug)
+    const title = entry.title?.trim() || known?.name || ''
+    if (!slug || !PUBLIC_SLUG.test(slug) || !title || seen.has(slug)) return []
+    seen.add(slug)
+    return [{ ...entry, slug, title }]
   })
 }
 
-export function findAdoptionAnimal(slug: string): AdoptionAnimal | undefined {
-  return ADOPTION_ANIMALS.find((animal) => animal.slug === slug)
+function cardFromOffering(entry: PublishedAdoption): AdoptionCard {
+  const slug = entry.slug?.trim() ?? ''
+  const known = knownAdoption(slug)
+  const name = entry.title?.trim() || known?.name || ''
+  const species = entry.speciesTitle?.trim()
+  const introduction = entry.introduction?.trim()
+  return {
+    name,
+    slug,
+    alt: known?.alt ?? entry.cardImage?.alt?.trim() ?? name,
+    imageKey: known?.imageKey,
+    tagline: entry.tagline?.trim() || known?.tagline || '',
+    showGold: known?.showGold ?? false,
+    href: adoptionPath(slug),
+    blurb: introduction || (known ? ADOPT_PAGE.cardBlurb : ''),
+    source: 'sanity',
+    speciesNote:
+      slug === 'clara' && species && !/highland/i.test(species)
+        ? `${name} is a ${CLARA_SPECIES}. Published species “${species}” is not used on this card.`
+        : undefined,
+    portrait: presentationImage(entry.cardImage, 1024),
+  }
+}
+
+function fallbackAdoptionCards(): AdoptionCard[] {
+  return ADOPTION_ANIMALS.map((animal) => ({
+    ...animal,
+    href: adoptionPath(animal.slug),
+    blurb: ADOPT_PAGE.cardBlurb,
+    source: 'fallback' as const,
+  }))
+}
+
+export function buildAdoptionCards(
+  published: readonly PublishedAdoption[] = [],
+  options: CollectionOptions = {},
+): AdoptionCard[] {
+  if (published.length === 0 && options.manageCollection !== true) return fallbackAdoptionCards()
+  return visibleOfferings(published).map(cardFromOffering)
+}
+
+export function findAdoptionAnimal(
+  slug: string,
+  published: readonly PublishedAdoption[] = [],
+  manageCollection = false,
+): AdoptionCard | undefined {
+  if (published.length === 0 && !manageCollection) {
+    const animal = knownAdoption(slug)
+    return animal
+      ? { ...animal, href: adoptionPath(animal.slug), blurb: ADOPT_PAGE.cardBlurb, source: 'fallback' }
+      : undefined
+  }
+  const match = visibleOfferings(published).find((entry) => entry.slug === slug)
+  return match ? cardFromOffering(match) : undefined
 }
 
 function requiredText(value: unknown, max: number): string | null {
@@ -315,7 +375,7 @@ export type AdoptionDetail = {
   seoDescription?: string
 }
 
-function localPackages(animal: AdoptionAnimal): AdoptionPackageView[] {
+function localPackages(animal: { name: string; showGold: boolean }): AdoptionPackageView[] {
   const silver: AdoptionPackageView = {
     name: 'Silver',
     kicker: 'Silver Pail',
@@ -367,21 +427,22 @@ function publishedParagraphs(
 }
 
 export function resolveAdoptionDetail(
-  animal: AdoptionAnimal,
+  animal: { name: string; slug: string; tagline: string; showGold: boolean },
   published: readonly PublishedAdoption[] = [],
 ): AdoptionDetail {
   const match = published.find((entry) => entry.slug?.trim() === animal.slug)
+  const known = knownAdoption(animal.slug)
   const tagline = match?.tagline?.trim()
   const seoTitle = match?.seo?.title?.trim()
   const seoDescription = match?.seo?.description?.trim()
   return {
     tagline: tagline && tagline.length <= 80 ? tagline : animal.tagline,
-    story: publishedParagraphs(match?.storyParagraphs, 4) ?? adoptionStory(animal.name),
-    support: publishedParagraphs(match?.supportParagraphs, 4) ?? adoptionSupportCopy(animal.name),
-    terms: publishedParagraphs(match?.termsItems, 8, 300) ?? importantInfo(animal.name),
-    packages: publishedPackages(match?.packages) ?? localPackages(animal),
+    story: publishedParagraphs(match?.storyParagraphs, 4) ?? (known ? adoptionStory(animal.name) : []),
+    support: publishedParagraphs(match?.supportParagraphs, 4) ?? (known ? adoptionSupportCopy(animal.name) : []),
+    terms: publishedParagraphs(match?.termsItems, 8, 300) ?? (known ? importantInfo(animal.name) : []),
+    packages: publishedPackages(match?.packages) ?? (known ? localPackages(animal) : []),
     gallery: imageList(match?.galleryOverride, 1024, 6),
-    seoTitle: seoTitle && seoTitle.length <= 70 ? seoTitle : undefined,
+    seoTitle: seoTitle && seoTitle.length <= SEO_TITLE_MAX ? seoTitle : undefined,
     seoDescription: seoDescription && seoDescription.length <= SEO_DESCRIPTION_MAX ? seoDescription : undefined,
   }
 }

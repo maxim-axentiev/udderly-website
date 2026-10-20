@@ -107,6 +107,15 @@ export const adoptionPage = defineType({
       description: 'Leave empty to keep the current photo.',
     }),
     defineField({
+      name: 'manageCollection',
+      title: 'Manage the animal list in Sanity',
+      type: 'boolean',
+      group: 'content',
+      initialValue: false,
+      description:
+        'Turn this on when Adopt an Animal should list only published offerings. After it is on, unpublishing every offering leaves the list empty instead of restoring the original cards.',
+    }),
+    defineField({
       name: 'animalsHeading',
       title: 'Animals heading',
       type: 'string',

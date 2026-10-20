@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { Button, ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
-import type { AdoptionAnimal } from '@/lib/adopt/content'
+import { ADOPTION_ANIMALS } from '@/lib/adopt/content'
 import { fillName, type AdoptionDetail, type AdoptionPageCopy, type AdoptionPackageView } from '@/lib/adopt/resolve'
 
 export function AnimalAdoptionPage({
@@ -12,7 +12,7 @@ export function AnimalAdoptionPage({
   images,
   newsletter,
 }: {
-  animal: AdoptionAnimal
+  animal: { name: string; slug: string }
   copy: AdoptionPageCopy
   detail: AdoptionDetail
   images: { hero: string; gallery: readonly string[]; support: string }
@@ -51,11 +51,13 @@ export function AnimalAdoptionPage({
           <ul className="grid grid-cols-2 gap-3">
             {(detail.gallery.length
               ? detail.gallery.map((image) => ({ key: image.src, src: image.src, alt: image.alt }))
-              : galleryAlts.map((alt, index) => ({
-                  key: alt,
-                  src: images.gallery[index] ?? images.gallery[0] ?? '',
-                  alt,
-                }))
+              : ADOPTION_ANIMALS.some((entry) => entry.slug === animal.slug)
+                ? galleryAlts.map((alt, index) => ({
+                    key: alt,
+                    src: images.gallery[index] ?? images.gallery[0] ?? '',
+                    alt,
+                  }))
+                : []
             ).map((image) => (
               <li key={image.key} className="overflow-hidden border-2 border-headline">
                 <img

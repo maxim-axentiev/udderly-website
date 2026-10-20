@@ -141,6 +141,16 @@ export const animalListing = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'groupDescription',
+      title: 'Group description',
+      type: 'text',
+      rows: 4,
+      group: 'content',
+      description:
+        'The second paragraph for a pair or group, such as “Write about all of {name}…”. Leave empty to keep the current text for animals already on the page.',
+      validation: (rule) => rule.max(800),
+    }),
+    defineField({
       name: 'placementIntro',
       title: 'Placement introduction',
       type: 'text',

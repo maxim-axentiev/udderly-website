@@ -95,7 +95,7 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
 
 export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(slug.current)].slug.current`
 
-export const adoptionOfferingsQuery = `*[_type == "adoptionOffering" && active != false]{
+export const adoptionOfferingsQuery = `*[_type == "adoptionOffering"] | order(sortOrder asc, title asc){
   _id,
   title,
   "slug": slug.current,
@@ -105,6 +105,8 @@ export const adoptionOfferingsQuery = `*[_type == "adoptionOffering" && active !
   supportParagraphs,
   termsItems,
   availability,
+  sortOrder,
+  active,
   cardImage ${altImage},
   galleryOverride[] ${altImage},
   packages[]{
@@ -133,6 +135,7 @@ export const adoptionPageQuery = `*[_id == "adoptionPage"][0]{
   sponsorParagraphs,
   sponsorNote,
   sponsorImage ${altImage},
+  manageCollection,
   animalsHeading,
   animalsIntro,
   learnMoreLabel,
@@ -156,13 +159,17 @@ export const adoptionPageQuery = `*[_id == "adoptionPage"][0]{
   seoDescription
 }`
 
-export const animalListingsQuery = `*[_type == "animalListing"]{
+export const animalListingsQuery = `*[_type == "animalListing"] | order(sortOrder asc, title asc){
   _id,
   title,
   "slug": slug.current,
   status,
+  sortOrder,
+  active,
+  detailsProfile,
   priceDisplay,
   personality,
+  groupDescription,
   birthHeight,
   birthWeight,
   "birthDate": birthDate,
@@ -192,6 +199,7 @@ export const animalsForSalePageQuery = `*[_id == "animalsForSalePage"][0]{
   intro,
   introButtonLabel,
   introButtonHref,
+  manageCollection,
   availableHeading,
   soldLead,
   soldAccent,

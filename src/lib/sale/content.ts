@@ -133,6 +133,10 @@ export const ALPACA_POLICY = [
 export const COW_PLACEMENT =
   'We’re passionate about where our animals go. That’s why we do not sell our calves to petting farms or travelling zoos. These environments often over-handle animals and compromise their well-being. Instead, we seek homes where animals are cared for with respect and companionship. Mini highland cows are herd animals and should never be kept alone. Please plan for at least one other cow companion.'
 
+export function saleGroupDescription(name: string): string {
+  return `Placeholder description. Write about all of ${name} here — personalities, ages, sexes, quirks and who sticks closest to whom. They're sold together so they always have a friend.`
+}
+
 export function salePath(slug: string): string {
   return `${SALE_PATH}/${slug}`
 }

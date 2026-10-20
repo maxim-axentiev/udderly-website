@@ -92,6 +92,15 @@ export const animalsForSalePage = defineType({
       validation: (rule) => rule.custom(optionalPublicHrefRule),
     }),
     defineField({
+      name: 'manageCollection',
+      title: 'Manage the animal list in Sanity',
+      type: 'boolean',
+      group: 'content',
+      initialValue: false,
+      description:
+        'Turn this on when Animals for Sale should list only published listings. After it is on, unpublishing every listing leaves the list empty instead of restoring the original cards.',
+    }),
+    defineField({
       name: 'availableHeading',
       title: 'Available heading',
       type: 'string',

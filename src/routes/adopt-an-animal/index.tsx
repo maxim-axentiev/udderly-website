@@ -26,7 +26,9 @@ export const Route = createFileRoute('/adopt-an-animal/')({
     }
     return {
       copy: resolveAdoptionPageCopy(data.page),
-      cards: buildAdoptionCards(data.offerings),
+      cards: buildAdoptionCards(data.offerings, {
+        manageCollection: data.page?.manageCollection === true,
+      }),
     }
   },
   head: ({ loaderData }) =>

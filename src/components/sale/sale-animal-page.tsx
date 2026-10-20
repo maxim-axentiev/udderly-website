@@ -11,6 +11,7 @@ import {
   GOAT_POLICY,
   PRICE_PLACEHOLDER,
   SPECIES_LABEL,
+  saleGroupDescription,
 } from '@/lib/sale/content'
 import type { SaleCard, SalePageCopy } from '@/lib/sale/resolve'
 import { WaitlistSection } from './waitlist-form'
@@ -29,12 +30,21 @@ export function SaleAnimalPage({
   copy: SalePageCopy
 }) {
   const isCow = animal.species === 'cow'
-  const label = animal.speciesTitle || SPECIES_LABEL[animal.species]
+  const isPair = animal.species === 'goat' || animal.species === 'alpaca'
+  const label = animal.speciesTitle || (animal.species === 'other' ? '' : SPECIES_LABEL[animal.species])
   const portrait = animal.images[0]?.src ?? images.portrait
-  const portraitAlt = animal.images[0]?.alt ?? `${animal.name}, ${label}`
-  const placementIntro = animal.placementIntro || COW_PLACEMENT
+  const portraitAlt = animal.images[0]?.alt ?? (label ? `${animal.name}, ${label}` : animal.name)
+  const placementIntro = animal.placementIntro || (isCow ? COW_PLACEMENT : '')
   const placementItems =
-    animal.placementItems ?? (animal.species === 'goat' ? GOAT_POLICY : ALPACA_POLICY)
+    animal.placementItems ??
+    (animal.species === 'goat' ? [...GOAT_POLICY] : animal.species === 'alpaca' ? [...ALPACA_POLICY] : undefined)
+  const groupCopy =
+    animal.groupDescription || (isPair ? saleGroupDescription(animal.name) : undefined)
+  const personality =
+    animal.personality ||
+    (animal.species === 'other'
+      ? undefined
+      : `Placeholder description. ${animal.name} ${isCow ? 'is' : 'are'} gentle, curious and well socialized from day one. Raised on our farm with plenty of attention, snacks and herd time, ${isCow ? 'this calf is' : "they're"} ready to bring a little ridiculousness to the right home.`)
   const facts = COW_FACTS.map(([name, fallback]) => {
     if (name === 'Birthdate' && animal.birthDate) return [name, animal.birthDate] as const
     if (name === 'Height at birth' && animal.birthHeight) return [name, animal.birthHeight] as const
@@ -50,11 +60,12 @@ export function SaleAnimalPage({
       <section className="farm-dots relative overflow-hidden border-b-2 border-headline bg-farm-beige py-24 md:py-32">
         <Container width="brand" className="max-w-5xl text-center">
           <p className="inline-block rotate-2 border-2 border-headline bg-background px-4 py-1 font-display text-sm font-black uppercase tracking-widest text-primary-accent">
-            {isCow ? 'Hi, my name is' : 'Hi, our names are'}
+            {isPair ? 'Hi, our names are' : 'Hi, my name is'}
           </p>
           <h1 className="mt-6 font-display text-[clamp(3rem,10vw,8.5rem)] font-black uppercase leading-[0.8] text-headline">
             {animal.name}
           </h1>
+          {label ? (
           <p className="mt-7 inline-block -rotate-2 bg-primary-accent px-5 py-2 font-accent text-2xl italic text-primary-foreground md:text-3xl">
             {animal.speciesTitle
               ? isCow
@@ -66,6 +77,7 @@ export function SaleAnimalPage({
                   ? "…and we're Miniature Goats"
                   : "…and we're Alpacas"}
           </p>
+          ) : null}
         </Container>
       </section>
 
@@ -75,16 +87,14 @@ export function SaleAnimalPage({
             <h2 className="font-display text-[clamp(2.2rem,5.2vw,4.4rem)] font-black uppercase leading-[0.85] text-headline">
               {animal.sold ? 'Happily rehomed' : <>Looking for <span className="text-stroke">a forever home</span></>}
             </h2>
-            <p className="mt-6 text-base leading-relaxed md:text-lg">
-              {animal.personality ||
-                `Placeholder description. ${animal.name} ${isCow ? 'is' : 'are'} gentle, curious and well socialized from day one. Raised on our farm with plenty of attention, snacks and herd time, ${isCow ? 'this calf is' : "they're"} ready to bring a little ridiculousness to the right home.`}
-            </p>
+            {personality ? <p className="mt-6 text-base leading-relaxed md:text-lg">{personality}</p> : null}
             {animal.sold ? null : (
               <ButtonLink href="#contact" size="lg" className="mt-8">
                 {copy.buyButtonLabel}
               </ButtonLink>
             )}
           </div>
+          {portrait ? (
           <img
             src={portrait}
             alt={portraitAlt}
@@ -93,17 +103,24 @@ export function SaleAnimalPage({
             loading="lazy"
             className="aspect-[4/3] w-full border-2 border-headline object-cover"
           />
+          ) : (
+            <div className="aspect-[4/3] w-full border-2 border-headline bg-farm-beige" />
+          )}
         </Container>
       </section>
 
       <section className="bg-farm-blue py-20 md:py-28">
         <Container width="brand" className="max-w-[1300px]">
           <article className="grid gap-8 border-2 border-headline bg-background p-5 shadow-[14px_14px_0_var(--color-headline)] md:p-8 lg:grid-cols-[1fr_1.3fr]">
-            <img src={portrait} alt={portraitAlt} width={1024} height={1024} loading="lazy" className="aspect-square w-full border-2 border-headline object-cover" />
+            {portrait ? (
+              <img src={portrait} alt={portraitAlt} width={1024} height={1024} loading="lazy" className="aspect-square w-full border-2 border-headline object-cover" />
+            ) : (
+              <div className="aspect-square w-full border-2 border-headline bg-farm-beige" />
+            )}
             <div>
               <div className="flex flex-wrap items-start justify-between gap-6">
                 <h2 className="font-display text-[clamp(2rem,4.5vw,3.6rem)] font-black uppercase leading-[0.85] text-headline">
-                  {isCow ? `All about ${animal.name}` : `Meet the ${animal.species === 'goat' ? 'goats' : 'alpacas'}`}
+                  {isCow ? `All about ${animal.name}` : isPair ? `Meet the ${animal.species === 'goat' ? 'goats' : 'alpacas'}` : `Meet ${animal.name}`}
                 </h2>
                 <div className="inline-flex -rotate-3 flex-col items-center border-4 border-headline bg-secondary-accent px-6 py-3">
                   <span className="font-display text-xs font-black uppercase tracking-widest">{animal.sold ? 'Status' : 'Price'}</span>
@@ -124,12 +141,9 @@ export function SaleAnimalPage({
                     </div>
                   ))}
                 </dl>
-              ) : (
-                <p className="mt-6 text-base leading-relaxed md:text-lg">
-                  {animal.personality ||
-                    `Placeholder description. Write about all of ${animal.name} here — personalities, ages, sexes, quirks and who sticks closest to whom. They're sold together so they always have a friend.`}
-                </p>
-              )}
+              ) : groupCopy ? (
+                <p className="mt-6 text-base leading-relaxed md:text-lg">{groupCopy}</p>
+              ) : null}
             </div>
           </article>
         </Container>
@@ -188,7 +202,7 @@ export function SaleAnimalPage({
                 />
               </article>
             </div>
-          ) : (
+          ) : placementItems?.length ? (
             <ul className="mt-12 space-y-4 border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
               {placementItems.map((item) => (
                 <li key={item} className="flex gap-3 text-base leading-relaxed md:text-lg">
@@ -197,7 +211,7 @@ export function SaleAnimalPage({
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </Container>
       </section>
 

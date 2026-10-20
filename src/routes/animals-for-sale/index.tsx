@@ -20,7 +20,9 @@ export const Route = createFileRoute('/animals-for-sale/')({
       page: Record<string, unknown> | null
       listings: PublishedListing[]
     }
-    const lists = buildSaleLists(data.listings)
+    const lists = buildSaleLists(data.listings, {
+      manageCollection: data.page?.manageCollection === true,
+    })
     return {
       copy: resolveSalePageCopy(data.page),
       available: lists.available,
