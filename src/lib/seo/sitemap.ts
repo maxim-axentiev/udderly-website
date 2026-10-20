@@ -48,6 +48,46 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
+    {
+      path: '/corporate-training',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      path: '/corporate-training/team-building-experiences',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/corporate-training/experiential-tourism-development',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/corporate-training/disc-assessment',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/corporate-training/the-power-of-conversation',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/corporate-training/alpaca-emotional-intelligence',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/corporate-training/beyond-engagement',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/corporate-training/innovation-on-the-farm',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
   ]
 }
 

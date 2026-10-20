@@ -20,6 +20,14 @@ import { Route as AdoptAnAnimalIndexRouteImport } from './routes/adopt-an-animal
 import { Route as AdoptAnAnimalSlugRouteImport } from './routes/adopt-an-animal/$slug'
 import { Route as AnimalsForSaleIndexRouteImport } from './routes/animals-for-sale/index'
 import { Route as AnimalsForSaleSlugRouteImport } from './routes/animals-for-sale/$slug'
+import { Route as CorporateTrainingIndexRouteImport } from './routes/corporate-training/index'
+import { Route as CorporateTrainingAlpacaEmotionalIntelligenceRouteImport } from './routes/corporate-training/alpaca-emotional-intelligence'
+import { Route as CorporateTrainingBeyondEngagementRouteImport } from './routes/corporate-training/beyond-engagement'
+import { Route as CorporateTrainingDiscAssessmentRouteImport } from './routes/corporate-training/disc-assessment'
+import { Route as CorporateTrainingExperientialTourismDevelopmentRouteImport } from './routes/corporate-training/experiential-tourism-development'
+import { Route as CorporateTrainingInnovationOnTheFarmRouteImport } from './routes/corporate-training/innovation-on-the-farm'
+import { Route as CorporateTrainingTeamBuildingExperiencesRouteImport } from './routes/corporate-training/team-building-experiences'
+import { Route as CorporateTrainingThePowerOfConversationRouteImport } from './routes/corporate-training/the-power-of-conversation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,6 +85,53 @@ const AnimalsForSaleSlugRoute = AnimalsForSaleSlugRouteImport.update({
   path: '/animals-for-sale/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CorporateTrainingIndexRoute = CorporateTrainingIndexRouteImport.update({
+  id: '/corporate-training/',
+  path: '/corporate-training/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CorporateTrainingAlpacaEmotionalIntelligenceRoute =
+  CorporateTrainingAlpacaEmotionalIntelligenceRouteImport.update({
+    id: '/corporate-training/alpaca-emotional-intelligence',
+    path: '/corporate-training/alpaca-emotional-intelligence',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CorporateTrainingBeyondEngagementRoute =
+  CorporateTrainingBeyondEngagementRouteImport.update({
+    id: '/corporate-training/beyond-engagement',
+    path: '/corporate-training/beyond-engagement',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CorporateTrainingDiscAssessmentRoute =
+  CorporateTrainingDiscAssessmentRouteImport.update({
+    id: '/corporate-training/disc-assessment',
+    path: '/corporate-training/disc-assessment',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CorporateTrainingExperientialTourismDevelopmentRoute =
+  CorporateTrainingExperientialTourismDevelopmentRouteImport.update({
+    id: '/corporate-training/experiential-tourism-development',
+    path: '/corporate-training/experiential-tourism-development',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CorporateTrainingInnovationOnTheFarmRoute =
+  CorporateTrainingInnovationOnTheFarmRouteImport.update({
+    id: '/corporate-training/innovation-on-the-farm',
+    path: '/corporate-training/innovation-on-the-farm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CorporateTrainingTeamBuildingExperiencesRoute =
+  CorporateTrainingTeamBuildingExperiencesRouteImport.update({
+    id: '/corporate-training/team-building-experiences',
+    path: '/corporate-training/team-building-experiences',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CorporateTrainingThePowerOfConversationRoute =
+  CorporateTrainingThePowerOfConversationRouteImport.update({
+    id: '/corporate-training/the-power-of-conversation',
+    path: '/corporate-training/the-power-of-conversation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,8 +143,16 @@ export interface FileRoutesByFullPath {
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
   '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
+  '/corporate-training/alpaca-emotional-intelligence': typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
+  '/corporate-training/beyond-engagement': typeof CorporateTrainingBeyondEngagementRoute
+  '/corporate-training/disc-assessment': typeof CorporateTrainingDiscAssessmentRoute
+  '/corporate-training/experiential-tourism-development': typeof CorporateTrainingExperientialTourismDevelopmentRoute
+  '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
+  '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
+  '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
   '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
+  '/corporate-training/': typeof CorporateTrainingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,8 +164,16 @@ export interface FileRoutesByTo {
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
   '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
+  '/corporate-training/alpaca-emotional-intelligence': typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
+  '/corporate-training/beyond-engagement': typeof CorporateTrainingBeyondEngagementRoute
+  '/corporate-training/disc-assessment': typeof CorporateTrainingDiscAssessmentRoute
+  '/corporate-training/experiential-tourism-development': typeof CorporateTrainingExperientialTourismDevelopmentRoute
+  '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
+  '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
+  '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
   '/adopt-an-animal': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale': typeof AnimalsForSaleIndexRoute
+  '/corporate-training': typeof CorporateTrainingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,8 +186,16 @@ export interface FileRoutesById {
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
   '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
+  '/corporate-training/alpaca-emotional-intelligence': typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
+  '/corporate-training/beyond-engagement': typeof CorporateTrainingBeyondEngagementRoute
+  '/corporate-training/disc-assessment': typeof CorporateTrainingDiscAssessmentRoute
+  '/corporate-training/experiential-tourism-development': typeof CorporateTrainingExperientialTourismDevelopmentRoute
+  '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
+  '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
+  '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
   '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
+  '/corporate-training/': typeof CorporateTrainingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,8 +209,16 @@ export interface FileRouteTypes {
     | '/tower-of-goats-discovery-trail'
     | '/adopt-an-animal/$slug'
     | '/animals-for-sale/$slug'
+    | '/corporate-training/alpaca-emotional-intelligence'
+    | '/corporate-training/beyond-engagement'
+    | '/corporate-training/disc-assessment'
+    | '/corporate-training/experiential-tourism-development'
+    | '/corporate-training/innovation-on-the-farm'
+    | '/corporate-training/team-building-experiences'
+    | '/corporate-training/the-power-of-conversation'
     | '/adopt-an-animal/'
     | '/animals-for-sale/'
+    | '/corporate-training/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -143,8 +230,16 @@ export interface FileRouteTypes {
     | '/tower-of-goats-discovery-trail'
     | '/adopt-an-animal/$slug'
     | '/animals-for-sale/$slug'
+    | '/corporate-training/alpaca-emotional-intelligence'
+    | '/corporate-training/beyond-engagement'
+    | '/corporate-training/disc-assessment'
+    | '/corporate-training/experiential-tourism-development'
+    | '/corporate-training/innovation-on-the-farm'
+    | '/corporate-training/team-building-experiences'
+    | '/corporate-training/the-power-of-conversation'
     | '/adopt-an-animal'
     | '/animals-for-sale'
+    | '/corporate-training'
   id:
     | '__root__'
     | '/'
@@ -156,8 +251,16 @@ export interface FileRouteTypes {
     | '/tower-of-goats-discovery-trail'
     | '/adopt-an-animal/$slug'
     | '/animals-for-sale/$slug'
+    | '/corporate-training/alpaca-emotional-intelligence'
+    | '/corporate-training/beyond-engagement'
+    | '/corporate-training/disc-assessment'
+    | '/corporate-training/experiential-tourism-development'
+    | '/corporate-training/innovation-on-the-farm'
+    | '/corporate-training/team-building-experiences'
+    | '/corporate-training/the-power-of-conversation'
     | '/adopt-an-animal/'
     | '/animals-for-sale/'
+    | '/corporate-training/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -170,8 +273,16 @@ export interface RootRouteChildren {
   TowerOfGoatsDiscoveryTrailRoute: typeof TowerOfGoatsDiscoveryTrailRoute
   AdoptAnAnimalSlugRoute: typeof AdoptAnAnimalSlugRoute
   AnimalsForSaleSlugRoute: typeof AnimalsForSaleSlugRoute
+  CorporateTrainingAlpacaEmotionalIntelligenceRoute: typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
+  CorporateTrainingBeyondEngagementRoute: typeof CorporateTrainingBeyondEngagementRoute
+  CorporateTrainingDiscAssessmentRoute: typeof CorporateTrainingDiscAssessmentRoute
+  CorporateTrainingExperientialTourismDevelopmentRoute: typeof CorporateTrainingExperientialTourismDevelopmentRoute
+  CorporateTrainingInnovationOnTheFarmRoute: typeof CorporateTrainingInnovationOnTheFarmRoute
+  CorporateTrainingTeamBuildingExperiencesRoute: typeof CorporateTrainingTeamBuildingExperiencesRoute
+  CorporateTrainingThePowerOfConversationRoute: typeof CorporateTrainingThePowerOfConversationRoute
   AdoptAnAnimalIndexRoute: typeof AdoptAnAnimalIndexRoute
   AnimalsForSaleIndexRoute: typeof AnimalsForSaleIndexRoute
+  CorporateTrainingIndexRoute: typeof CorporateTrainingIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -253,6 +364,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnimalsForSaleSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/corporate-training/': {
+      id: '/corporate-training/'
+      path: '/corporate-training'
+      fullPath: '/corporate-training/'
+      preLoaderRoute: typeof CorporateTrainingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/alpaca-emotional-intelligence': {
+      id: '/corporate-training/alpaca-emotional-intelligence'
+      path: '/corporate-training/alpaca-emotional-intelligence'
+      fullPath: '/corporate-training/alpaca-emotional-intelligence'
+      preLoaderRoute: typeof CorporateTrainingAlpacaEmotionalIntelligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/beyond-engagement': {
+      id: '/corporate-training/beyond-engagement'
+      path: '/corporate-training/beyond-engagement'
+      fullPath: '/corporate-training/beyond-engagement'
+      preLoaderRoute: typeof CorporateTrainingBeyondEngagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/disc-assessment': {
+      id: '/corporate-training/disc-assessment'
+      path: '/corporate-training/disc-assessment'
+      fullPath: '/corporate-training/disc-assessment'
+      preLoaderRoute: typeof CorporateTrainingDiscAssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/experiential-tourism-development': {
+      id: '/corporate-training/experiential-tourism-development'
+      path: '/corporate-training/experiential-tourism-development'
+      fullPath: '/corporate-training/experiential-tourism-development'
+      preLoaderRoute: typeof CorporateTrainingExperientialTourismDevelopmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/innovation-on-the-farm': {
+      id: '/corporate-training/innovation-on-the-farm'
+      path: '/corporate-training/innovation-on-the-farm'
+      fullPath: '/corporate-training/innovation-on-the-farm'
+      preLoaderRoute: typeof CorporateTrainingInnovationOnTheFarmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/team-building-experiences': {
+      id: '/corporate-training/team-building-experiences'
+      path: '/corporate-training/team-building-experiences'
+      fullPath: '/corporate-training/team-building-experiences'
+      preLoaderRoute: typeof CorporateTrainingTeamBuildingExperiencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate-training/the-power-of-conversation': {
+      id: '/corporate-training/the-power-of-conversation'
+      path: '/corporate-training/the-power-of-conversation'
+      fullPath: '/corporate-training/the-power-of-conversation'
+      preLoaderRoute: typeof CorporateTrainingThePowerOfConversationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -266,8 +433,22 @@ const rootRouteChildren: RootRouteChildren = {
   TowerOfGoatsDiscoveryTrailRoute: TowerOfGoatsDiscoveryTrailRoute,
   AdoptAnAnimalSlugRoute: AdoptAnAnimalSlugRoute,
   AnimalsForSaleSlugRoute: AnimalsForSaleSlugRoute,
+  CorporateTrainingAlpacaEmotionalIntelligenceRoute:
+    CorporateTrainingAlpacaEmotionalIntelligenceRoute,
+  CorporateTrainingBeyondEngagementRoute:
+    CorporateTrainingBeyondEngagementRoute,
+  CorporateTrainingDiscAssessmentRoute: CorporateTrainingDiscAssessmentRoute,
+  CorporateTrainingExperientialTourismDevelopmentRoute:
+    CorporateTrainingExperientialTourismDevelopmentRoute,
+  CorporateTrainingInnovationOnTheFarmRoute:
+    CorporateTrainingInnovationOnTheFarmRoute,
+  CorporateTrainingTeamBuildingExperiencesRoute:
+    CorporateTrainingTeamBuildingExperiencesRoute,
+  CorporateTrainingThePowerOfConversationRoute:
+    CorporateTrainingThePowerOfConversationRoute,
   AdoptAnAnimalIndexRoute: AdoptAnAnimalIndexRoute,
   AnimalsForSaleIndexRoute: AnimalsForSaleIndexRoute,
+  CorporateTrainingIndexRoute: CorporateTrainingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

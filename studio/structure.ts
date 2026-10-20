@@ -50,6 +50,16 @@ export const structure: StructureResolver = (S) =>
                     .title('Experiences hub'),
                 ),
               S.documentTypeListItem('experience').title('Experiences'),
+              S.listItem()
+                .title('Corporate Training page')
+                .id(SINGLETON_IDS.corporateTrainingPage)
+                .icon(CaseIcon)
+                .child(
+                  S.document()
+                    .schemaType('corporateTrainingPage')
+                    .documentId(SINGLETON_IDS.corporateTrainingPage)
+                    .title('Corporate Training page'),
+                ),
               S.documentTypeListItem('corporateProgram').title('Corporate Programs'),
             ]),
         ),

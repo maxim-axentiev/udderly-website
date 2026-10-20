@@ -16,6 +16,14 @@ describe('sitemap foundation', () => {
       '/tower-of-goats-discovery-trail',
       '/adopt-an-animal',
       '/animals-for-sale',
+      '/corporate-training',
+      '/corporate-training/team-building-experiences',
+      '/corporate-training/experiential-tourism-development',
+      '/corporate-training/disc-assessment',
+      '/corporate-training/the-power-of-conversation',
+      '/corporate-training/alpaca-emotional-intelligence',
+      '/corporate-training/beyond-engagement',
+      '/corporate-training/innovation-on-the-farm',
     ])
     expect(isSitemapPathExcluded('/health')).toBe(true)
     expect(isSitemapPathExcluded('/')).toBe(false)

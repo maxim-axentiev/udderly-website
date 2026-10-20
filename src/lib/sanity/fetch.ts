@@ -21,11 +21,15 @@ import {
   animalListingsQuery,
   animalsForSalePageQuery,
   experiencesHubContentQuery,
+  corporateProgramBySlugQuery,
+  corporateProgramCardsQuery,
+  corporateTrainingPageQuery,
   homepageFaqsQuery,
   homepageQuery,
   navigationQuery,
   siteSettingsQuery,
 } from './queries'
+import type { CmsCorporateProgram, CmsCorporateTrainingPage } from '@/lib/corporate/cms'
 import type { PublishedAdoption } from '@/lib/adopt/resolve'
 import type { PublishedListing } from '@/lib/sale/resolve'
 
@@ -201,6 +205,44 @@ export async function fetchAnimalListings(): Promise<PublishedListing[]> {
     return listings ?? []
   } catch {
     return []
+  }
+}
+
+export async function fetchCorporateTrainingPage(): Promise<CmsCorporateTrainingPage | null> {
+  try {
+    return (
+      (await withTimeout(
+        sanityClient.fetch<CmsCorporateTrainingPage | null>(corporateTrainingPageQuery),
+        CHROME_FETCH_TIMEOUT_MS,
+      )) ?? null
+    )
+  } catch {
+    return null
+  }
+}
+
+export async function fetchCorporateProgramCards(): Promise<CmsCorporateProgram[]> {
+  try {
+    const programs = await withTimeout(
+      sanityClient.fetch<CmsCorporateProgram[] | null>(corporateProgramCardsQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return programs ?? []
+  } catch {
+    return []
+  }
+}
+
+export async function fetchCorporateProgram(slug: string): Promise<CmsCorporateProgram | null> {
+  try {
+    return (
+      (await withTimeout(
+        sanityClient.fetch<CmsCorporateProgram | null>(corporateProgramBySlugQuery, { slug }),
+        CHROME_FETCH_TIMEOUT_MS,
+      )) ?? null
+    )
+  } catch {
+    return null
   }
 }
 

@@ -1,9 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
 
+import { isCorporateProgramSlug } from '@/lib/corporate/slugs'
 import { resolveHomepageFaqs } from '@/lib/homepage-faqs'
 import { mergeSiteChrome } from '@/lib/site-chrome'
 
 import {
+  fetchCorporateProgram,
+  fetchCorporateProgramCards,
+  fetchCorporateTrainingPage,
   fetchExperienceBySlug,
   fetchExperienceFoundation,
   fetchExperienceHub,
@@ -77,6 +81,25 @@ export const getAnimalsForSalePageFn = createServerFn({
   ])
   return { page, listings }
 })
+
+export const getCorporateTrainingPageFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => fetchCorporateTrainingPage())
+
+export const getCorporateProgramCardsFn = createServerFn({
+  method: 'GET',
+  strict: false,
+}).handler(async () => fetchCorporateProgramCards())
+
+export const getCorporateProgramFn = createServerFn({ method: 'GET', strict: false })
+  .validator((data: unknown) => {
+    if (typeof data !== 'string' || !isCorporateProgramSlug(data)) {
+      throw new Error('Unknown corporate program.')
+    }
+    return data
+  })
+  .handler(async ({ data }) => fetchCorporateProgram(data))
 
 export const getHomepageContentFn = createServerFn({
   method: 'GET',

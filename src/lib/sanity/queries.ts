@@ -450,6 +450,150 @@ export const homepageQuery = `*[_id == "homepage"][0]{
   ogDescription
 }`
 
+const corporateImageText = `{
+  eyebrow,
+  title,
+  body,
+  href,
+  ctaLabel,
+  enabled,
+  image ${altImage}
+}`
+
+const corporatePerson = `{
+  enabled,
+  eyebrow,
+  title,
+  body,
+  ctaLabel,
+  ctaHref,
+  image ${altImage}
+}`
+
+const corporateBanner = `{
+  enabled,
+  headingLead,
+  headingAccent,
+  body,
+  image ${altImage}
+}`
+
+const corporateFacility = `{
+  enabled,
+  headingLead,
+  headingAccent,
+  items[]{ icon, title, body },
+  gallery[] ${altImage}
+}`
+
+const corporateQuotes = `"testimonials": testimonials[]->{
+  _id,
+  quote,
+  guestName
+}[defined(_id)]`
+
+export const corporateTrainingPageQuery = `*[_id == "corporateTrainingPage"][0]{
+  _id,
+  heroLead,
+  heroAccent,
+  heroIntro,
+  heroImage ${altImage},
+  introLead,
+  introAccent,
+  introParagraphs,
+  introGallery[] ${altImage},
+  introBadge,
+  programsHeading,
+  featuredProgram ${corporateImageText},
+  programCards[] ${corporateImageText},
+  tourismProgram ${corporateImageText},
+  showAwards,
+  reviewsApproved,
+  reviewsHeading,
+  reviewsCtaLabel,
+  reviewsCtaHref,
+  ${corporateQuotes},
+  facilitator ${corporatePerson},
+  environment ${corporateBanner},
+  facility ${corporateFacility},
+  enquiryHeading,
+  enquiryIntro,
+  seo { title, description }
+}`
+
+export const corporateProgramCardsQuery = `*[_type == "corporateProgram" && active != false && defined(slug.current)]{
+  title,
+  "slug": slug.current,
+  shortDescription,
+  heroImage ${altImage},
+  active
+}`
+
+export const corporateProgramBySlugQuery = `*[_type == "corporateProgram" && slug.current == $slug && active != false][0]{
+  _id,
+  title,
+  heroLead,
+  titleAccent,
+  "slug": slug.current,
+  shortDescription,
+  heroIntro,
+  heroImage ${altImage},
+  introHeading,
+  introHeadingAccent,
+  programDescription,
+  introImage ${altImage},
+  learningOutcomes,
+  outcomesHeading,
+  duration,
+  durationDetail,
+  enhancements,
+  enhancementsNote,
+  reviewsApproved,
+  reviewsHeading,
+  ${corporateQuotes},
+  contactHeading,
+  contactIntro,
+  enquiryShowPhone,
+  enquiryPrograms,
+  introCtaLabel,
+  showAwards,
+  activities[] ${corporateImageText},
+  mixHeading,
+  mixBody,
+  mixCtaLabel,
+  herdHeading,
+  herdHeadingAccent,
+  pathHeading,
+  pathSteps[]{ title, body },
+  consultationLabel,
+  credentials[]{ icon, label },
+  servicesHeading,
+  services[]{
+    name,
+    price,
+    featured,
+    items[]{ title, body }
+  },
+  audiences[]{ icon, label },
+  audienceHeading,
+  audienceNote,
+  offeringsHeading,
+  offerings[]{
+    title,
+    body,
+    image ${altImage},
+    outcomes,
+    ctaLabel
+  },
+  practicalHeading,
+  practicalItems[]{ icon, label, lines },
+  facilitator ${corporatePerson},
+  environment ${corporateBanner},
+  facility ${corporateFacility},
+  seo { title, description },
+  active
+}`
+
 export const homepageFaqsQuery = `*[_id == "siteSettings"][0]{
   homepageFaqs[]{
     _key,

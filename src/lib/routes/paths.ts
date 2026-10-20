@@ -15,6 +15,7 @@ export const RESERVED_SLUGS = [
   'adopt',
   'adopt-an-animal',
   'corporate',
+  'corporate-training',
   'our-farm',
   'animals-for-sale',
   'urbort',
@@ -47,6 +48,16 @@ const INTERNAL_DOCUMENT_TYPE_SET = new Set<string>(INTERNAL_DOCUMENT_TYPES)
 
 /** Document types whose public route is implemented. */
 const ROUTED_DOCUMENT_TYPES = new Set<InternalDocumentType>(['experience'])
+
+const CORPORATE_PROGRAM_SLUGS = new Set<string>([
+  'team-building-experiences',
+  'experiential-tourism-development',
+  'disc-assessment',
+  'the-power-of-conversation',
+  'alpaca-emotional-intelligence',
+  'beyond-engagement',
+  'innovation-on-the-farm',
+])
 
 const EXPERIENCE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -88,6 +99,13 @@ export function resolveDocumentPath(
 
   if (!EXPERIENCE_SLUG.test(normalized)) {
     return { ok: false, reason: 'invalid-slug' }
+  }
+
+  if (type === 'corporateProgram') {
+    if (!CORPORATE_PROGRAM_SLUGS.has(normalized)) {
+      return { ok: false, reason: 'route-not-implemented' }
+    }
+    return { ok: true, href: `/corporate-training/${normalized}` }
   }
 
   if (!ROUTED_DOCUMENT_TYPES.has(type)) {

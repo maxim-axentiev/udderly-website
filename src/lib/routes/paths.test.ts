@@ -85,7 +85,7 @@ describe('document types without an implemented route', () => {
     ['animal', 'clara'],
     ['animalListing', 'mini-highland-calf-june'],
     ['adoptionOffering', 'adopt-clara'],
-    ['corporateProgram', 'beyond-engagement'],
+    ['corporateProgram', 'future-program'],
     ['urbortArticle', 'worlds-first-cow-wedding'],
   ] as const)('leaves %s / %s unresolved', (type, slug) => {
     expect(resolveDocumentPath(type, slug)).toEqual({
@@ -93,6 +93,21 @@ describe('document types without an implemented route', () => {
       reason: 'route-not-implemented',
     })
     expect(documentPath(type, slug)).toBeUndefined()
+  })
+})
+
+describe('corporate program URLs', () => {
+  it('builds the approved program paths', () => {
+    expect(documentPath('corporateProgram', 'beyond-engagement')).toBe(
+      '/corporate-training/beyond-engagement',
+    )
+    expect(documentPath('corporateProgram', 'disc-assessment')).toBe(
+      '/corporate-training/disc-assessment',
+    )
+  })
+
+  it('keeps corporate-training itself out of the experience catch-all', () => {
+    expect(routableExperienceSlug('corporate-training')).toBeUndefined()
   })
 })
 

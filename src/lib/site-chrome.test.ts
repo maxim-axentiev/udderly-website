@@ -309,7 +309,10 @@ describe('CMS link resolution', () => {
     expect(documentHref('animal', 'clara')).toBeUndefined()
     expect(documentHref('animalListing', 'mini-highland-calf-june')).toBeUndefined()
     expect(documentHref('adoptionOffering', 'adopt-clara')).toBeUndefined()
-    expect(documentHref('corporateProgram', 'beyond-engagement')).toBeUndefined()
+    expect(documentHref('corporateProgram', 'beyond-engagement')).toBe(
+      '/corporate-training/beyond-engagement',
+    )
+    expect(documentHref('corporateProgram', 'future-program')).toBeUndefined()
     expect(documentHref('urbortArticle', 'worlds-first-cow-wedding')).toBeUndefined()
     expect(documentHref('experience', 'experiences')).toBeUndefined()
     expect(documentHref('promotion', 'spring-offer')).toBeUndefined()
