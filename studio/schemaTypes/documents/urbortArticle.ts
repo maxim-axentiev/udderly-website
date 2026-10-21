@@ -1,7 +1,7 @@
 import {BookIcon} from '../../lib/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {slugField} from '../fields'
+import {activeField, slugField} from '../fields'
 
 export const urbortArticle = defineType({
   name: 'urbortArticle',
@@ -42,7 +42,7 @@ export const urbortArticle = defineType({
       title: 'Publish date',
       type: 'datetime',
       group: 'content',
-      validation: (rule) => rule.required(),
+      description: 'Shown on the article. The page stays off the website until the article is published with a body.',
     }),
     defineField({
       name: 'author',
@@ -55,9 +55,18 @@ export const urbortArticle = defineType({
       title: 'Article',
       type: 'portableText',
       group: 'content',
-      description: 'You can add headings, images, galleries, and YouTube or Vimeo videos in the article.',
-      validation: (rule) => rule.required(),
+      description:
+        'Headings, images, galleries, and YouTube or Vimeo videos. Leave this empty while drafting. The public article is a 404 until this document is published with real article text. Do not paste placeholder Latin.',
     }),
+    defineField({
+      name: 'gallery',
+      title: 'Photo gallery',
+      type: 'array',
+      group: 'content',
+      description: 'Optional slideshow under the article. Leave empty to hide it.',
+      of: [defineArrayMember({type: 'altImage'})],
+    }),
+    activeField('Show on the website', 'content'),
     defineField({
       name: 'externalLinks',
       title: 'External / media links',
@@ -67,7 +76,7 @@ export const urbortArticle = defineType({
     }),
     defineField({
       name: 'tags',
-      title: 'Tags',
+      title: 'Categories and tags',
       type: 'array',
       group: 'content',
       description: 'Optional labels such as animal story or farm experiment.',

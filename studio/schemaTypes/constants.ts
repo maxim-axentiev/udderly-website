@@ -71,6 +71,9 @@ export const policyTypes = [
   {title: 'Adoption terms', value: 'adoption'},
   {title: 'Animal welfare', value: 'welfare'},
   {title: 'Visiting the farm', value: 'visiting'},
+  {title: 'Privacy', value: 'privacy'},
+  {title: 'Terms of service', value: 'terms'},
+  {title: 'Cookies', value: 'cookies'},
   {title: 'Other', value: 'other'},
 ] as const
 

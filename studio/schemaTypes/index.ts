@@ -44,9 +44,17 @@ import {richTextSection} from './sections/richTextSection'
 import {testimonialsSection} from './sections/testimonialsSection'
 import {urbortGrid} from './sections/urbortGrid'
 import {videoEmbed} from './sections/videoEmbed'
+import {faqPageSection, storyChapter, visionValue} from './objects/about'
 import {corporateBanner, corporateFacilityBlock, corporateFacilityItem, corporateHighlight, corporateIconLabel, corporateOffering, corporatePerson, corporatePracticalItem, corporateService, corporateServiceItem, corporateStep} from './objects/corporate'
 import {adoptionPage} from './singletons/adoptionPage'
 import {corporateTrainingPage} from './singletons/corporateTrainingPage'
+import {contactPage} from './singletons/contactPage'
+import {faqPage} from './singletons/faqPage'
+import {newsletterPage} from './singletons/newsletterPage'
+import {urbortBlogPage} from './singletons/urbortBlogPage'
+import {ourStoryPage} from './singletons/ourStoryPage'
+import {teamPage} from './singletons/teamPage'
+import {visionValuesPage} from './singletons/visionValuesPage'
 import {animalsForSalePage} from './singletons/animalsForSalePage'
 import {experiencesHub} from './singletons/experiencesHub'
 import {farmSounds} from './singletons/farmSounds'
@@ -77,6 +85,16 @@ export const schemaTypes = [
   adoptionPage,
   animalsForSalePage,
   corporateTrainingPage,
+  ourStoryPage,
+  visionValuesPage,
+  teamPage,
+  faqPage,
+  urbortBlogPage,
+  contactPage,
+  newsletterPage,
+  storyChapter,
+  visionValue,
+  faqPageSection,
   corporateHighlight,
   corporateStep,
   corporateServiceItem,

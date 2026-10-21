@@ -81,18 +81,42 @@ describe('missing and invalid slugs', () => {
 
 describe('document types without an implemented route', () => {
   it.each([
-    ['page', 'our-story'],
+    ['page', 'gift-cards'],
     ['animal', 'clara'],
     ['animalListing', 'mini-highland-calf-june'],
     ['adoptionOffering', 'adopt-clara'],
     ['corporateProgram', 'future-program'],
-    ['urbortArticle', 'worlds-first-cow-wedding'],
-  ] as const)('leaves %s / %s unresolved', (type, slug) => {
+  ] as const)('leaves %s / %s without a public route', (type, slug) => {
     expect(resolveDocumentPath(type, slug)).toEqual({
       ok: false,
       reason: 'route-not-implemented',
     })
     expect(documentPath(type, slug)).toBeUndefined()
+  })
+})
+
+describe('about page URLs', () => {
+  it('builds the four about paths and keeps them out of the experience catch-all', () => {
+    expect(documentPath('page', 'our-story')).toBe('/our-story')
+    expect(documentPath('page', 'vision-values')).toBe('/vision-values')
+    expect(documentPath('page', 'team')).toBe('/team')
+    expect(documentPath('page', 'faq')).toBe('/faq')
+    expect(routableExperienceSlug('our-story')).toBeUndefined()
+    expect(routableExperienceSlug('vision-values')).toBeUndefined()
+    expect(routableExperienceSlug('team')).toBeUndefined()
+    expect(routableExperienceSlug('faq')).toBeUndefined()
+  })
+
+  it('routes published URBORT articles under the board and keeps the board out of experiences', () => {
+    expect(documentPath('urbortArticle', 'worlds-first-cow-wedding')).toBe(
+      '/urbort-blog/worlds-first-cow-wedding',
+    )
+    expect(routableExperienceSlug('urbort-blog')).toBeUndefined()
+    expect(routableExperienceSlug('contact')).toBeUndefined()
+    expect(routableExperienceSlug('newsletter')).toBeUndefined()
+    expect(routableExperienceSlug('privacy-policy')).toBeUndefined()
+    expect(routableExperienceSlug('terms-of-service')).toBeUndefined()
+    expect(routableExperienceSlug('cookies-policy')).toBeUndefined()
   })
 })
 

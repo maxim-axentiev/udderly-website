@@ -88,21 +88,79 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       changeFrequency: 'monthly',
       priority: 0.6,
     },
+    {
+      path: '/our-story',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/vision-values',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/team',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/faq',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/urbort-blog',
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
+      path: '/contact',
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      path: '/newsletter',
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      path: '/privacy-policy',
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      path: '/terms-of-service',
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      path: '/cookies-policy',
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
   ]
 }
 
 export async function getSitemapEntries(): Promise<SitemapEntry[]> {
-  const { fetchExperienceSitemapSlugs } = await import('@/lib/sanity/fetch')
+  const { fetchExperienceSitemapSlugs, fetchUrbortSitemapSlugs } = await import('@/lib/sanity/fetch')
 
   try {
-    const slugs = await fetchExperienceSitemapSlugs()
+    const [slugs, articleSlugs] = await Promise.all([
+      fetchExperienceSitemapSlugs(),
+      fetchUrbortSitemapSlugs().catch(() => [] as string[]),
+    ])
     const experienceEntries: SitemapEntry[] = slugs.map((slug) => ({
       path: `/${slug}`,
       changeFrequency: 'weekly',
       priority: 0.8,
     }))
+    const articleEntries: SitemapEntry[] = articleSlugs.map((slug) => ({
+      path: `/urbort-blog/${slug}`,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    }))
 
-    return [...getStaticSitemapEntries(), ...experienceEntries]
+    return [...getStaticSitemapEntries(), ...experienceEntries, ...articleEntries]
   } catch {
     return getStaticSitemapEntries()
   }

@@ -7,6 +7,13 @@ export const SINGLETON_TYPES = [
   'adoptionPage',
   'animalsForSalePage',
   'corporateTrainingPage',
+  'ourStoryPage',
+  'visionValuesPage',
+  'teamPage',
+  'faqPage',
+  'urbortBlogPage',
+  'contactPage',
+  'newsletterPage',
 ] as const
 
 export type SingletonType = (typeof SINGLETON_TYPES)[number]
@@ -20,6 +27,13 @@ export const SINGLETON_IDS: Record<SingletonType, string> = {
   adoptionPage: 'adoptionPage',
   animalsForSalePage: 'animalsForSalePage',
   corporateTrainingPage: 'corporateTrainingPage',
+  ourStoryPage: 'ourStoryPage',
+  visionValuesPage: 'visionValuesPage',
+  teamPage: 'teamPage',
+  faqPage: 'faqPage',
+  urbortBlogPage: 'urbortBlogPage',
+  contactPage: 'contactPage',
+  newsletterPage: 'newsletterPage',
 }
 
 export function isSingletonType(type: string): type is SingletonType {

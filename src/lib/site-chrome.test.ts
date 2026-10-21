@@ -313,7 +313,9 @@ describe('CMS link resolution', () => {
       '/corporate-training/beyond-engagement',
     )
     expect(documentHref('corporateProgram', 'future-program')).toBeUndefined()
-    expect(documentHref('urbortArticle', 'worlds-first-cow-wedding')).toBeUndefined()
+    expect(documentHref('urbortArticle', 'worlds-first-cow-wedding')).toBe(
+      '/urbort-blog/worlds-first-cow-wedding',
+    )
     expect(documentHref('experience', 'experiences')).toBeUndefined()
     expect(documentHref('promotion', 'spring-offer')).toBeUndefined()
 

@@ -16,12 +16,21 @@ export const RESERVED_SLUGS = [
   'adopt-an-animal',
   'corporate',
   'corporate-training',
+  'faq',
   'our-farm',
+  'our-story',
+  'team',
+  'vision-values',
   'animals-for-sale',
   'urbort',
+  'urbort-blog',
   'contact',
+  'newsletter',
   'privacy',
+  'privacy-policy',
   'terms',
+  'terms-of-service',
+  'cookies-policy',
   'health',
   'studio',
   'robots.txt',
@@ -48,6 +57,8 @@ const INTERNAL_DOCUMENT_TYPE_SET = new Set<string>(INTERNAL_DOCUMENT_TYPES)
 
 /** Document types whose public route is implemented. */
 const ROUTED_DOCUMENT_TYPES = new Set<InternalDocumentType>(['experience'])
+
+const ABOUT_PAGE_SLUGS = new Set<string>(['our-story', 'vision-values', 'team', 'faq'])
 
 const CORPORATE_PROGRAM_SLUGS = new Set<string>([
   'team-building-experiences',
@@ -93,12 +104,20 @@ export function resolveDocumentPath(
     return { ok: false, reason: 'missing-slug' }
   }
 
+  if (type === 'page' && ABOUT_PAGE_SLUGS.has(normalized)) {
+    return { ok: true, href: `/${normalized}` }
+  }
+
   if (isReservedSlug(normalized)) {
     return { ok: false, reason: 'reserved-slug' }
   }
 
   if (!EXPERIENCE_SLUG.test(normalized)) {
     return { ok: false, reason: 'invalid-slug' }
+  }
+
+  if (type === 'urbortArticle') {
+    return { ok: true, href: `/urbort-blog/${normalized}` }
   }
 
   if (type === 'corporateProgram') {

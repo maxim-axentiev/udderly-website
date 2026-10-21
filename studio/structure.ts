@@ -2,12 +2,15 @@ import type {StructureResolver} from 'sanity/structure'
 
 import {
   BoltIcon,
+  BookIcon,
   CaseIcon,
   CogIcon,
+  CommentIcon,
   ComposeIcon,
   DocumentIcon,
   DocumentTextIcon,
   HeartIcon,
+  HelpCircleIcon,
   ListIcon,
   MenuIcon,
   PlayIcon,
@@ -64,6 +67,40 @@ export const structure: StructureResolver = (S) =>
             ]),
         ),
       S.listItem()
+        .title('About')
+        .icon(HeartIcon)
+        .child(
+          S.list()
+            .title('About')
+            .items([
+              S.listItem()
+                .title('Our Story')
+                .id(SINGLETON_IDS.ourStoryPage)
+                .icon(DocumentTextIcon)
+                .child(S.document().schemaType('ourStoryPage').documentId(SINGLETON_IDS.ourStoryPage)),
+              S.listItem()
+                .title('Vision and Values')
+                .id(SINGLETON_IDS.visionValuesPage)
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document()
+                    .schemaType('visionValuesPage')
+                    .documentId(SINGLETON_IDS.visionValuesPage),
+                ),
+              S.listItem()
+                .title('Team page')
+                .id(SINGLETON_IDS.teamPage)
+                .icon(DocumentTextIcon)
+                .child(S.document().schemaType('teamPage').documentId(SINGLETON_IDS.teamPage)),
+              S.documentTypeListItem('teamMember').title('Team members'),
+              S.listItem()
+                .title('FAQ page')
+                .id(SINGLETON_IDS.faqPage)
+                .icon(HelpCircleIcon)
+                .child(S.document().schemaType('faqPage').documentId(SINGLETON_IDS.faqPage)),
+            ]),
+        ),
+      S.listItem()
         .title('The Farm')
         .icon(HeartIcon)
         .child(
@@ -73,7 +110,14 @@ export const structure: StructureResolver = (S) =>
               S.documentTypeListItem('animal').title('Animals'),
               S.documentTypeListItem('animalSpecies').title('Animal Species'),
               S.documentTypeListItem('teamMember').title('Team Members'),
-              S.documentTypeListItem('urbortArticle').title('URBORT'),
+              S.listItem()
+                .title('URBORT board')
+                .id(SINGLETON_IDS.urbortBlogPage)
+                .icon(BookIcon)
+                .child(
+                  S.document().schemaType('urbortBlogPage').documentId(SINGLETON_IDS.urbortBlogPage),
+                ),
+              S.documentTypeListItem('urbortArticle').title('URBORT articles'),
             ]),
         ),
       S.listItem()
@@ -112,6 +156,18 @@ export const structure: StructureResolver = (S) =>
             .title('Shared Content')
             .items([
               S.documentTypeListItem('faq').title('FAQs'),
+              S.listItem()
+                .title('Contact page')
+                .id(SINGLETON_IDS.contactPage)
+                .icon(CommentIcon)
+                .child(S.document().schemaType('contactPage').documentId(SINGLETON_IDS.contactPage)),
+              S.listItem()
+                .title('Newsletter page')
+                .id(SINGLETON_IDS.newsletterPage)
+                .icon(CommentIcon)
+                .child(
+                  S.document().schemaType('newsletterPage').documentId(SINGLETON_IDS.newsletterPage),
+                ),
               S.documentTypeListItem('policy').title('Policies'),
               S.documentTypeListItem('testimonial').title('Testimonials'),
               S.documentTypeListItem('promotion').title('Promotions'),

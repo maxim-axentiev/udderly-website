@@ -24,6 +24,16 @@ describe('sitemap foundation', () => {
       '/corporate-training/alpaca-emotional-intelligence',
       '/corporate-training/beyond-engagement',
       '/corporate-training/innovation-on-the-farm',
+      '/our-story',
+      '/vision-values',
+      '/team',
+      '/faq',
+      '/urbort-blog',
+      '/contact',
+      '/newsletter',
+      '/privacy-policy',
+      '/terms-of-service',
+      '/cookies-policy',
     ])
     expect(isSitemapPathExcluded('/health')).toBe(true)
     expect(isSitemapPathExcluded('/')).toBe(false)

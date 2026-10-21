@@ -594,6 +594,105 @@ export const corporateProgramBySlugQuery = `*[_type == "corporateProgram" && slu
   active
 }`
 
+const aboutSeo = `seo { title, description, noIndex, image ${altImage} }`
+
+const aboutFaq = `{
+  _id,
+  question,
+  answer,
+  category,
+  sortOrder,
+  active
+}`
+
+export const ourStoryPageQuery = `*[_id == "ourStoryPage"][0]{
+  heroLead,
+  heroAccent,
+  heroIntro,
+  heroImage ${altImage},
+  chapters[]{
+    sectionId,
+    title,
+    paragraphs,
+    image ${altImage},
+    imageOnLeft,
+    tone,
+    showSignOff,
+    signOffName,
+    ctaLabel,
+    ctaHref,
+    enabled
+  },
+  ${aboutSeo}
+}`
+
+export const visionValuesPageQuery = `*[_id == "visionValuesPage"][0]{
+  heroLead,
+  heroAccent,
+  heroImage ${altImage},
+  showVision,
+  visionHeading,
+  visionParagraphs,
+  visionImage ${altImage},
+  showGallery,
+  gallery[] ${altImage},
+  showValues,
+  valuesHeading,
+  valuesImage ${altImage},
+  values[]{ title, description },
+  showCta,
+  ctaHeading,
+  ctaBody,
+  ctaLabel,
+  ctaHref,
+  ${aboutSeo}
+}`
+
+export const teamPageQuery = `*[_id == "teamPage"][0]{
+  heroLead,
+  heroAccent,
+  heroIntro,
+  heroImage ${altImage},
+  factLabel,
+  showCta,
+  ctaHeading,
+  ctaBody,
+  ctaLabel,
+  ctaHref,
+  ${aboutSeo}
+}`
+
+export const teamMembersQuery = `*[_type == "teamMember" && active != false] | order(sortOrder asc, name asc) {
+  _id,
+  name,
+  role,
+  ridiculousFact,
+  bio,
+  photo ${altImage},
+  sortOrder,
+  active
+}`
+
+export const publishedFaqsQuery = `*[_type == "faq" && active != false] | order(sortOrder asc, question asc) ${aboutFaq}`
+
+export const faqPageQuery = `*[_id == "faqPage"][0]{
+  heroLead,
+  heroAccent,
+  heroImage ${altImage},
+  sections[]{
+    title,
+    categories,
+    enabled,
+    "questions": questions[]->${aboutFaq}[defined(_id) && active != false]
+  },
+  showCta,
+  ctaHeading,
+  ctaBody,
+  ctaLabel,
+  ctaHref,
+  ${aboutSeo}
+}`
+
 export const homepageFaqsQuery = `*[_id == "siteSettings"][0]{
   homepageFaqs[]{
     _key,
@@ -604,4 +703,99 @@ export const homepageFaqsQuery = `*[_id == "siteSettings"][0]{
       active
     }
   }
+}`
+
+const urbortCard = `{
+  _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  heroImage ${altImage},
+  publishedAt,
+  author,
+  body,
+  tags,
+  active,
+  seo { title, description, noIndex, image ${altImage} }
+}`
+
+export const urbortBlogPageQuery = `*[_id == "urbortBlogPage"][0]{
+  titleLead,
+  titleAccent,
+  intro,
+  showPlaceholderCards,
+  ctaHeading,
+  ctaBody,
+  ctaLabel,
+  ctaHref,
+  ${aboutSeo}
+}`
+
+export const urbortArticlesQuery = `*[_type == "urbortArticle" && active != false && defined(slug.current)] | order(publishedAt desc)${urbortCard}`
+
+export const urbortArticleBySlugQuery = `*[_type == "urbortArticle" && slug.current == $slug && active != false][0]{
+  _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  heroImage ${altImage},
+  publishedAt,
+  author,
+  body,
+  gallery[] ${altImage},
+  tags,
+  externalLinks[]{
+    label,
+    linkType,
+    href,
+    internalLink->{_type, "slug": slug.current}
+  },
+  active,
+  seo { title, description, noIndex, image ${altImage} }
+}`
+
+export const urbortSitemapSlugsQuery = `*[_type == "urbortArticle" && active != false && defined(slug.current) && count(body) > 0].slug.current`
+
+export const contactPageQuery = `*[_id == "contactPage"][0]{
+  heroLead,
+  heroAccent,
+  businessName,
+  intro,
+  formHeading,
+  nameLabel,
+  emailLabel,
+  messageLabel,
+  submitLabel,
+  unavailableMessage,
+  ${aboutSeo}
+}`
+
+export const contactSettingsQuery = `*[_id == "siteSettings"][0]{
+  email,
+  phone,
+  hoursNote,
+  address { line1, line2, city, region, postalCode, country },
+  weeklyHours[]{ day, closed, openTime, closeTime }
+}`
+
+export const newsletterPageQuery = `*[_id == "newsletterPage"][0]{
+  title,
+  copy,
+  firstNameLabel,
+  emailLabel,
+  dateOfBirthLabel,
+  submitLabel,
+  unavailableMessage,
+  ${aboutSeo}
+}`
+
+export const legalPolicyQuery = `*[_type == "policy" && publicSlug == $slug && policyType != "cancellation" && active != false][0]{
+  _id,
+  heading,
+  policyType,
+  publicSlug,
+  revisionLabel,
+  content,
+  active,
+  seo { title, description, noIndex, image ${altImage} }
 }`

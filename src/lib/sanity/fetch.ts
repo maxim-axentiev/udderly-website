@@ -24,11 +24,31 @@ import {
   corporateProgramBySlugQuery,
   corporateProgramCardsQuery,
   corporateTrainingPageQuery,
+  faqPageQuery,
   homepageFaqsQuery,
+  ourStoryPageQuery,
+  publishedFaqsQuery,
+  teamMembersQuery,
+  teamPageQuery,
+  visionValuesPageQuery,
+  contactPageQuery,
+  contactSettingsQuery,
   homepageQuery,
+  legalPolicyQuery,
   navigationQuery,
+  newsletterPageQuery,
   siteSettingsQuery,
+  urbortArticleBySlugQuery,
+  urbortArticlesQuery,
+  urbortBlogPageQuery,
+  urbortSitemapSlugsQuery,
 } from './queries'
+import type { CmsFaq, CmsFaqPage, CmsOurStoryPage, CmsTeamMember, CmsTeamPage, CmsVisionValuesPage } from '@/lib/about/cms'
+import type { CmsContactPage, CmsContactSettings } from '@/lib/contact/cms'
+import type { CmsLegalPolicy } from '@/lib/legal/cms'
+import type { LegalSlug } from '@/lib/legal/model'
+import type { CmsNewsletterPage } from '@/lib/newsletter/cms'
+import type { CmsUrbortArticle, CmsUrbortBlogPage } from '@/lib/urbort/cms'
 import type { CmsCorporateProgram, CmsCorporateTrainingPage } from '@/lib/corporate/cms'
 import type { PublishedAdoption } from '@/lib/adopt/resolve'
 import type { PublishedListing } from '@/lib/sale/resolve'
@@ -238,6 +258,120 @@ export async function fetchCorporateProgram(slug: string): Promise<CmsCorporateP
     return (
       (await withTimeout(
         sanityClient.fetch<CmsCorporateProgram | null>(corporateProgramBySlugQuery, { slug }),
+        CHROME_FETCH_TIMEOUT_MS,
+      )) ?? null
+    )
+  } catch {
+    return null
+  }
+}
+
+async function fetchAboutDocument<T>(query: string): Promise<T | null> {
+  try {
+    return (await withTimeout(sanityClient.fetch<T | null>(query), CHROME_FETCH_TIMEOUT_MS)) ?? null
+  } catch {
+    return null
+  }
+}
+
+export function fetchOurStoryPage(): Promise<CmsOurStoryPage | null> {
+  return fetchAboutDocument<CmsOurStoryPage>(ourStoryPageQuery)
+}
+
+export function fetchVisionValuesPage(): Promise<CmsVisionValuesPage | null> {
+  return fetchAboutDocument<CmsVisionValuesPage>(visionValuesPageQuery)
+}
+
+export function fetchTeamPage(): Promise<CmsTeamPage | null> {
+  return fetchAboutDocument<CmsTeamPage>(teamPageQuery)
+}
+
+export function fetchFaqPage(): Promise<CmsFaqPage | null> {
+  return fetchAboutDocument<CmsFaqPage>(faqPageQuery)
+}
+
+export async function fetchTeamMembers(): Promise<CmsTeamMember[]> {
+  try {
+    const members = await withTimeout(
+      sanityClient.fetch<CmsTeamMember[] | null>(teamMembersQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return members ?? []
+  } catch {
+    return []
+  }
+}
+
+export async function fetchPublishedFaqs(): Promise<CmsFaq[]> {
+  try {
+    const faqs = await withTimeout(
+      sanityClient.fetch<CmsFaq[] | null>(publishedFaqsQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return faqs ?? []
+  } catch {
+    return []
+  }
+}
+
+export function fetchUrbortBlogPage(): Promise<CmsUrbortBlogPage> {
+  return fetchAboutDocument<CmsUrbortBlogPage>(urbortBlogPageQuery)
+}
+
+export async function fetchUrbortArticles(): Promise<CmsUrbortArticle[]> {
+  try {
+    const articles = await withTimeout(
+      sanityClient.fetch<CmsUrbortArticle[] | null>(urbortArticlesQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return articles ?? []
+  } catch {
+    return []
+  }
+}
+
+export async function fetchUrbortArticle(slug: string): Promise<CmsUrbortArticle> {
+  try {
+    return (
+      (await withTimeout(
+        sanityClient.fetch<CmsUrbortArticle>(urbortArticleBySlugQuery, { slug }),
+        CHROME_FETCH_TIMEOUT_MS,
+      )) ?? null
+    )
+  } catch {
+    return null
+  }
+}
+
+export async function fetchUrbortSitemapSlugs(): Promise<string[]> {
+  try {
+    const slugs = await withTimeout(
+      sanityClient.fetch<string[] | null>(urbortSitemapSlugsQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return (slugs ?? []).filter((slug) => typeof slug === 'string' && slug.length > 0)
+  } catch {
+    return []
+  }
+}
+
+export function fetchContactPage(): Promise<CmsContactPage> {
+  return fetchAboutDocument<CmsContactPage>(contactPageQuery)
+}
+
+export function fetchContactSettings(): Promise<CmsContactSettings> {
+  return fetchAboutDocument<CmsContactSettings>(contactSettingsQuery)
+}
+
+export function fetchNewsletterPage(): Promise<CmsNewsletterPage> {
+  return fetchAboutDocument<CmsNewsletterPage>(newsletterPageQuery)
+}
+
+export async function fetchLegalPolicy(slug: LegalSlug): Promise<CmsLegalPolicy> {
+  try {
+    return (
+      (await withTimeout(
+        sanityClient.fetch<CmsLegalPolicy>(legalPolicyQuery, { slug }),
         CHROME_FETCH_TIMEOUT_MS,
       )) ?? null
     )

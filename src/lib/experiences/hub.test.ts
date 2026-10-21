@@ -175,7 +175,7 @@ describe('experiences hub content', () => {
     expect(content.heading).toBe('Farm experiences')
     expect(documentPath('experience', 'goat-yoga')).toBe('/goat-yoga')
     expect(documentPath('experience', 'experiences')).toBeUndefined()
-    expect(documentPath('page', 'our-story')).toBeUndefined()
+    expect(documentPath('page', 'our-story')).toBe('/our-story')
     expect(documentPath('animal', 'clara')).toBeUndefined()
   })
 })

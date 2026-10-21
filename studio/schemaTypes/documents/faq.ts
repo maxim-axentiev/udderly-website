@@ -26,12 +26,15 @@ export const faq = defineType({
       name: 'category',
       title: 'Category',
       type: 'string',
-      description: 'Shown on the website. Choose the FAQ category so pages can reuse the same questions.',
+      description:
+        'The FAQ page groups published questions by this category. The homepage uses its own selected list and does not follow this category.',
       options: {list: [...faqCategories]},
       initialValue: 'general',
       validation: (rule) => rule.required(),
     }),
-    orderRankField(),
+    orderRankField(
+      'Lower numbers appear first within a category on the FAQ page. Homepage order is set separately.',
+    ),
     activeField(),
   ],
   preview: {

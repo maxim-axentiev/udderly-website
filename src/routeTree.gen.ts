@@ -11,11 +11,20 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CookiesPolicyRouteImport } from './routes/cookies-policy'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HealthRouteImport } from './routes/health'
+import { Route as NewsletterRouteImport } from './routes/newsletter'
+import { Route as OurStoryRouteImport } from './routes/our-story'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TeamRouteImport } from './routes/team'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as TowerOfGoatsDiscoveryTrailRouteImport } from './routes/tower-of-goats-discovery-trail'
+import { Route as VisionValuesRouteImport } from './routes/vision-values'
 import { Route as AdoptAnAnimalIndexRouteImport } from './routes/adopt-an-animal/index'
 import { Route as AdoptAnAnimalSlugRouteImport } from './routes/adopt-an-animal/$slug'
 import { Route as AnimalsForSaleIndexRouteImport } from './routes/animals-for-sale/index'
@@ -28,6 +37,8 @@ import { Route as CorporateTrainingExperientialTourismDevelopmentRouteImport } f
 import { Route as CorporateTrainingInnovationOnTheFarmRouteImport } from './routes/corporate-training/innovation-on-the-farm'
 import { Route as CorporateTrainingTeamBuildingExperiencesRouteImport } from './routes/corporate-training/team-building-experiences'
 import { Route as CorporateTrainingThePowerOfConversationRouteImport } from './routes/corporate-training/the-power-of-conversation'
+import { Route as UrbortBlogIndexRouteImport } from './routes/urbort-blog/index'
+import { Route as UrbortBlogSlugRouteImport } from './routes/urbort-blog/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,14 +50,44 @@ const SplatRoute = SplatRouteImport.update({
   path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesPolicyRoute = CookiesPolicyRouteImport.update({
+  id: '/cookies-policy',
+  path: '/cookies-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExperiencesRoute = ExperiencesRouteImport.update({
   id: '/experiences',
   path: '/experiences',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HealthRoute = HealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsletterRoute = NewsletterRouteImport.update({
+  id: '/newsletter',
+  path: '/newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OurStoryRoute = OurStoryRouteImport.update({
+  id: '/our-story',
+  path: '/our-story',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -59,12 +100,27 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TowerOfGoatsDiscoveryTrailRoute =
   TowerOfGoatsDiscoveryTrailRouteImport.update({
     id: '/tower-of-goats-discovery-trail',
     path: '/tower-of-goats-discovery-trail',
     getParentRoute: () => rootRouteImport,
   } as any)
+const VisionValuesRoute = VisionValuesRouteImport.update({
+  id: '/vision-values',
+  path: '/vision-values',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdoptAnAnimalIndexRoute = AdoptAnAnimalIndexRouteImport.update({
   id: '/adopt-an-animal/',
   path: '/adopt-an-animal/',
@@ -132,15 +188,34 @@ const CorporateTrainingThePowerOfConversationRoute =
     path: '/corporate-training/the-power-of-conversation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const UrbortBlogIndexRoute = UrbortBlogIndexRouteImport.update({
+  id: '/urbort-blog/',
+  path: '/urbort-blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UrbortBlogSlugRoute = UrbortBlogSlugRouteImport.update({
+  id: '/urbort-blog/$slug',
+  path: '/urbort-blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/contact': typeof ContactRoute
+  '/cookies-policy': typeof CookiesPolicyRoute
   '/experiences': typeof ExperiencesRoute
+  '/faq': typeof FaqRoute
   '/health': typeof HealthRoute
+  '/newsletter': typeof NewsletterRoute
+  '/our-story': typeof OurStoryRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/team': typeof TeamRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
+  '/vision-values': typeof VisionValuesRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
   '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
   '/corporate-training/alpaca-emotional-intelligence': typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
@@ -150,18 +225,29 @@ export interface FileRoutesByFullPath {
   '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
   '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
   '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
+  '/urbort-blog/$slug': typeof UrbortBlogSlugRoute
   '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
   '/corporate-training/': typeof CorporateTrainingIndexRoute
+  '/urbort-blog/': typeof UrbortBlogIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/contact': typeof ContactRoute
+  '/cookies-policy': typeof CookiesPolicyRoute
   '/experiences': typeof ExperiencesRoute
+  '/faq': typeof FaqRoute
   '/health': typeof HealthRoute
+  '/newsletter': typeof NewsletterRoute
+  '/our-story': typeof OurStoryRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/team': typeof TeamRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
+  '/vision-values': typeof VisionValuesRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
   '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
   '/corporate-training/alpaca-emotional-intelligence': typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
@@ -171,19 +257,30 @@ export interface FileRoutesByTo {
   '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
   '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
   '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
+  '/urbort-blog/$slug': typeof UrbortBlogSlugRoute
   '/adopt-an-animal': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale': typeof AnimalsForSaleIndexRoute
   '/corporate-training': typeof CorporateTrainingIndexRoute
+  '/urbort-blog': typeof UrbortBlogIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/contact': typeof ContactRoute
+  '/cookies-policy': typeof CookiesPolicyRoute
   '/experiences': typeof ExperiencesRoute
+  '/faq': typeof FaqRoute
   '/health': typeof HealthRoute
+  '/newsletter': typeof NewsletterRoute
+  '/our-story': typeof OurStoryRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/team': typeof TeamRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
+  '/vision-values': typeof VisionValuesRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
   '/animals-for-sale/$slug': typeof AnimalsForSaleSlugRoute
   '/corporate-training/alpaca-emotional-intelligence': typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
@@ -193,20 +290,31 @@ export interface FileRoutesById {
   '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
   '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
   '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
+  '/urbort-blog/$slug': typeof UrbortBlogSlugRoute
   '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
   '/corporate-training/': typeof CorporateTrainingIndexRoute
+  '/urbort-blog/': typeof UrbortBlogIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$'
+    | '/contact'
+    | '/cookies-policy'
     | '/experiences'
+    | '/faq'
     | '/health'
+    | '/newsletter'
+    | '/our-story'
+    | '/privacy-policy'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/team'
+    | '/terms-of-service'
     | '/tower-of-goats-discovery-trail'
+    | '/vision-values'
     | '/adopt-an-animal/$slug'
     | '/animals-for-sale/$slug'
     | '/corporate-training/alpaca-emotional-intelligence'
@@ -216,18 +324,29 @@ export interface FileRouteTypes {
     | '/corporate-training/innovation-on-the-farm'
     | '/corporate-training/team-building-experiences'
     | '/corporate-training/the-power-of-conversation'
+    | '/urbort-blog/$slug'
     | '/adopt-an-animal/'
     | '/animals-for-sale/'
     | '/corporate-training/'
+    | '/urbort-blog/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
+    | '/contact'
+    | '/cookies-policy'
     | '/experiences'
+    | '/faq'
     | '/health'
+    | '/newsletter'
+    | '/our-story'
+    | '/privacy-policy'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/team'
+    | '/terms-of-service'
     | '/tower-of-goats-discovery-trail'
+    | '/vision-values'
     | '/adopt-an-animal/$slug'
     | '/animals-for-sale/$slug'
     | '/corporate-training/alpaca-emotional-intelligence'
@@ -237,18 +356,29 @@ export interface FileRouteTypes {
     | '/corporate-training/innovation-on-the-farm'
     | '/corporate-training/team-building-experiences'
     | '/corporate-training/the-power-of-conversation'
+    | '/urbort-blog/$slug'
     | '/adopt-an-animal'
     | '/animals-for-sale'
     | '/corporate-training'
+    | '/urbort-blog'
   id:
     | '__root__'
     | '/'
     | '/$'
+    | '/contact'
+    | '/cookies-policy'
     | '/experiences'
+    | '/faq'
     | '/health'
+    | '/newsletter'
+    | '/our-story'
+    | '/privacy-policy'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/team'
+    | '/terms-of-service'
     | '/tower-of-goats-discovery-trail'
+    | '/vision-values'
     | '/adopt-an-animal/$slug'
     | '/animals-for-sale/$slug'
     | '/corporate-training/alpaca-emotional-intelligence'
@@ -258,19 +388,30 @@ export interface FileRouteTypes {
     | '/corporate-training/innovation-on-the-farm'
     | '/corporate-training/team-building-experiences'
     | '/corporate-training/the-power-of-conversation'
+    | '/urbort-blog/$slug'
     | '/adopt-an-animal/'
     | '/animals-for-sale/'
     | '/corporate-training/'
+    | '/urbort-blog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
+  ContactRoute: typeof ContactRoute
+  CookiesPolicyRoute: typeof CookiesPolicyRoute
   ExperiencesRoute: typeof ExperiencesRoute
+  FaqRoute: typeof FaqRoute
   HealthRoute: typeof HealthRoute
+  NewsletterRoute: typeof NewsletterRoute
+  OurStoryRoute: typeof OurStoryRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TeamRoute: typeof TeamRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
   TowerOfGoatsDiscoveryTrailRoute: typeof TowerOfGoatsDiscoveryTrailRoute
+  VisionValuesRoute: typeof VisionValuesRoute
   AdoptAnAnimalSlugRoute: typeof AdoptAnAnimalSlugRoute
   AnimalsForSaleSlugRoute: typeof AnimalsForSaleSlugRoute
   CorporateTrainingAlpacaEmotionalIntelligenceRoute: typeof CorporateTrainingAlpacaEmotionalIntelligenceRoute
@@ -280,9 +421,11 @@ export interface RootRouteChildren {
   CorporateTrainingInnovationOnTheFarmRoute: typeof CorporateTrainingInnovationOnTheFarmRoute
   CorporateTrainingTeamBuildingExperiencesRoute: typeof CorporateTrainingTeamBuildingExperiencesRoute
   CorporateTrainingThePowerOfConversationRoute: typeof CorporateTrainingThePowerOfConversationRoute
+  UrbortBlogSlugRoute: typeof UrbortBlogSlugRoute
   AdoptAnAnimalIndexRoute: typeof AdoptAnAnimalIndexRoute
   AnimalsForSaleIndexRoute: typeof AnimalsForSaleIndexRoute
   CorporateTrainingIndexRoute: typeof CorporateTrainingIndexRoute
+  UrbortBlogIndexRoute: typeof UrbortBlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -301,6 +444,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies-policy': {
+      id: '/cookies-policy'
+      path: '/cookies-policy'
+      fullPath: '/cookies-policy'
+      preLoaderRoute: typeof CookiesPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/experiences': {
       id: '/experiences'
       path: '/experiences'
@@ -308,11 +465,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperiencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/health': {
       id: '/health'
       path: '/health'
       fullPath: '/health'
       preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/newsletter': {
+      id: '/newsletter'
+      path: '/newsletter'
+      fullPath: '/newsletter'
+      preLoaderRoute: typeof NewsletterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/our-story': {
+      id: '/our-story'
+      path: '/our-story'
+      fullPath: '/our-story'
+      preLoaderRoute: typeof OurStoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -329,11 +514,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tower-of-goats-discovery-trail': {
       id: '/tower-of-goats-discovery-trail'
       path: '/tower-of-goats-discovery-trail'
       fullPath: '/tower-of-goats-discovery-trail'
       preLoaderRoute: typeof TowerOfGoatsDiscoveryTrailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vision-values': {
+      id: '/vision-values'
+      path: '/vision-values'
+      fullPath: '/vision-values'
+      preLoaderRoute: typeof VisionValuesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/adopt-an-animal/': {
@@ -420,17 +626,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CorporateTrainingThePowerOfConversationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/urbort-blog/': {
+      id: '/urbort-blog/'
+      path: '/urbort-blog'
+      fullPath: '/urbort-blog/'
+      preLoaderRoute: typeof UrbortBlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/urbort-blog/$slug': {
+      id: '/urbort-blog/$slug'
+      path: '/urbort-blog/$slug'
+      fullPath: '/urbort-blog/$slug'
+      preLoaderRoute: typeof UrbortBlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  ContactRoute: ContactRoute,
+  CookiesPolicyRoute: CookiesPolicyRoute,
   ExperiencesRoute: ExperiencesRoute,
+  FaqRoute: FaqRoute,
   HealthRoute: HealthRoute,
+  NewsletterRoute: NewsletterRoute,
+  OurStoryRoute: OurStoryRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TeamRoute: TeamRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
   TowerOfGoatsDiscoveryTrailRoute: TowerOfGoatsDiscoveryTrailRoute,
+  VisionValuesRoute: VisionValuesRoute,
   AdoptAnAnimalSlugRoute: AdoptAnAnimalSlugRoute,
   AnimalsForSaleSlugRoute: AnimalsForSaleSlugRoute,
   CorporateTrainingAlpacaEmotionalIntelligenceRoute:
@@ -446,9 +675,11 @@ const rootRouteChildren: RootRouteChildren = {
     CorporateTrainingTeamBuildingExperiencesRoute,
   CorporateTrainingThePowerOfConversationRoute:
     CorporateTrainingThePowerOfConversationRoute,
+  UrbortBlogSlugRoute: UrbortBlogSlugRoute,
   AdoptAnAnimalIndexRoute: AdoptAnAnimalIndexRoute,
   AnimalsForSaleIndexRoute: AnimalsForSaleIndexRoute,
   CorporateTrainingIndexRoute: CorporateTrainingIndexRoute,
+  UrbortBlogIndexRoute: UrbortBlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
