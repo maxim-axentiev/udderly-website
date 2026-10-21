@@ -52,8 +52,8 @@ describe('homepage migration content', () => {
     )
     expect(document.experienceCards.map((card) => card.cta.href)).toEqual([
       '/experiences',
-      '/stay',
-      '/corporate',
+      '/farm-glamping',
+      '/corporate-training',
       '/animals-for-sale',
     ])
     expect(document.mediaVideos.map((video) => video.url)).toEqual(
@@ -63,9 +63,9 @@ describe('homepage migration content', () => {
       homepageWelfare.points.map((point) => point.name),
     )
     expect(document.urbortArticles.map((article) => article.href)).toEqual([
-      '/urbort',
-      '/urbort',
-      '/urbort',
+      '/urbort-blog',
+      '/urbort-blog',
+      '/urbort-blog',
     ])
     expect(document.urbortArticles.map((article) => article.title)).toEqual(
       homepageUrbort.articles.map((article) => article.title),

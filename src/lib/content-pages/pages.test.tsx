@@ -304,14 +304,15 @@ describe('content page publishing rules', () => {
   })
 
   it('leaves the current header links unchanged', () => {
-    expect(primaryNav.map((item) => item.href)).toEqual([
-      '/experiences',
-      '/meet-the-herd',
-      '/stay',
-      '/adopt-an-animal',
-      '/animals-for-sale',
-      '/corporate',
-      '/our-farm',
+    expect(primaryNav.map((item) => item.label)).toEqual([
+      'Experiences',
+      'Gift Cards',
+      'Animals for Sale',
+      'Adopt an Animal',
+      'Corporate Training',
+      'Explore',
+      'About',
+      'Contact',
     ])
   })
 })

@@ -125,6 +125,28 @@ const INTERNAL_PATHS = new Set([
   '/adopt-an-animal',
   '/animals-for-sale',
   TOWER_OF_GOATS_PATH,
+  '/farm-market-store',
+  '/ice-cream',
+  '/gift-card',
+  '/farm-glamping',
+  '/corporate-training',
+  '/corporate-training/team-building-experiences',
+  '/corporate-training/experiential-tourism-development',
+  '/corporate-training/disc-assessment',
+  '/corporate-training/the-power-of-conversation',
+  '/corporate-training/alpaca-emotional-intelligence',
+  '/corporate-training/beyond-engagement',
+  '/corporate-training/innovation-on-the-farm',
+  '/our-story',
+  '/vision-values',
+  '/team',
+  '/faq',
+  '/urbort-blog',
+  '/contact',
+  '/newsletter',
+  '/privacy-policy',
+  '/terms-of-service',
+  '/cookies-policy',
 ])
 
 const lovableCards: HubExperienceCard[] = [
@@ -193,6 +215,7 @@ const fallbackPage = {
       season: 'May to October',
       age: 'All ages',
       imageKey: 'glamping' as const,
+      learnMoreHref: '/farm-glamping',
     },
   ] satisfies HubFeature[],
   giftsIntro: {
@@ -206,6 +229,7 @@ const fallbackPage = {
       kicker: 'Gift Card',
       title: 'A ridiculous day, wrapped',
       imageKey: 'ice-cream' as const,
+      learnMoreHref: '/gift-card',
     },
     {
       key: 'adopt',
@@ -227,12 +251,14 @@ const fallbackPage = {
       title: 'Corporate Training & Team-Building',
       imageKey: 'training' as const,
       ctaLabel: 'Explore Corporate Programs',
+      ctaHref: '/corporate-training',
     },
     {
       key: 'tourism',
       title: 'Experiential Tourism Development',
       imageKey: 'alpaca-walk' as const,
       ctaLabel: 'Explore Tourism Development',
+      ctaHref: '/corporate-training/experiential-tourism-development',
     },
   ] satisfies HubFeature[],
   rainbow: {
@@ -258,11 +284,7 @@ const fallbackPage = {
 }
 
 export const UNRESOLVED_EXPERIENCE_LINKS = [
-  '/gift-card',
-  '/farm-glamping',
-  '/corporate',
   'corporate program booking',
-  'tourism development page',
   'experience detail pages other than Tower of Goats',
   'verified FareHarbor booking URLs',
   'newsletter submission',

@@ -12,14 +12,49 @@ export const navigation = defineType({
       title: 'Header navigation',
       type: 'array',
       of: [defineArrayMember({type: 'navItem'})],
-      validation: (rule) => rule.required().min(1).max(8),
+      validation: (rule) => rule.max(8),
+      description: 'Leave empty to keep the approved header. A published list replaces it. Explore and About can be dropdowns without their own page.',
+    }),
+    defineField({
+      name: 'footerColumns',
+      title: 'Footer columns',
+      type: 'array',
+      description: 'Leave empty to keep the approved footer columns. A published list replaces those columns.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'title',
+              title: 'Column title',
+              type: 'string',
+              validation: (rule) => rule.required().max(40),
+            }),
+            defineField({
+              name: 'links',
+              title: 'Links',
+              type: 'array',
+              of: [defineArrayMember({type: 'navLink'})],
+              validation: (rule) => rule.min(1).max(8),
+            }),
+          ],
+          preview: {
+            select: {title: 'title'},
+            prepare({title}) {
+              return {title: title || 'Footer column'}
+            },
+          },
+        }),
+      ],
+      validation: (rule) => rule.max(4),
     }),
     defineField({
       name: 'footerItems',
-      title: 'Footer navigation',
+      title: 'Extra footer links',
       type: 'array',
+      description: 'Optional flat list. The columns above are the footer people see when they are published.',
       of: [defineArrayMember({type: 'navLink'})],
-      validation: (rule) => rule.max(12),
+      validation: (rule) => rule.max(16),
     }),
     defineField({
       name: 'legalItems',

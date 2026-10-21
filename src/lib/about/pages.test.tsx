@@ -216,14 +216,15 @@ describe('about pages', () => {
     expect(faqPageQuery).toContain('_id == "faqPage"')
     expect(faqPageQuery).toContain('active != false')
     expect(homepageFaqsQuery).toContain('_id == "siteSettings"')
-    expect(primaryNav.map((item) => item.href)).toEqual([
-      '/experiences',
-      '/meet-the-herd',
-      '/stay',
-      '/adopt-an-animal',
-      '/animals-for-sale',
-      '/corporate',
-      '/our-farm',
+    expect(primaryNav.map((item) => item.label)).toEqual([
+      'Experiences',
+      'Gift Cards',
+      'Animals for Sale',
+      'Adopt an Animal',
+      'Corporate Training',
+      'Explore',
+      'About',
+      'Contact',
     ])
   })
 })

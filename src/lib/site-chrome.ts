@@ -1,17 +1,14 @@
 import { documentPath } from '@/lib/routes/paths'
 import {
   bookCta as fallbackBookCta,
+  FOOTER_LOCATION_FALLBACK,
+  FOOTER_TAGLINE,
+  footerColumns as fallbackFooterColumns,
   footerLegalNav as fallbackLegalNav,
   footerNav as fallbackFooterNav,
   primaryNav as fallbackPrimaryNav,
 } from '@/lib/navigation'
 import { SITE_NAME } from '@/lib/site'
-
-const FOOTER_LOCATION_FALLBACK =
-  'Ontario, Canada · Farm life, but make it ridiculous.'
-
-const FOOTER_TAGLINE_FALLBACK =
-  'Made with questionable judgement and excellent animal care.'
 
 export type ChromeLink = {
   label: string
@@ -19,14 +16,23 @@ export type ChromeLink = {
   openInNewTab?: boolean
 }
 
-export type ChromeNavItem = ChromeLink & {
+export type ChromeNavItem = {
+  label: string
+  href?: string
+  openInNewTab?: boolean
   children?: ChromeLink[]
+}
+
+export type FooterColumn = {
+  title: string
+  links: ChromeLink[]
 }
 
 export type SiteChrome = {
   siteName: string
   primaryNav: ChromeNavItem[]
   footerNav: ChromeLink[]
+  footerColumns: FooterColumn[]
   legalNav: ChromeLink[]
   bookCta: ChromeLink
   social: {
@@ -54,10 +60,15 @@ export type CmsLink = {
 
 export type CmsNavigation = {
   headerItems?: Array<{
+    menuLabel?: string | null
     link?: CmsLink | null
     children?: Array<{ link?: CmsLink | null } | null> | null
   } | null> | null
   footerItems?: Array<{ link?: CmsLink | null } | null> | null
+  footerColumns?: Array<{
+    title?: string | null
+    links?: Array<{ link?: CmsLink | null } | null> | null
+  } | null> | null
   legalItems?: Array<{ link?: CmsLink | null } | null> | null
 } | null
 
@@ -98,8 +109,12 @@ export const siteChromeFallback: SiteChrome = {
     instagram: '#instagram',
     tiktok: '#tiktok',
   },
+  footerColumns: fallbackFooterColumns.map((column) => ({
+    title: column.title,
+    links: column.links.map((link) => ({ ...link })),
+  })),
   locationLine: FOOTER_LOCATION_FALLBACK,
-  tagline: FOOTER_TAGLINE_FALLBACK,
+  tagline: FOOTER_TAGLINE,
 }
 
 export function chromeLinkProps(link: ChromeLink) {
@@ -157,20 +172,35 @@ function resolveNavItems(
 
   return items.flatMap((item) => {
     const link = resolveCmsLink(item?.link)
-    if (!link) {
-      return []
-    }
-
+    const label = item?.menuLabel?.trim() || link?.label
     const children = (item?.children ?? [])
       .map((child) => resolveCmsLink(child?.link))
       .filter((child): child is ChromeLink => Boolean(child))
 
+    if (!label || (!link && children.length === 0)) {
+      return []
+    }
+
     return [
       {
-        ...link,
+        label,
+        ...(link ? { href: link.href, ...(link.openInNewTab ? { openInNewTab: true } : {}) } : {}),
         ...(children.length ? { children } : {}),
       },
     ]
+  })
+}
+
+function resolveFooterColumns(
+  columns: NonNullable<CmsNavigation>['footerColumns'],
+): FooterColumn[] {
+  if (!Array.isArray(columns)) return []
+  return columns.flatMap((column) => {
+    const title = column?.title?.trim()
+    const links = (column?.links ?? [])
+      .map((item) => resolveCmsLink(item?.link))
+      .filter((link): link is ChromeLink => Boolean(link))
+    return title && links.length ? [{ title, links }] : []
   })
 }
 
@@ -210,6 +240,7 @@ export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
   const settings = documents?.siteSettings
   const headerItems = resolveNavItems(navigation?.headerItems)
   const footerItems = resolveFooterItems(navigation?.footerItems)
+  const footerColumns = resolveFooterColumns(navigation?.footerColumns)
   const social = settings?.socialLinks
   const locationLine = formatAddress(settings?.address)
   const siteName = settings?.siteName?.trim()
@@ -223,6 +254,7 @@ export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
     siteName: siteName || siteChromeFallback.siteName,
     primaryNav: headerItems.length ? headerItems : siteChromeFallback.primaryNav,
     footerNav: footerItems.length ? footerItems : siteChromeFallback.footerNav,
+    footerColumns: footerColumns.length ? footerColumns : siteChromeFallback.footerColumns,
     legalNav: legalItems.length ? legalItems : siteChromeFallback.legalNav,
     bookCta: bookCta ?? siteChromeFallback.bookCta,
     social: {
@@ -232,7 +264,7 @@ export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
       ...(social?.youtube?.trim() ? { youtube: social.youtube.trim() } : {}),
     },
     locationLine: locationLine || siteChromeFallback.locationLine,
-    tagline: tagline || siteChromeFallback.tagline,
+    tagline: tagline || FOOTER_TAGLINE,
     ...(email ? { email } : {}),
     ...(phone ? { phone } : {}),
   }

@@ -16,6 +16,10 @@ import {
   fetchContactSettings,
   fetchFaqPage,
   fetchLegalPolicy,
+  fetchFarmGlampingPage,
+  fetchFarmMarketPage,
+  fetchGiftCardPage,
+  fetchIceCreamPage,
   fetchNewsletterPage,
   fetchUrbortArticle,
   fetchUrbortArticles,
@@ -166,6 +170,22 @@ export const getContactSettingsFn = createServerFn({ method: 'GET', strict: fals
 
 export const getNewsletterPageFn = createServerFn({ method: 'GET', strict: false }).handler(
   async () => fetchNewsletterPage(),
+)
+
+export const getFarmMarketPageFn = createServerFn({ method: 'GET', strict: false }).handler(
+  async () => fetchFarmMarketPage(),
+)
+
+export const getIceCreamPageFn = createServerFn({ method: 'GET', strict: false }).handler(
+  async () => fetchIceCreamPage(),
+)
+
+export const getGiftCardPageFn = createServerFn({ method: 'GET', strict: false }).handler(
+  async () => fetchGiftCardPage(),
+)
+
+export const getFarmGlampingPageFn = createServerFn({ method: 'GET', strict: false }).handler(
+  async () => fetchFarmGlampingPage(),
 )
 
 export const getLegalPolicyFn = createServerFn({ method: 'GET', strict: false })

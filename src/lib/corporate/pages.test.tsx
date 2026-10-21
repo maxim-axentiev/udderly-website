@@ -252,14 +252,15 @@ describe('corporate training pages', () => {
   })
 
   it('does not add corporate training to the current header', () => {
-    expect(primaryNav.map((item) => item.href)).toEqual([
-      '/experiences',
-      '/meet-the-herd',
-      '/stay',
-      '/adopt-an-animal',
-      '/animals-for-sale',
-      '/corporate',
-      '/our-farm',
+    expect(primaryNav.map((item) => item.label)).toEqual([
+      'Experiences',
+      'Gift Cards',
+      'Animals for Sale',
+      'Adopt an Animal',
+      'Corporate Training',
+      'Explore',
+      'About',
+      'Contact',
     ])
   })
 })

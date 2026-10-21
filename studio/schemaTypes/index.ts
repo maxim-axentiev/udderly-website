@@ -51,6 +51,7 @@ import {corporateTrainingPage} from './singletons/corporateTrainingPage'
 import {contactPage} from './singletons/contactPage'
 import {faqPage} from './singletons/faqPage'
 import {newsletterPage} from './singletons/newsletterPage'
+import {farmGlampingPage, farmMarketPage, giftCardPage, iceCreamPage} from './singletons/visitPages'
 import {urbortBlogPage} from './singletons/urbortBlogPage'
 import {ourStoryPage} from './singletons/ourStoryPage'
 import {teamPage} from './singletons/teamPage'
@@ -92,6 +93,10 @@ export const schemaTypes = [
   urbortBlogPage,
   contactPage,
   newsletterPage,
+  farmMarketPage,
+  iceCreamPage,
+  giftCardPage,
+  farmGlampingPage,
   storyChapter,
   visionValue,
   faqPageSection,

@@ -121,7 +121,7 @@ export const homepageExperienceCards = [
     title: 'Farm glamping with the animals',
     fact: 'STAY OVER',
     copy: 'Unwind in a luxury RV right on the farm, with front-row seats to stunning sunsets and animals whoâ€™ll audition for your next Instagram post.',
-    cta: { label: 'Sleepover with the animals', href: '/stay' },
+    cta: { label: 'Sleepover with the animals', href: '/farm-glamping' },
     image: {
       src: glampingPhoto,
       alt: 'Luxury RV glowing at night beside a campfire on the farm',
@@ -136,7 +136,7 @@ export const homepageExperienceCards = [
     copy: 'Leverage 20+ years of corporate training expertise along with the unique environment of our crazy animals to learn a lot, have fun, and bond.',
     cta: {
       label: 'See all training programs and team-building experiences',
-      href: '/corporate',
+      href: '/corporate-training',
     },
     image: {
       src: trainingImage,
@@ -176,7 +176,7 @@ export const homepageOwners = {
     'Top 10% of worldwide attractions',
     'Over 40,000 guests since 2021',
   ],
-  cta: { label: 'Learn more about our ridiculous story', href: '/our-farm' },
+  cta: { label: 'Learn more about our ridiculous story', href: '/our-story' },
   family: {
     src: ownersFamily,
     alt: 'Cheryl and Greg with their farm greeter dog Aspen in the pasture',
@@ -299,7 +299,7 @@ export const homepageStore = {
     badge: 'Farm Market Store',
     title: 'Bring a piece of the farm home with you',
     copy: 'After your experience, take home a souvenir. Whether itâ€™s a conversation starter or a treat for your belly. Weâ€™ve stocked items from over 100 local producers, and you know itâ€™s good because weâ€™re ridiculously picky about what we offer! Itâ€™s a win-win-win: you support local businesses, support us, and take something special home with you. We love a triple win!',
-    cta: { label: 'See whatâ€™s inside', href: '/our-farm' },
+    cta: { label: 'See whatâ€™s inside', href: '/farm-market-store' },
     image: {
       src: storePhoto,
       alt: 'Looking through the doorway into the Farm Market Store with wooden barrels and local products',
@@ -315,7 +315,7 @@ export const homepageStore = {
       'Packed with more nutrients than regular ice cream and featuring rich, unique flavours like Vanilla Lavender and Wine & Dark Chocolate, itâ€™s all made with real, locally sourced ingredients.',
       'Youâ€™re on a farm with goatsâ€¦ you need to try goat milk ice cream!',
     ],
-    cta: { label: 'See the ridiculous flavours', href: '/our-farm' },
+    cta: { label: 'See the ridiculous flavours', href: '/ice-cream' },
     image: {
       src: iceCream,
       alt: 'Stacked tubs of Udderly Ridiculous goat milk ice cream in many flavours',
@@ -374,11 +374,11 @@ export const homepageNewsletter = {
 export const homepageUrbort = {
   title: 'URBORT',
   copy: "URBORT stands for Udderly Ridiculous Board of Ridiculous Things. It's a compilation of all the insane things we've done. It's like going to Las Vegas and rather than being all hush hush about the trip, we instead document, record, analyze, and fully display it for the world to see.",
-  cta: { label: "See all the ridiculous things we've done", href: '/urbort' },
+  cta: { label: "See all the ridiculous things we've done", href: '/urbort-blog' },
   articles: [
     {
       title: "World's First Cow Wedding",
-      href: '/urbort',
+      href: '/urbort-blog',
       rotate: '-rotate-2',
       image: {
         src: urbort1,
@@ -389,7 +389,7 @@ export const homepageUrbort = {
     },
     {
       title: 'Biggest, Littlest Collab',
-      href: '/urbort',
+      href: '/urbort-blog',
       rotate: 'rotate-1',
       image: {
         src: urbort2,
@@ -400,7 +400,7 @@ export const homepageUrbort = {
     },
     {
       title: 'Viral Alpaca Sex',
-      href: '/urbort',
+      href: '/urbort-blog',
       rotate: 'rotate-2',
       image: {
         src: urbort3,

@@ -21,7 +21,7 @@ describe('site chrome fallbacks', () => {
     expect(chrome.social).toEqual({ instagram: '#instagram', tiktok: '#tiktok' })
     expect(chrome.locationLine).toContain('Ontario, Canada')
     expect(chrome.tagline).toBe(
-      'Made with questionable judgement and excellent animal care.',
+      'Come Do Something Udderly Ridiculous',
     )
     expect(chrome.email).toBeUndefined()
     expect(chrome.phone).toBeUndefined()
@@ -74,7 +74,7 @@ describe('site chrome CMS mapping', () => {
       label: 'Farm Days',
       href: '/mini-highland-cow-experience',
     })
-    expect(chrome.primaryNav[1]?.label).toBe('Meet the Herd')
+    expect(chrome.primaryNav[1]?.label).toBe('Gift Cards')
     expect(chrome.social.instagram).toBe('https://instagram.com/udderlyridiculous')
     expect(chrome.social.tiktok).toBe('#tiktok')
     expect(chrome.siteName).toBe('Udderly Test Farm')
@@ -118,7 +118,7 @@ describe('site chrome CMS mapping', () => {
     expect(chrome.social.facebook).toBe('https://facebook.com/udderly')
     expect(chrome.legalNav).toEqual(footerLegalNav.map((item) => ({ ...item })))
     expect(chrome.tagline).toBe(
-      'Made with questionable judgement and excellent animal care.',
+      'Come Do Something Udderly Ridiculous',
     )
     expect(chrome.bookCta).toEqual({ ...bookCta })
   })
@@ -201,7 +201,7 @@ describe('site chrome CMS mapping', () => {
 
     expect(chrome.bookCta).toEqual({ ...bookCta })
     expect(chrome.tagline).toBe(
-      'Made with questionable judgement and excellent animal care.',
+      'Come Do Something Udderly Ridiculous',
     )
     expect(chrome.legalNav).toEqual(footerLegalNav.map((item) => ({ ...item })))
   })

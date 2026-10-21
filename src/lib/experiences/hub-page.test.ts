@@ -118,7 +118,7 @@ describe('experiences hub page resolution', () => {
 
     expect(page.cards.map((card) => card.title)).toEqual(['First', 'Second', 'Goat Cuddles'])
     expect(page.cards[1]?.description).toBeUndefined()
-    expect(page.cards[0]?.href).toBeUndefined()
+    expect(page.cards[0]?.href).toBe('/gift-card')
     expect(page.cards[0]?.bookingUrl).toBeUndefined()
     expect(page.cards[2]?.href).toBe('/goat-cuddles')
     expect(page.cards[2]?.description).toBe('A published description.')

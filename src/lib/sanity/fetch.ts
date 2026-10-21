@@ -36,6 +36,10 @@ import {
   homepageQuery,
   legalPolicyQuery,
   navigationQuery,
+  farmGlampingPageQuery,
+  farmMarketPageQuery,
+  giftCardPageQuery,
+  iceCreamPageQuery,
   newsletterPageQuery,
   siteSettingsQuery,
   urbortArticleBySlugQuery,
@@ -365,6 +369,22 @@ export function fetchContactSettings(): Promise<CmsContactSettings> {
 
 export function fetchNewsletterPage(): Promise<CmsNewsletterPage> {
   return fetchAboutDocument<CmsNewsletterPage>(newsletterPageQuery)
+}
+
+export function fetchFarmMarketPage() {
+  return fetchAboutDocument<Parameters<typeof import('@/lib/visit/resolve').resolveFarmMarket>[0]>(farmMarketPageQuery)
+}
+
+export function fetchIceCreamPage() {
+  return fetchAboutDocument<Parameters<typeof import('@/lib/visit/resolve').resolveIceCream>[0]>(iceCreamPageQuery)
+}
+
+export function fetchGiftCardPage() {
+  return fetchAboutDocument<Parameters<typeof import('@/lib/visit/resolve').resolveGiftCard>[0]>(giftCardPageQuery)
+}
+
+export function fetchFarmGlampingPage() {
+  return fetchAboutDocument<Parameters<typeof import('@/lib/visit/resolve').resolveGlamping>[0]>(farmGlampingPageQuery)
 }
 
 export async function fetchLegalPolicy(slug: LegalSlug): Promise<CmsLegalPolicy> {

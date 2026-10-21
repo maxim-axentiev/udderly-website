@@ -15,7 +15,11 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookiesPolicyRouteImport } from './routes/cookies-policy'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as FarmGlampingRouteImport } from './routes/farm-glamping'
+import { Route as FarmMarketStoreRouteImport } from './routes/farm-market-store'
+import { Route as GiftCardRouteImport } from './routes/gift-card'
 import { Route as HealthRouteImport } from './routes/health'
+import { Route as IceCreamRouteImport } from './routes/ice-cream'
 import { Route as NewsletterRouteImport } from './routes/newsletter'
 import { Route as OurStoryRouteImport } from './routes/our-story'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
@@ -37,6 +41,7 @@ import { Route as CorporateTrainingExperientialTourismDevelopmentRouteImport } f
 import { Route as CorporateTrainingInnovationOnTheFarmRouteImport } from './routes/corporate-training/innovation-on-the-farm'
 import { Route as CorporateTrainingTeamBuildingExperiencesRouteImport } from './routes/corporate-training/team-building-experiences'
 import { Route as CorporateTrainingThePowerOfConversationRouteImport } from './routes/corporate-training/the-power-of-conversation'
+import { Route as ExperiencesFarmGlampingRouteImport } from './routes/experiences_.farm-glamping'
 import { Route as UrbortBlogIndexRouteImport } from './routes/urbort-blog/index'
 import { Route as UrbortBlogSlugRouteImport } from './routes/urbort-blog/$slug'
 
@@ -70,9 +75,29 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FarmGlampingRoute = FarmGlampingRouteImport.update({
+  id: '/farm-glamping',
+  path: '/farm-glamping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FarmMarketStoreRoute = FarmMarketStoreRouteImport.update({
+  id: '/farm-market-store',
+  path: '/farm-market-store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftCardRoute = GiftCardRouteImport.update({
+  id: '/gift-card',
+  path: '/gift-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HealthRoute = HealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IceCreamRoute = IceCreamRouteImport.update({
+  id: '/ice-cream',
+  path: '/ice-cream',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsletterRoute = NewsletterRouteImport.update({
@@ -188,6 +213,11 @@ const CorporateTrainingThePowerOfConversationRoute =
     path: '/corporate-training/the-power-of-conversation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ExperiencesFarmGlampingRoute = ExperiencesFarmGlampingRouteImport.update({
+  id: '/experiences_/farm-glamping',
+  path: '/experiences/farm-glamping',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UrbortBlogIndexRoute = UrbortBlogIndexRouteImport.update({
   id: '/urbort-blog/',
   path: '/urbort-blog/',
@@ -206,7 +236,11 @@ export interface FileRoutesByFullPath {
   '/cookies-policy': typeof CookiesPolicyRoute
   '/experiences': typeof ExperiencesRoute
   '/faq': typeof FaqRoute
+  '/farm-glamping': typeof FarmGlampingRoute
+  '/farm-market-store': typeof FarmMarketStoreRoute
+  '/gift-card': typeof GiftCardRoute
   '/health': typeof HealthRoute
+  '/ice-cream': typeof IceCreamRoute
   '/newsletter': typeof NewsletterRoute
   '/our-story': typeof OurStoryRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -225,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
   '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
   '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
+  '/experiences/farm-glamping': typeof ExperiencesFarmGlampingRoute
   '/urbort-blog/$slug': typeof UrbortBlogSlugRoute
   '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
@@ -238,7 +273,11 @@ export interface FileRoutesByTo {
   '/cookies-policy': typeof CookiesPolicyRoute
   '/experiences': typeof ExperiencesRoute
   '/faq': typeof FaqRoute
+  '/farm-glamping': typeof FarmGlampingRoute
+  '/farm-market-store': typeof FarmMarketStoreRoute
+  '/gift-card': typeof GiftCardRoute
   '/health': typeof HealthRoute
+  '/ice-cream': typeof IceCreamRoute
   '/newsletter': typeof NewsletterRoute
   '/our-story': typeof OurStoryRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -257,6 +296,7 @@ export interface FileRoutesByTo {
   '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
   '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
   '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
+  '/experiences/farm-glamping': typeof ExperiencesFarmGlampingRoute
   '/urbort-blog/$slug': typeof UrbortBlogSlugRoute
   '/adopt-an-animal': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale': typeof AnimalsForSaleIndexRoute
@@ -271,7 +311,11 @@ export interface FileRoutesById {
   '/cookies-policy': typeof CookiesPolicyRoute
   '/experiences': typeof ExperiencesRoute
   '/faq': typeof FaqRoute
+  '/farm-glamping': typeof FarmGlampingRoute
+  '/farm-market-store': typeof FarmMarketStoreRoute
+  '/gift-card': typeof GiftCardRoute
   '/health': typeof HealthRoute
+  '/ice-cream': typeof IceCreamRoute
   '/newsletter': typeof NewsletterRoute
   '/our-story': typeof OurStoryRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -290,6 +334,7 @@ export interface FileRoutesById {
   '/corporate-training/innovation-on-the-farm': typeof CorporateTrainingInnovationOnTheFarmRoute
   '/corporate-training/team-building-experiences': typeof CorporateTrainingTeamBuildingExperiencesRoute
   '/corporate-training/the-power-of-conversation': typeof CorporateTrainingThePowerOfConversationRoute
+  '/experiences_/farm-glamping': typeof ExperiencesFarmGlampingRoute
   '/urbort-blog/$slug': typeof UrbortBlogSlugRoute
   '/adopt-an-animal/': typeof AdoptAnAnimalIndexRoute
   '/animals-for-sale/': typeof AnimalsForSaleIndexRoute
@@ -305,7 +350,11 @@ export interface FileRouteTypes {
     | '/cookies-policy'
     | '/experiences'
     | '/faq'
+    | '/farm-glamping'
+    | '/farm-market-store'
+    | '/gift-card'
     | '/health'
+    | '/ice-cream'
     | '/newsletter'
     | '/our-story'
     | '/privacy-policy'
@@ -324,6 +373,7 @@ export interface FileRouteTypes {
     | '/corporate-training/innovation-on-the-farm'
     | '/corporate-training/team-building-experiences'
     | '/corporate-training/the-power-of-conversation'
+    | '/experiences/farm-glamping'
     | '/urbort-blog/$slug'
     | '/adopt-an-animal/'
     | '/animals-for-sale/'
@@ -337,7 +387,11 @@ export interface FileRouteTypes {
     | '/cookies-policy'
     | '/experiences'
     | '/faq'
+    | '/farm-glamping'
+    | '/farm-market-store'
+    | '/gift-card'
     | '/health'
+    | '/ice-cream'
     | '/newsletter'
     | '/our-story'
     | '/privacy-policy'
@@ -356,6 +410,7 @@ export interface FileRouteTypes {
     | '/corporate-training/innovation-on-the-farm'
     | '/corporate-training/team-building-experiences'
     | '/corporate-training/the-power-of-conversation'
+    | '/experiences/farm-glamping'
     | '/urbort-blog/$slug'
     | '/adopt-an-animal'
     | '/animals-for-sale'
@@ -369,7 +424,11 @@ export interface FileRouteTypes {
     | '/cookies-policy'
     | '/experiences'
     | '/faq'
+    | '/farm-glamping'
+    | '/farm-market-store'
+    | '/gift-card'
     | '/health'
+    | '/ice-cream'
     | '/newsletter'
     | '/our-story'
     | '/privacy-policy'
@@ -388,6 +447,7 @@ export interface FileRouteTypes {
     | '/corporate-training/innovation-on-the-farm'
     | '/corporate-training/team-building-experiences'
     | '/corporate-training/the-power-of-conversation'
+    | '/experiences_/farm-glamping'
     | '/urbort-blog/$slug'
     | '/adopt-an-animal/'
     | '/animals-for-sale/'
@@ -402,7 +462,11 @@ export interface RootRouteChildren {
   CookiesPolicyRoute: typeof CookiesPolicyRoute
   ExperiencesRoute: typeof ExperiencesRoute
   FaqRoute: typeof FaqRoute
+  FarmGlampingRoute: typeof FarmGlampingRoute
+  FarmMarketStoreRoute: typeof FarmMarketStoreRoute
+  GiftCardRoute: typeof GiftCardRoute
   HealthRoute: typeof HealthRoute
+  IceCreamRoute: typeof IceCreamRoute
   NewsletterRoute: typeof NewsletterRoute
   OurStoryRoute: typeof OurStoryRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -421,6 +485,7 @@ export interface RootRouteChildren {
   CorporateTrainingInnovationOnTheFarmRoute: typeof CorporateTrainingInnovationOnTheFarmRoute
   CorporateTrainingTeamBuildingExperiencesRoute: typeof CorporateTrainingTeamBuildingExperiencesRoute
   CorporateTrainingThePowerOfConversationRoute: typeof CorporateTrainingThePowerOfConversationRoute
+  ExperiencesFarmGlampingRoute: typeof ExperiencesFarmGlampingRoute
   UrbortBlogSlugRoute: typeof UrbortBlogSlugRoute
   AdoptAnAnimalIndexRoute: typeof AdoptAnAnimalIndexRoute
   AnimalsForSaleIndexRoute: typeof AnimalsForSaleIndexRoute
@@ -472,11 +537,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/farm-glamping': {
+      id: '/farm-glamping'
+      path: '/farm-glamping'
+      fullPath: '/farm-glamping'
+      preLoaderRoute: typeof FarmGlampingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/farm-market-store': {
+      id: '/farm-market-store'
+      path: '/farm-market-store'
+      fullPath: '/farm-market-store'
+      preLoaderRoute: typeof FarmMarketStoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gift-card': {
+      id: '/gift-card'
+      path: '/gift-card'
+      fullPath: '/gift-card'
+      preLoaderRoute: typeof GiftCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/health': {
       id: '/health'
       path: '/health'
       fullPath: '/health'
       preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ice-cream': {
+      id: '/ice-cream'
+      path: '/ice-cream'
+      fullPath: '/ice-cream'
+      preLoaderRoute: typeof IceCreamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/newsletter': {
@@ -626,6 +719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CorporateTrainingThePowerOfConversationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experiences_/farm-glamping': {
+      id: '/experiences_/farm-glamping'
+      path: '/experiences/farm-glamping'
+      fullPath: '/experiences/farm-glamping'
+      preLoaderRoute: typeof ExperiencesFarmGlampingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/urbort-blog/': {
       id: '/urbort-blog/'
       path: '/urbort-blog'
@@ -650,7 +750,11 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesPolicyRoute: CookiesPolicyRoute,
   ExperiencesRoute: ExperiencesRoute,
   FaqRoute: FaqRoute,
+  FarmGlampingRoute: FarmGlampingRoute,
+  FarmMarketStoreRoute: FarmMarketStoreRoute,
+  GiftCardRoute: GiftCardRoute,
   HealthRoute: HealthRoute,
+  IceCreamRoute: IceCreamRoute,
   NewsletterRoute: NewsletterRoute,
   OurStoryRoute: OurStoryRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
@@ -675,6 +779,7 @@ const rootRouteChildren: RootRouteChildren = {
     CorporateTrainingTeamBuildingExperiencesRoute,
   CorporateTrainingThePowerOfConversationRoute:
     CorporateTrainingThePowerOfConversationRoute,
+  ExperiencesFarmGlampingRoute: ExperiencesFarmGlampingRoute,
   UrbortBlogSlugRoute: UrbortBlogSlugRoute,
   AdoptAnAnimalIndexRoute: AdoptAnAnimalIndexRoute,
   AnimalsForSaleIndexRoute: AnimalsForSaleIndexRoute,

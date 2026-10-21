@@ -124,6 +124,26 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       priority: 0.4,
     },
     {
+      path: '/farm-market-store',
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      path: '/ice-cream',
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      path: '/gift-card',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      path: '/farm-glamping',
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       path: '/privacy-policy',
       changeFrequency: 'yearly',
       priority: 0.3,

@@ -309,10 +309,15 @@ const cmsLink = `{
 
 export const navigationQuery = `*[_id == "navigation"][0]{
   headerItems[]{
+    menuLabel,
     link ${cmsLink},
     children[]{ link ${cmsLink} }
   },
   footerItems[]{ link ${cmsLink} },
+  footerColumns[]{
+    title,
+    links[]{ link ${cmsLink} }
+  },
   legalItems[]{ link ${cmsLink} }
 }`
 
@@ -776,6 +781,73 @@ export const contactSettingsQuery = `*[_id == "siteSettings"][0]{
   hoursNote,
   address { line1, line2, city, region, postalCode, country },
   weeklyHours[]{ day, closed, openTime, closeTime }
+}`
+
+export const farmMarketPageQuery = `*[_id == "farmMarketPage"][0]{
+  heroLead,
+  heroAccent,
+  introHeading,
+  intro,
+  localHeading,
+  localParagraphs,
+  statValue,
+  statLabel,
+  iceHeading,
+  iceCopy,
+  iceCta,
+  closeHeading,
+  closeCopy,
+  heroImage ${altImage},
+  gallery[] ${altImage},
+  showStat,
+  showIceCream,
+  showGallery,
+  ${aboutSeo}
+}`
+
+export const iceCreamPageQuery = `*[_id == "iceCreamPage"][0]{
+  heroLead,
+  heroAccent,
+  introHeading,
+  showFlavours,
+  flavours[]{ name, story, ingredients },
+  showGift,
+  showVideo,
+  videoHeading,
+  videoUrl,
+  poster ${altImage},
+  ${aboutSeo}
+}`
+
+export const giftCardPageQuery = `*[_id == "giftCardPage"][0]{
+  heroLead,
+  heroAccent,
+  intro,
+  amounts[]{ name, description },
+  showThings,
+  things,
+  showGallery,
+  gallery[] ${altImage},
+  showRainbow,
+  showFeast,
+  ${aboutSeo}
+}`
+
+export const farmGlampingPageQuery = `*[_id == "farmGlampingPage"][0]{
+  heroLead,
+  heroAccent,
+  intro,
+  heroImage ${altImage},
+  gallery[] ${altImage},
+  showAmenities,
+  amenities,
+  showAddOns,
+  addOnsNote,
+  showInfo,
+  showCancellation,
+  cancellationNote,
+  showCheese,
+  ${aboutSeo}
 }`
 
 export const newsletterPageQuery = `*[_id == "newsletterPage"][0]{

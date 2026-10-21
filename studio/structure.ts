@@ -64,6 +64,32 @@ export const structure: StructureResolver = (S) =>
                     .title('Corporate Training page'),
                 ),
               S.documentTypeListItem('corporateProgram').title('Corporate Programs'),
+              S.listItem()
+                .title('Farm Market Store')
+                .id(SINGLETON_IDS.farmMarketPage)
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document().schemaType('farmMarketPage').documentId(SINGLETON_IDS.farmMarketPage),
+                ),
+              S.listItem()
+                .title('Goat Milk Ice Cream')
+                .id(SINGLETON_IDS.iceCreamPage)
+                .icon(DocumentTextIcon)
+                .child(S.document().schemaType('iceCreamPage').documentId(SINGLETON_IDS.iceCreamPage)),
+              S.listItem()
+                .title('Gift Card')
+                .id(SINGLETON_IDS.giftCardPage)
+                .icon(DocumentTextIcon)
+                .child(S.document().schemaType('giftCardPage').documentId(SINGLETON_IDS.giftCardPage)),
+              S.listItem()
+                .title('Farm Glamping')
+                .id(SINGLETON_IDS.farmGlampingPage)
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document()
+                    .schemaType('farmGlampingPage')
+                    .documentId(SINGLETON_IDS.farmGlampingPage),
+                ),
             ]),
         ),
       S.listItem()

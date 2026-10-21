@@ -36,10 +36,23 @@ export const navItem = defineType({
   icon: LinkIcon,
   fields: [
     defineField({
+      name: 'menuLabel',
+      title: 'Menu label',
+      type: 'string',
+      description: 'Use this for a dropdown that has no page of its own, such as Explore or About. Leave empty to use the link label.',
+    }),
+    defineField({
       name: 'link',
       title: 'Link',
       type: 'link',
-      validation: (rule) => rule.required(),
+      description: 'Optional when this item only opens a dropdown.',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const parent = context.parent as {children?: unknown[]} | undefined
+          if (Array.isArray(parent?.children) && parent.children.length > 0) return true
+          if (!value) return 'Add a link, or add dropdown links.'
+          return true
+        }),
     }),
     defineField({
       name: 'children',
@@ -52,13 +65,14 @@ export const navItem = defineType({
   ],
   preview: {
     select: {
-      title: 'link.label',
+      title: 'menuLabel',
+      linkTitle: 'link.label',
       children: 'children',
     },
-    prepare({title, children}) {
+    prepare({title, linkTitle, children}: {title?: string; linkTitle?: string; children?: unknown}) {
       const count = Array.isArray(children) ? children.length : 0
       return {
-        title: title || 'Untitled item',
+        title: title || linkTitle || 'Untitled item',
         subtitle: count ? `${count} dropdown link${count === 1 ? '' : 's'}` : 'Top-level link',
       }
     },
