@@ -51,6 +51,7 @@ export type CmsLink = {
   label?: string | null
   linkType?: string | null
   href?: string | null
+  path?: string | null
   openInNewTab?: boolean | null
   internalLink?: {
     _type?: string | null
@@ -61,15 +62,16 @@ export type CmsLink = {
 export type CmsNavigation = {
   headerItems?: Array<{
     menuLabel?: string | null
+    hidden?: boolean | null
     link?: CmsLink | null
-    children?: Array<{ link?: CmsLink | null } | null> | null
+    children?: Array<{ hidden?: boolean | null; link?: CmsLink | null } | null> | null
   } | null> | null
-  footerItems?: Array<{ link?: CmsLink | null } | null> | null
+  footerItems?: Array<{ hidden?: boolean | null; link?: CmsLink | null } | null> | null
   footerColumns?: Array<{
     title?: string | null
-    links?: Array<{ link?: CmsLink | null } | null> | null
+    links?: Array<{ hidden?: boolean | null; link?: CmsLink | null } | null> | null
   } | null> | null
-  legalItems?: Array<{ link?: CmsLink | null } | null> | null
+  legalItems?: Array<{ hidden?: boolean | null; link?: CmsLink | null } | null> | null
 } | null
 
 export type CmsSiteSettings = {
@@ -132,6 +134,17 @@ export function documentHref(
   return documentPath(type, slug)
 }
 
+/** A path on this website. Full addresses and unsafe values stay unresolved. */
+export function sitePath(value: string | null | undefined): string | undefined {
+  const href = value?.trim()
+  if (!href || href.length > 200 || !href.startsWith('/') || href.startsWith('//')) return undefined
+  if (href.includes('\\') || href.includes('..') || /\s/.test(href) || href.includes('?') || href.includes('#')) {
+    return undefined
+  }
+  if (!/^\/[A-Za-z0-9/_~.%+-]*$/.test(href)) return undefined
+  return href
+}
+
 export function resolveCmsLink(link: CmsLink | null | undefined): ChromeLink | undefined {
   if (!link) {
     return undefined
@@ -155,6 +168,12 @@ export function resolveCmsLink(link: CmsLink | null | undefined): ChromeLink | u
     }
   }
 
+  if (link.linkType === 'path') {
+    const href = sitePath(link.path)
+    if (!href) return undefined
+    return { label, href }
+  }
+
   const href = documentHref(link.internalLink?._type, link.internalLink?.slug)
   if (!href) {
     return undefined
@@ -163,57 +182,122 @@ export function resolveCmsLink(link: CmsLink | null | undefined): ChromeLink | u
   return { label, href }
 }
 
-function resolveNavItems(
-  items: NonNullable<CmsNavigation>['headerItems'],
-): ChromeNavItem[] {
-  if (!Array.isArray(items)) {
-    return []
-  }
+function hrefsOf(items: ChromeNavItem[]): string[] {
+  return items.flatMap((item) => [item.href, ...(item.children ?? []).map((child) => child.href)].filter((href): href is string => Boolean(href)))
+}
 
-  return items.flatMap((item) => {
+function coversRequired(required: string[], present: Set<string>, hidden: Set<string>) {
+  return required.every((href) => present.has(href) || hidden.has(href))
+}
+
+/**
+ * A published collection replaces the approved menu only when every current
+ * destination is still present or explicitly hidden, and at least one link remains.
+ * An empty or partial collection keeps the approved menu.
+ */
+function publishedOrFallback<T>(
+  required: string[],
+  present: Set<string>,
+  hidden: Set<string>,
+  published: T[],
+  fallback: T[],
+): T[] {
+  if (!published.length || !coversRequired(required, present, hidden)) return fallback
+  return published
+}
+
+function resolveNavItems(items: NonNullable<CmsNavigation>['headerItems']): {
+  items: ChromeNavItem[]
+  present: Set<string>
+  hidden: Set<string>
+} {
+  const present = new Set<string>()
+  const hidden = new Set<string>()
+  if (!Array.isArray(items)) return { items: [], present, hidden }
+
+  const resolved = items.flatMap((item) => {
     const link = resolveCmsLink(item?.link)
     const label = item?.menuLabel?.trim() || link?.label
-    const children = (item?.children ?? [])
-      .map((child) => resolveCmsLink(child?.link))
-      .filter((child): child is ChromeLink => Boolean(child))
+    const children = (item?.children ?? []).flatMap((child) => {
+      const childLink = resolveCmsLink(child?.link)
+      if (!childLink) return []
+      if (item?.hidden || child?.hidden) {
+        hidden.add(childLink.href)
+        return []
+      }
+      present.add(childLink.href)
+      return [childLink]
+    })
 
-    if (!label || (!link && children.length === 0)) {
-      return []
+    if (link) {
+      if (item?.hidden) hidden.add(link.href)
+      else present.add(link.href)
     }
+
+    if (item?.hidden || !label || (!link && children.length === 0)) return []
 
     return [
       {
         label,
-        ...(link ? { href: link.href, ...(link.openInNewTab ? { openInNewTab: true } : {}) } : {}),
+        ...(link && !item?.hidden
+          ? { href: link.href, ...(link.openInNewTab ? { openInNewTab: true } : {}) }
+          : {}),
         ...(children.length ? { children } : {}),
       },
     ]
   })
+
+  return { items: resolved, present, hidden }
 }
 
-function resolveFooterColumns(
-  columns: NonNullable<CmsNavigation>['footerColumns'],
-): FooterColumn[] {
-  if (!Array.isArray(columns)) return []
-  return columns.flatMap((column) => {
+function resolveFooterColumns(columns: NonNullable<CmsNavigation>['footerColumns']): {
+  columns: FooterColumn[]
+  present: Set<string>
+  hidden: Set<string>
+} {
+  const present = new Set<string>()
+  const hidden = new Set<string>()
+  if (!Array.isArray(columns)) return { columns: [], present, hidden }
+
+  const resolved = columns.flatMap((column) => {
     const title = column?.title?.trim()
-    const links = (column?.links ?? [])
-      .map((item) => resolveCmsLink(item?.link))
-      .filter((link): link is ChromeLink => Boolean(link))
+    const links = (column?.links ?? []).flatMap((item) => {
+      const link = resolveCmsLink(item?.link)
+      if (!link) return []
+      if (item?.hidden) {
+        hidden.add(link.href)
+        return []
+      }
+      present.add(link.href)
+      return [link]
+    })
     return title && links.length ? [{ title, links }] : []
   })
+
+  return { columns: resolved, present, hidden }
 }
 
-function resolveFooterItems(
-  items: NonNullable<CmsNavigation>['footerItems'],
-): ChromeLink[] {
-  if (!Array.isArray(items)) {
-    return []
-  }
+function resolveFooterItems(items: NonNullable<CmsNavigation>['footerItems']): {
+  items: ChromeLink[]
+  present: Set<string>
+  hidden: Set<string>
+} {
+  const present = new Set<string>()
+  const hidden = new Set<string>()
+  if (!Array.isArray(items)) return { items: [], present, hidden }
 
-  return items
-    .map((item) => resolveCmsLink(item?.link))
-    .filter((item): item is ChromeLink => Boolean(item))
+  const resolved = items.flatMap((item) => {
+    const link = resolveCmsLink(item?.link)
+    if (!link) return []
+    if (item?.hidden) {
+      hidden.add(link.href)
+      return []
+    }
+    present.add(link.href)
+    return [link]
+  })
+
+  return { items: resolved, present, hidden }
 }
 
 function formatAddress(address: NonNullable<CmsSiteSettings>['address']): string | undefined {
@@ -238,9 +322,10 @@ function formatAddress(address: NonNullable<CmsSiteSettings>['address']): string
 export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
   const navigation = documents?.navigation
   const settings = documents?.siteSettings
-  const headerItems = resolveNavItems(navigation?.headerItems)
-  const footerItems = resolveFooterItems(navigation?.footerItems)
-  const footerColumns = resolveFooterColumns(navigation?.footerColumns)
+  const header = resolveNavItems(navigation?.headerItems)
+  const footer = resolveFooterItems(navigation?.footerItems)
+  const columns = resolveFooterColumns(navigation?.footerColumns)
+  const legal = resolveFooterItems(navigation?.legalItems)
   const social = settings?.socialLinks
   const locationLine = formatAddress(settings?.address)
   const siteName = settings?.siteName?.trim()
@@ -248,14 +333,37 @@ export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
   const phone = settings?.phone?.trim()
   const tagline = settings?.footerTagline?.trim()
   const bookCta = resolveCmsLink(settings?.bookingCta)
-  const legalItems = resolveFooterItems(navigation?.legalItems)
 
   return {
     siteName: siteName || siteChromeFallback.siteName,
-    primaryNav: headerItems.length ? headerItems : siteChromeFallback.primaryNav,
-    footerNav: footerItems.length ? footerItems : siteChromeFallback.footerNav,
-    footerColumns: footerColumns.length ? footerColumns : siteChromeFallback.footerColumns,
-    legalNav: legalItems.length ? legalItems : siteChromeFallback.legalNav,
+    primaryNav: publishedOrFallback(
+      hrefsOf(siteChromeFallback.primaryNav),
+      header.present,
+      header.hidden,
+      header.items,
+      siteChromeFallback.primaryNav,
+    ),
+    footerNav: publishedOrFallback(
+      siteChromeFallback.footerNav.map((item) => item.href),
+      footer.present,
+      footer.hidden,
+      footer.items,
+      siteChromeFallback.footerNav,
+    ),
+    footerColumns: publishedOrFallback(
+      siteChromeFallback.footerColumns.flatMap((column) => column.links.map((link) => link.href)),
+      columns.present,
+      columns.hidden,
+      columns.columns,
+      siteChromeFallback.footerColumns,
+    ),
+    legalNav: publishedOrFallback(
+      siteChromeFallback.legalNav.map((item) => item.href),
+      legal.present,
+      legal.hidden,
+      legal.items,
+      siteChromeFallback.legalNav,
+    ),
     bookCta: bookCta ?? siteChromeFallback.bookCta,
     social: {
       instagram: social?.instagram?.trim() || siteChromeFallback.social.instagram,

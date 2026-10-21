@@ -114,7 +114,7 @@ export const corporateTrainingPage = defineType({
       type: 'array',
       group: 'programs',
       description:
-        'Leave empty to keep the five approved cards. A published program replaces the card that links to its page.',
+        'Leave empty to keep the five approved cards. A shorter list updates the cards with the same link and keeps the others. A list as long as the approved set replaces that set. Turn Show this block off to hide one card. A published program can still replace the title, description, and image of the card that links to its page.',
       of: [defineArrayMember({type: 'corporateHighlight'})],
       validation: (rule) => rule.max(8),
     }),

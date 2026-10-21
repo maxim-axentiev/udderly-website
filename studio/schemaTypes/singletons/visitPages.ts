@@ -232,6 +232,11 @@ export const farmGlampingPage = defineType({
       description: 'Leave empty to keep the approved amenity list.',
     }),
     flag('showAddOns', 'Show add-ons'),
+    stringField(
+      'addOnsHeading',
+      'Add-ons heading',
+      'Leave empty to keep the approved heading. Add-ons are design copy, not a checkout.',
+    ),
     defineField({
       name: 'addOnsNote',
       title: 'Add-on note',
@@ -240,7 +245,55 @@ export const farmGlampingPage = defineType({
       group: 'page',
       description: 'Prices in the design are not a live checkout.',
     }),
+    defineField({
+      name: 'addOns',
+      title: 'Add-ons',
+      type: 'array',
+      group: 'page',
+      description:
+        'Leave empty to keep the approved design add-ons and their prices. A shorter list updates an add-on with the same name and keeps the others. These prices do not charge a guest.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'name',
+              title: 'Name',
+              type: 'string',
+              validation: (rule) => rule.required().max(80),
+            }),
+            defineField({
+              name: 'price',
+              title: 'Price text',
+              type: 'string',
+              description: 'Design price text only. This does not take payment.',
+              validation: (rule) => rule.required().max(40),
+            }),
+            defineField({name: 'note', title: 'Note', type: 'text', rows: 2}),
+            defineField({
+              name: 'items',
+              title: 'Included items',
+              type: 'array',
+              of: [defineArrayMember({type: 'string'})],
+            }),
+          ],
+          preview: {
+            select: {title: 'name', subtitle: 'price'},
+          },
+        }),
+      ],
+    }),
     flag('showInfo', 'Show things to know'),
+    stringField('infoHeading', 'Things to know heading', 'Leave empty to keep the approved heading.'),
+    defineField({
+      name: 'info',
+      title: 'Things to know',
+      type: 'array',
+      group: 'page',
+      description:
+        'Leave empty to keep the approved notes. A shorter list updates a matching note and keeps the others. This is design wording, not a legal policy.',
+      of: [defineArrayMember({type: 'text', rows: 3})],
+    }),
     flag('showCancellation', 'Show cancellation wording'),
     defineField({
       name: 'cancellationNote',
@@ -250,7 +303,50 @@ export const farmGlampingPage = defineType({
       group: 'page',
       description: 'This is design wording, not a published legal policy. Booking stays off.',
     }),
+    defineField({
+      name: 'cancellationTiers',
+      title: 'Cancellation tiers',
+      type: 'array',
+      group: 'page',
+      description:
+        'Leave empty to keep the approved design wording. This is not a legal policy, and booking stays off. A shorter list updates a tier with the same timing label and keeps the others.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'when',
+              title: 'When',
+              type: 'string',
+              validation: (rule) => rule.required().max(40),
+            }),
+            defineField({
+              name: 'text',
+              title: 'Wording',
+              type: 'text',
+              rows: 3,
+              validation: (rule) => rule.required().max(300),
+            }),
+          ],
+          preview: {select: {title: 'when'}},
+        }),
+      ],
+    }),
     flag('showCheese', 'Show cheese trail'),
+    stringField('cheeseHeading', 'Cheese trail heading', 'Leave empty to keep the approved heading.'),
+    textField(
+      'cheeseCopy',
+      'Cheese trail text',
+      'Leave empty to keep the approved text. Do not invent a new partnership claim.',
+    ),
+    defineField({
+      name: 'cheeseHref',
+      title: 'Cheese trail link',
+      type: 'url',
+      group: 'page',
+      description: 'Leave empty to keep the approved cheese trail link.',
+      validation: (rule) => rule.uri({scheme: ['https']}),
+    }),
     seoField,
   ],
   preview: {prepare: () => ({title: 'Farm glamping'})},

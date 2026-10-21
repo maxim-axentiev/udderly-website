@@ -134,11 +134,21 @@ export const corporateProgram = defineType({
       description: 'Saved with the program. The current page designs do not show this field.',
     }),
     defineField({
+      name: 'introParagraphs',
+      title: 'Introduction paragraphs',
+      type: 'array',
+      group: 'content',
+      description:
+        'Leave empty to keep the approved introduction. The four shared programs start from the same design introduction. Paragraphs you add here replace that introduction for this program.',
+      of: [defineArrayMember({type: 'text', rows: 4})],
+    }),
+    defineField({
       name: 'programDescription',
-      title: 'Program description',
+      title: 'Formatted introduction',
       type: 'portableText',
       group: 'content',
-      description: 'Replaces the introduction paragraphs when filled. Leave empty to keep the approved introduction.',
+      description:
+        'Optional. When this has text, it is shown instead of the introduction paragraphs. Leave empty to keep the paragraphs above or the approved introduction.',
     }),
     defineField({
       name: 'outcomesHeading',
@@ -155,7 +165,7 @@ export const corporateProgram = defineType({
       group: 'program',
       hidden: hiddenUnless(['shared']),
       description:
-        'The four shared program pages start with the same design list. Replace it here when this program has its own outcomes. That shared list is not a separate verified fact about each program.',
+        'Leave empty to keep the approved outcome list. A shorter list updates matching lines and keeps the rest. A list at least as long as the approved set replaces it. That shared list is design copy, not a separate verified fact about each program.',
       of: [defineArrayMember({type: 'string'})],
     }),
     defineField({

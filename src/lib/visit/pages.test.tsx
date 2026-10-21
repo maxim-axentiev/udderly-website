@@ -137,6 +137,21 @@ describe('visit pages', () => {
     expect(resolveIceCream({ videoUrl: 'https://example.com/clip' }).videoUrl).toBe('https://example.com/clip')
     expect(resolveIceCream(null).flavours).toBeUndefined()
     expect(resolveGiftCard(null).amounts).toEqual([])
+
+    const designStay = resolveGlamping(null)
+    expect(designStay.addOns.map((addOn) => addOn.price)).toContain('CA$10.60')
+    expect(designStay.cancellation.map((tier) => tier.when)).toContain('7+ days')
+    const partialStay = resolveGlamping({
+      addOns: [{ name: 'Campfire Kit', price: 'Ask the farm', items: ['Bag of Firewood & Firestarter'] }],
+      cancellationTiers: [],
+      cheeseHref: 'javascript:alert(1)',
+    })
+    expect(partialStay.addOns.map((addOn) => addOn.name)).toEqual(
+      expect.arrayContaining(['Campfire Kit', 'Continental Ontario Breakfast Kit for 2']),
+    )
+    expect(partialStay.addOns.find((addOn) => addOn.name === 'Campfire Kit')?.price).toBe('Ask the farm')
+    expect(partialStay.cancellation).toEqual(designStay.cancellation)
+    expect(partialStay.cheeseHref).toBe('https://oxfordcountycheesetrail.ca/')
   })
 
   it('uses the glamping path as canonical and redirects the experiences alias', () => {

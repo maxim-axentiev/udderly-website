@@ -303,6 +303,7 @@ const cmsLink = `{
   label,
   linkType,
   href,
+  path,
   openInNewTab,
   internalLink->{_type, "slug": slug.current}
 }`
@@ -310,15 +311,16 @@ const cmsLink = `{
 export const navigationQuery = `*[_id == "navigation"][0]{
   headerItems[]{
     menuLabel,
+    hidden,
     link ${cmsLink},
-    children[]{ link ${cmsLink} }
+    children[]{ hidden, link ${cmsLink} }
   },
-  footerItems[]{ link ${cmsLink} },
+  footerItems[]{ hidden, link ${cmsLink} },
   footerColumns[]{
     title,
-    links[]{ link ${cmsLink} }
+    links[]{ hidden, link ${cmsLink} }
   },
-  legalItems[]{ link ${cmsLink} }
+  legalItems[]{ hidden, link ${cmsLink} }
 }`
 
 export const siteSettingsQuery = `*[_id == "siteSettings"][0]{
@@ -545,6 +547,7 @@ export const corporateProgramBySlugQuery = `*[_type == "corporateProgram" && slu
   heroImage ${altImage},
   introHeading,
   introHeadingAccent,
+  introParagraphs,
   programDescription,
   introImage ${altImage},
   learningOutcomes,
@@ -842,11 +845,19 @@ export const farmGlampingPageQuery = `*[_id == "farmGlampingPage"][0]{
   showAmenities,
   amenities,
   showAddOns,
+  addOnsHeading,
   addOnsNote,
+  addOns[]{ name, price, note, items },
   showInfo,
+  infoHeading,
+  info,
   showCancellation,
   cancellationNote,
+  cancellationTiers[]{ when, text },
   showCheese,
+  cheeseHeading,
+  cheeseCopy,
+  cheeseHref,
   ${aboutSeo}
 }`
 

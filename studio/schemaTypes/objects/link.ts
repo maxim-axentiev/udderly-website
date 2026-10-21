@@ -22,6 +22,7 @@ export const link = defineType({
       options: {
         list: [
           {title: 'Website page', value: 'internal'},
+          {title: 'Site path', value: 'path'},
           {title: 'External website', value: 'external'},
         ],
         layout: 'radio',
@@ -41,6 +42,22 @@ export const link = defineType({
           const parent = context.parent as {linkType?: string} | undefined
           if (parent?.linkType === 'internal' && !value) {
             return 'Choose a page, experience, or other website item.'
+          }
+          return true
+        }),
+    }),
+    defineField({
+      name: 'path',
+      title: 'Site path',
+      type: 'string',
+      description: 'A path on this website, such as /farm-glamping. Do not paste a full web address.',
+      hidden: ({parent}) => parent?.linkType !== 'path',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const parent = context.parent as {linkType?: string} | undefined
+          if (parent?.linkType !== 'path') return true
+          if (typeof value !== 'string' || !/^\/[A-Za-z0-9/_~.%+-]*$/.test(value) || value.startsWith('//') || value.includes('..')) {
+            return 'Enter a site path such as /contact. Do not include a web address, spaces, or ..'
           }
           return true
         }),

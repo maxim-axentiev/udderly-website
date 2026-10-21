@@ -8,6 +8,14 @@ export const navLink = defineType({
   icon: LinkIcon,
   fields: [
     defineField({
+      name: 'hidden',
+      title: 'Hide this link',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Hidden links stay out of the menu. They still count, so the rest of a complete menu can replace the approved menu.',
+    }),
+    defineField({
       name: 'link',
       title: 'Link',
       type: 'link',
@@ -35,6 +43,14 @@ export const navItem = defineType({
   type: 'object',
   icon: LinkIcon,
   fields: [
+    defineField({
+      name: 'hidden',
+      title: 'Hide this item',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Hidden items stay out of the header. They still count, so a complete menu can omit a destination on purpose.',
+    }),
     defineField({
       name: 'menuLabel',
       title: 'Menu label',

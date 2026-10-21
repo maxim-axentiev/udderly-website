@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { bookCta, footerLegalNav, footerNav, primaryNav } from '@/lib/navigation'
+import { bookCta, footerColumns, footerLegalNav, footerNav, primaryNav } from '@/lib/navigation'
 import {
   documentHref,
   mergeSiteChrome,
   resolveCmsLink,
   siteChromeFallback,
+  sitePath,
 } from '@/lib/site-chrome'
 import { SITE_NAME } from '@/lib/site'
 
@@ -41,27 +42,25 @@ describe('site chrome fallbacks', () => {
   })
 })
 
-describe('site chrome CMS mapping', () => {
-  it('updates one navigation label, one social URL, and the site name from a published CMS payload', () => {
-    const headerItems = [
-      {
-        link: {
-          label: 'Farm Days',
-          linkType: 'internal',
-          internalLink: { _type: 'experience', slug: 'mini-highland-cow-experience' },
-        },
-      },
-      ...primaryNav.slice(1).map((item) => ({
-        link: {
-          label: item.label,
-          linkType: 'external' as const,
-          href: `https://example.com${item.href}`,
-        },
-      })),
-    ]
+function pathLink(label: string, href: string) {
+  return { label, linkType: 'path' as const, path: href }
+}
 
+function completeHeader(rename?: { index: number; label: string }) {
+  return primaryNav.map((item, index) => ({
+    hidden: false,
+    menuLabel: rename?.index === index ? rename.label : item.label,
+    ...(item.href
+      ? { link: pathLink(rename?.index === index ? rename.label : item.label, item.href) }
+      : {}),
+    children: item.children?.map((child) => ({ link: pathLink(child.label, child.href) })),
+  }))
+}
+
+describe('site chrome CMS mapping', () => {
+  it('updates one navigation label from a complete menu, and site settings from any payload', () => {
     const chrome = mergeSiteChrome({
-      navigation: { headerItems },
+      navigation: { headerItems: completeHeader({ index: 0, label: 'Farm Days' }) },
       siteSettings: {
         siteName: 'Udderly Test Farm',
         socialLinks: {
@@ -72,9 +71,11 @@ describe('site chrome CMS mapping', () => {
 
     expect(chrome.primaryNav[0]).toEqual({
       label: 'Farm Days',
-      href: '/mini-highland-cow-experience',
+      href: '/experiences',
+      children: primaryNav[0]?.children,
     })
-    expect(chrome.primaryNav[1]?.label).toBe('Gift Cards')
+    expect(chrome.primaryNav.map((item) => item.label)).toContain('Gift Cards')
+    expect(chrome.primaryNav.map((item) => item.label)).toContain('Contact')
     expect(chrome.social.instagram).toBe('https://instagram.com/udderlyridiculous')
     expect(chrome.social.tiktok).toBe('#tiktok')
     expect(chrome.siteName).toBe('Udderly Test Farm')
@@ -110,7 +111,8 @@ describe('site chrome CMS mapping', () => {
       },
     })
 
-    expect(chrome.footerNav).toEqual([{ label: 'Visit us', href: '/farm-visit' }])
+    expect(chrome.footerNav).toEqual(footerNav.map((item) => ({ ...item })))
+    expect(chrome.footerColumns).toEqual(siteChromeFallback.footerColumns)
     expect(chrome.email).toBe('hello@example.com')
     expect(chrome.phone).toBe('519-555-0100')
     expect(chrome.locationLine).toBe('123 Farm Lane · Ayr, ON · Canada')
@@ -166,13 +168,22 @@ describe('site chrome CMS mapping', () => {
       href: '/goat-yoga',
     })
     expect(chrome.tagline).toBe('Come Do Something Udderly Ridiculous')
-    expect(chrome.legalNav).toEqual([
-      {
-        label: 'Privacy Policy',
-        href: 'https://example.com/privacy',
-        openInNewTab: true,
+    expect(chrome.legalNav).toEqual(footerLegalNav.map((item) => ({ ...item })))
+  })
+
+  it('uses a complete legal list, including a renamed label', () => {
+    const chrome = mergeSiteChrome({
+      navigation: {
+        legalItems: footerLegalNav.map((item) => ({
+          link: pathLink(item.href === '/privacy-policy' ? 'Privacy' : item.label, item.href),
+        })),
       },
-      { label: 'Cow day', href: '/mini-highland-cow-experience' },
+    })
+
+    expect(chrome.legalNav).toEqual([
+      { label: 'Privacy', href: '/privacy-policy' },
+      { label: 'Terms of Service', href: '/terms-of-service' },
+      { label: 'Cookies Policy', href: '/cookies-policy' },
     ])
   })
 
@@ -264,9 +275,73 @@ describe('site chrome CMS mapping', () => {
       },
     })
 
-    expect(chrome.primaryNav[0]?.children).toEqual([
-      { label: 'Cow day', href: '/mini-highland-cow-experience' },
-    ])
+    expect(chrome.primaryNav).toEqual(primaryNav.map((item) => ({ ...item })))
+  })
+})
+
+describe('navigation publication safety', () => {
+  it('keeps the approved menus when navigation is absent or empty', () => {
+    expect(mergeSiteChrome(null).primaryNav).toEqual(siteChromeFallback.primaryNav)
+    expect(mergeSiteChrome({ navigation: null }).footerColumns).toEqual(siteChromeFallback.footerColumns)
+    const empty = mergeSiteChrome({
+      navigation: { headerItems: [], footerColumns: [], footerItems: [], legalItems: [] },
+    })
+    expect(empty.primaryNav).toEqual(siteChromeFallback.primaryNav)
+    expect(empty.footerColumns).toEqual(siteChromeFallback.footerColumns)
+    expect(empty.footerNav).toEqual(siteChromeFallback.footerNav)
+    expect(empty.legalNav).toEqual(siteChromeFallback.legalNav)
+  })
+
+  it('keeps the approved header and footer when a published menu is only partial', () => {
+    const chrome = mergeSiteChrome({
+      navigation: {
+        headerItems: [
+          {
+            menuLabel: 'Visit',
+            link: pathLink('Visit', '/experiences'),
+            children: [{ link: pathLink('Cow day', '/mini-highland-cow-experience') }],
+          },
+        ],
+        footerColumns: [
+          {
+            title: 'Only one',
+            links: [{ link: pathLink('Gift Cards', '/gift-card') }],
+          },
+        ],
+        legalItems: [{ link: pathLink('Privacy', '/privacy-policy') }],
+      },
+    })
+
+    expect(chrome.primaryNav).toEqual(siteChromeFallback.primaryNav)
+    expect(chrome.footerColumns).toEqual(siteChromeFallback.footerColumns)
+    expect(chrome.legalNav).toEqual(siteChromeFallback.legalNav)
+    expect(chrome.primaryNav.flatMap((item) => [item.href, ...(item.children ?? []).map((child) => child.href)])).toContain(
+      '/farm-glamping',
+    )
+    expect(chrome.primaryNav.flatMap((item) => [item.href, ...(item.children ?? []).map((child) => child.href)])).toContain(
+      '/corporate-training',
+    )
+  })
+
+  it('uses a complete footer and can hide one header destination', () => {
+    const headerItems = completeHeader()
+    const contact = headerItems.find((item) => item.link?.path === '/contact')
+    if (contact) contact.hidden = true
+
+    const chrome = mergeSiteChrome({
+      navigation: {
+        headerItems,
+        footerColumns: footerColumns.map((column) => ({
+          title: column.title,
+          links: column.links.map((link) => ({ link: pathLink(link.label, link.href) })),
+        })),
+      },
+    })
+
+    expect(chrome.primaryNav.map((item) => item.label)).not.toContain('Contact')
+    expect(chrome.primaryNav.flatMap((item) => item.children ?? []).map((item) => item.href)).toContain('/our-story')
+    expect(chrome.footerColumns.map((column) => column.title)).toEqual(footerColumns.map((column) => column.title))
+    expect(chrome.footerColumns.flatMap((column) => column.links.map((link) => link.href))).toContain('/farm-market-store')
   })
 })
 
@@ -355,6 +430,19 @@ describe('CMS link resolution', () => {
     expect(chrome.footerNav).toEqual(footerNav.map((item) => ({ ...item })))
     expect(chrome.legalNav).toEqual(footerLegalNav.map((item) => ({ ...item })))
     expect(chrome.bookCta).toEqual({ ...bookCta })
+  })
+
+  it('accepts a site path and rejects addresses and unsafe values', () => {
+    expect(sitePath('/farm-glamping')).toBe('/farm-glamping')
+    expect(sitePath('/corporate-training/team-building-experiences')).toBe(
+      '/corporate-training/team-building-experiences',
+    )
+    expect(sitePath('https://example.com/farm-glamping')).toBeUndefined()
+    expect(sitePath('//example.com')).toBeUndefined()
+    expect(sitePath('/../admin')).toBeUndefined()
+    expect(
+      resolveCmsLink({ label: 'Glamping', linkType: 'path', path: '/farm-glamping' }),
+    ).toEqual({ label: 'Glamping', href: '/farm-glamping' })
   })
 
   it('keeps an external new-tab flag only when it is set', () => {

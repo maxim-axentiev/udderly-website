@@ -40,7 +40,24 @@ function list(value: Array<string | null> | null | undefined, fallback: readonly
     const line = clean(item)
     return line ? [line] : []
   })
-  return next.length ? next : [...fallback]
+  return mergeNamed(fallback, next, (item) => item)
+}
+
+function mergeNamed<T>(fallback: readonly T[], incoming: readonly T[], key: (item: T) => string): T[] {
+  if (!incoming.length) return [...fallback]
+  if (incoming.length >= fallback.length) return [...incoming]
+  const byKey = new Map(incoming.map((item) => [key(item), item]))
+  const used = new Set<string>()
+  const merged = fallback.map((item) => {
+    const next = byKey.get(key(item))
+    if (!next) return item
+    used.add(key(item))
+    return next
+  })
+  for (const item of incoming) {
+    if (!used.has(key(item))) merged.push(item)
+  }
+  return merged
 }
 
 export type VisitImage = { src: string; alt: string }
@@ -212,19 +229,57 @@ export function resolveGlamping(
     showAddOns?: boolean | null
     showCancellation?: boolean | null
     showCheese?: boolean | null
+    addOnsHeading?: string | null
     addOnsNote?: string | null
+    addOns?: Array<{
+      name?: string | null
+      price?: string | null
+      note?: string | null
+      items?: Array<string | null> | null
+    } | null> | null
     cancellationNote?: string | null
+    cancellationTiers?: Array<{ when?: string | null; text?: string | null } | null> | null
+    infoHeading?: string | null
+    info?: Array<string | null> | null
+    cheeseHeading?: string | null
+    cheeseCopy?: string | null
+    cheeseHref?: string | null
     showAmenities?: boolean | null
     showInfo?: boolean | null
     seo?: CmsSeo
   } | null,
 ) {
+  const addOns = (page?.addOns ?? []).flatMap((item) => {
+    const name = clean(item?.name)
+    const price = clean(item?.price)
+    if (!name || !price) return []
+    const items = (item?.items ?? []).flatMap((line) => {
+      const entry = clean(line)
+      return entry ? [entry] : []
+    })
+    const note = clean(item?.note)
+    return [{ name, price, ...(note ? { note } : {}), items }]
+  })
+  const cancellation = (page?.cancellationTiers ?? []).flatMap((item) => {
+    const when = clean(item?.when)
+    const tier = clean(item?.text)
+    return when && tier ? [{ when, text: tier }] : []
+  })
+  const cheeseHref = clean(page?.cheeseHref)
   return {
     ...glampingFallback,
     heroImage: photo(page?.heroImage),
     gallery: photos(page?.gallery),
+    addOnsHeading: text(page?.addOnsHeading, glampingFallback.addOnsHeading),
     addOnsNote: text(page?.addOnsNote, glampingFallback.addOnsNote),
+    addOns: mergeNamed(glampingFallback.addOns, addOns, (item) => item.name),
     cancellationNote: text(page?.cancellationNote, glampingFallback.cancellationNote),
+    cancellation: mergeNamed(glampingFallback.cancellation, cancellation, (item) => item.when),
+    infoHeading: text(page?.infoHeading, glampingFallback.infoHeading),
+    info: list(page?.info, glampingFallback.info),
+    cheeseHeading: text(page?.cheeseHeading, glampingFallback.cheeseHeading),
+    cheeseCopy: text(page?.cheeseCopy, glampingFallback.cheeseCopy),
+    cheeseHref: cheeseHref && /^https:\/\//.test(cheeseHref) ? cheeseHref : glampingFallback.cheeseHref,
     showAmenities: page?.showAmenities !== false,
     showInfo: page?.showInfo !== false,
     heroLead: text(page?.heroLead, glampingFallback.heroLead),

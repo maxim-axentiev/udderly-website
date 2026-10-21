@@ -77,6 +77,7 @@ export type CmsCorporateProgram = {
   heroImage?: SanityImage
   introHeading?: string | null
   introHeadingAccent?: string | null
+  introParagraphs?: string[] | null
   programDescription?: PortableTextContent
   introImage?: SanityImage
   learningOutcomes?: string[] | null

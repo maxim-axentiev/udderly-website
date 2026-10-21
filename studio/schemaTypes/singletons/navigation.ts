@@ -13,13 +13,15 @@ export const navigation = defineType({
       type: 'array',
       of: [defineArrayMember({type: 'navItem'})],
       validation: (rule) => rule.max(8),
-      description: 'Leave empty to keep the approved header. A published list replaces it. Explore and About can be dropdowns without their own page.',
+      description:
+        'Leave this empty to keep the approved header. A published list replaces it only when every current destination is included or marked hidden. A shorter list keeps the approved header, including Farm Glamping, Corporate Training, and the other current links. Use a site path for pages that are not experiences or articles.',
     }),
     defineField({
       name: 'footerColumns',
       title: 'Footer columns',
       type: 'array',
-      description: 'Leave empty to keep the approved footer columns. A published list replaces those columns.',
+      description:
+        'Leave this empty to keep the approved footer. A published set of columns replaces it only when every current footer destination is included or marked hidden. A shorter set keeps the approved footer.',
       of: [
         defineArrayMember({
           type: 'object',
@@ -61,7 +63,7 @@ export const navigation = defineType({
       title: 'Footer legal links',
       type: 'array',
       description:
-        'Privacy Policy, Terms of Service, and Cookies Policy. Leave empty to keep the current website links. Do not paste policy text here.',
+        'Privacy Policy, Terms of Service, and Cookies Policy. Leave empty to keep those three links. A published list replaces them only when all three destinations are included or marked hidden. Do not paste policy text here.',
       of: [defineArrayMember({type: 'navLink'})],
       validation: (rule) => rule.max(3),
     }),

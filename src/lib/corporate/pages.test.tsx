@@ -123,7 +123,7 @@ describe('corporate training pages', () => {
     expect(page.hero.lead).toBe('Conversation')
     expect(page.hero.accent).toBe('Practice')
     expect(page.hero.intro).toBe('A published hero introduction.')
-    expect(page.outcomes.items).toEqual(['One published outcome.'])
+    expect(page.outcomes.items).toEqual([...SHARED_PROGRAM_OUTCOMES, 'One published outcome.'])
     expect(page.seo).toMatchObject({
       title: 'Published conversation title',
       description: 'Published conversation description',
@@ -219,8 +219,61 @@ describe('corporate training pages', () => {
       null,
       images,
     )
-    expect(replaced.services[0]?.price).toBe('Ask for the current fee')
-    expect(replaced.credentials).toEqual([{ icon: 'award', label: 'Confirmed recognition' }])
+    expect(replaced.services.map((service) => service.price)).toEqual(
+      expect.arrayContaining(['$125/hour', '$2500 + HST & travel costs', 'Ask for the current fee']),
+    )
+    expect(replaced.credentials.map((item) => item.label)).toEqual(
+      expect.arrayContaining(['14-time award winning', 'Confirmed recognition']),
+    )
+  })
+
+  it('keeps approved sections when a published corporate document is only partial', () => {
+    const landing = resolveCorporateLanding(
+      {
+        heroLead: 'Hello from the farm',
+        programCards: [
+          {
+            title: 'DiSC Assessment',
+            body: 'A real card description.',
+            href: '/corporate-training/disc-assessment',
+            ctaLabel: 'Learn More',
+          },
+        ],
+        reviewsApproved: true,
+        testimonials: [{ quote: '', guestName: '' }],
+      },
+      [],
+      null,
+      images,
+    )
+    expect(landing.hero.lead).toBe('Hello from the farm')
+    expect(landing.cards.map((card) => card.title)).toEqual(
+      expect.arrayContaining(['DiSC Assessment', 'The Power of Conversation', 'Innovation on the Farm']),
+    )
+    expect(landing.cards.find((card) => card.title === 'DiSC Assessment')?.body).toBe('A real card description.')
+    expect(landing.close.reviews).toBeNull()
+
+    const replacedIntro = resolveSharedProgram(
+      'the-power-of-conversation',
+      {
+        title: 'The Power of Conversation',
+        slug: 'the-power-of-conversation',
+        active: true,
+        introParagraphs: ['A real introduction for this program.'],
+      },
+      null,
+      images,
+    )
+    expect(replacedIntro.introduction.paragraphs).toEqual(['A real introduction for this program.'])
+
+    const shared = resolveSharedProgram(
+      'beyond-engagement',
+      { title: 'Beyond Engagement', slug: 'beyond-engagement', active: true },
+      null,
+      images,
+    )
+    expect(shared.introduction.paragraphs[0]).toContain('Placeholder description')
+    expect(shared.close.reviews).toBeNull()
   })
 
   it('builds metadata for every corporate path', () => {

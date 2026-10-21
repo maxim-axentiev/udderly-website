@@ -75,6 +75,24 @@ function lines(value: string[] | null | undefined): string[] {
   return (value ?? []).map((item) => item.trim()).filter(Boolean)
 }
 
+/** A shorter published list updates matching items and keeps the rest of the approved section. */
+function mergeSection<T>(fallback: readonly T[], incoming: readonly T[], key: (item: T) => string): T[] {
+  if (!incoming.length) return [...fallback]
+  if (incoming.length >= fallback.length) return [...incoming]
+  const byKey = new Map(incoming.map((item) => [key(item), item]))
+  const used = new Set<string>()
+  const merged = fallback.map((item) => {
+    const next = byKey.get(key(item))
+    if (!next) return item
+    used.add(key(item))
+    return next
+  })
+  for (const item of incoming) {
+    if (!used.has(key(item))) merged.push(item)
+  }
+  return merged
+}
+
 function text(value: string | null | undefined, fallback: string): string {
   return clean(value) ?? fallback
 }
@@ -264,7 +282,7 @@ function facility(
   return {
     lead: text(source?.headingLead, fallback.lead),
     accent: text(source?.headingAccent, fallback.accent),
-    items: items.length ? items : fallback.items,
+    items: mergeSection(fallback.items, items, (item) => item.title),
     gallery: gallery(source?.gallery, fallback.gallery),
   }
 }
@@ -338,6 +356,7 @@ export function resolveCorporateLanding(
       )
   const customCards = (page?.programCards ?? [])
     .map((card) => {
+      if (card.enabled === false) return null
       const title = clean(card.title)
       const link = clean(card.href)
       if (!title || !link) return null
@@ -351,9 +370,17 @@ export function resolveCorporateLanding(
       return overlayProgram(base, programByHref(published, base.href))
     })
     .filter((card): card is CorporateCard => Boolean(card))
-  const cards = (customCards.length ? customCards : fallback.cards).map((card) =>
-    customCards.length ? card : overlayProgram(card, programByHref(published, card.href)),
+  const hiddenCardHrefs = new Set(
+    (page?.programCards ?? []).flatMap((card) => {
+      const link = clean(card.href)
+      return card.enabled === false && link ? [link] : []
+    }),
   )
+  const cards = mergeSection(
+    fallback.cards.filter((card) => !hiddenCardHrefs.has(card.href)),
+    customCards,
+    (card) => card.href,
+  ).map((card) => overlayProgram(card, programByHref(published, card.href)))
   const tourism = page?.tourismProgram?.enabled === false
     ? null
     : overlayProgram(
@@ -417,7 +444,7 @@ function sharedIntroduction(
   return {
     lead: text(program?.introHeading, fallback.lead),
     accent: text(program?.introHeadingAccent, fallback.accent),
-    paragraphs: fallback.paragraphs,
+    paragraphs: lines(program?.introParagraphs).length ? lines(program?.introParagraphs) : fallback.paragraphs,
     richText: rich(program?.programDescription),
     image: picture(program?.introImage, fallback.image, 1400),
     ctaLabel: text(program?.introCtaLabel, fallback.ctaLabel),
@@ -451,7 +478,7 @@ export function resolveSharedProgram(
     introduction: sharedIntroduction(published, fallback.introduction),
     outcomes: {
       heading: text(published?.outcomesHeading, fallback.outcomes.heading),
-      items: outcomes.length ? outcomes : SHARED_PROGRAM_OUTCOMES,
+      items: mergeSection(SHARED_PROGRAM_OUTCOMES, outcomes, (item) => item),
       durationTitle: fallback.outcomes.durationTitle,
       durationBody: text(published?.durationDetail ?? published?.duration, fallback.outcomes.durationBody),
       enhancementsTitle: fallback.outcomes.enhancementsTitle,
@@ -475,7 +502,14 @@ export function resolveTeamBuilding(
 ): TeamBuildingPage {
   const fallback = teamBuildingFallback(images)
   const published = publishedProgram(program, 'team-building-experiences')
+  const hiddenActivityTitles = new Set(
+    (published?.activities ?? []).flatMap((activity) => {
+      const title = clean(activity.title)
+      return activity.enabled === false && title ? [title] : []
+    }),
+  )
   const activities = (published?.activities ?? [])
+    .filter((activity) => activity.enabled !== false)
     .map((activity, index) => {
       const title = clean(activity.title)
       if (!title) return null
@@ -493,7 +527,11 @@ export function resolveTeamBuilding(
     awards: awardsFor(foundation, images, published?.showAwards),
     headingLead: text(published?.herdHeading, fallback.headingLead),
     headingAccent: text(published?.herdHeadingAccent, fallback.headingAccent),
-    activities: activities.length ? activities : fallback.activities,
+    activities: mergeSection(
+      fallback.activities.filter((activity) => !hiddenActivityTitles.has(activity.title)),
+      activities,
+      (activity) => activity.title,
+    ),
     mix: {
       title: text(published?.mixHeading, fallback.mix.title),
       body: text(published?.mixBody, fallback.mix.body),
@@ -579,16 +617,16 @@ export function resolveTourism(
     },
     portrait: picture(published?.facilitator?.image, fallback.portrait, 1200),
     pathHeading: text(published?.pathHeading, fallback.pathHeading),
-    path: steps.length ? steps : fallback.path,
+    path: mergeSection(fallback.path, steps, (step) => step.title),
     pathCtaLabel: consultation,
     pathCtaHref: '#contact',
-    credentials: credentials.length ? credentials : fallback.credentials,
+    credentials: mergeSection(fallback.credentials, credentials, (item) => item.label),
     servicesHeading: text(published?.servicesHeading, fallback.servicesHeading),
-    services: services.length ? services : fallback.services,
+    services: mergeSection(fallback.services, services, (service) => service.name),
     servicesCtaLabel: consultation,
     servicesCtaHref: '#contact',
     audienceHeading: text(published?.audienceHeading, fallback.audienceHeading),
-    audiences: audiences.length ? audiences : fallback.audiences,
+    audiences: mergeSection(fallback.audiences, audiences, (item) => item.label),
     audienceNote: text(published?.audienceNote, fallback.audienceNote),
     audienceCtaLabel: consultation,
     audienceCtaHref: '#contact',
@@ -648,9 +686,9 @@ export function resolveDisc(
     awards: awardsFor(foundation, images, published?.showAwards),
     introduction: sharedIntroduction(published, fallback.introduction),
     offeringsHeading: text(published?.offeringsHeading, fallback.offeringsHeading),
-    offerings: offerings.length ? offerings : fallback.offerings,
+    offerings: mergeSection(fallback.offerings, offerings, (offering) => offering.title),
     practicalHeading: text(published?.practicalHeading, fallback.practicalHeading),
-    practical: practical.length ? practical : fallback.practical,
+    practical: mergeSection(fallback.practical, practical, (item) => item.label),
     close: closeFor(published ?? {}, images, {
       reviewsHeading: fallback.reviewsHeading,
       contactHeading: fallback.contactHeading,
