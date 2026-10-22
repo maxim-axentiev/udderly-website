@@ -23,6 +23,9 @@ npm-debug.log*
 # Test / coverage
 coverage/
 
+# Local audit inputs. Do not commit Search Console exports or WordPress extracts.
+.local/
+
 # Editor / OS
 .DS_Store
 Thumbs.db

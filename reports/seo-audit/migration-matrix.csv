@@ -1,13 +1,228 @@
-legacy_url,new_route,classification,evidence,notes
-,/,no match,New site route exists. WordPress WXR was not available.,Do not invent a legacy homepage URL or a redirect.
-,/experiences,no match,New Experiences Hub route. No WordPress join.,Preserve as the hub. Do not redirect until a legacy URL is verified.
-,/mini-highland-cow-experience,preserve,Canonical experience route in code and the unpublished draft slug.,Open and private sessions are consolidated on this page in this batch.
-/private-mini-highland-experience,/mini-highland-cow-experience,consolidate,Explicit consolidation approved for this batch. Staging middleware returns 301 for both slash forms.,Not verified from a WordPress export. Do not apply this rule in WordPress or DNS from this repo.
-/private-mini-highland-experience/,/mini-highland-cow-experience,consolidate,Trailing slash normalizes to the same staging rule.,Same destination as the slashless path.
-,/animals-for-sale,no match,New route exists. Legacy animal-sale URLs were not in an accessible export.,Investigate before any redirect.
-,/farm-glamping,no match,New route exists. Earlier site used /stay in homepage content; that homepage field was already updated to /farm-glamping.,Do not add a /stay redirect until the WordPress URL is verified.
-,/farm-market-store,no match,New route exists.,Do not assume /our-farm or another legacy path.
-,/goat-yoga,no match,Unpublished draft slug. Not publicly rendered.,No WordPress URL join.
-,/baby-goat-playtime-and-snuggles,no match,Unpublished draft slug.,No WordPress URL join.
-,/urbort-blog,no match,New board route. Historical blog URLs were not in an accessible export.,Investigate each legacy post before redirecting.
-,animal and blog URLs,investigate,No WXR or GSC page export was accessible.,Do not invent destinations.
+legacy_path,gsc_clicks,gsc_impressions,gsc_ctr,gsc_position,in_wordpress_export,wp_type,wp_title,stored_rank_math_robots,new_route,classification,redirect_status,notes
+/,27947,581946,4.80%,11.68,yes,page,Home,index,/,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/mini-highland-cow-experience,17202,1261834,1.36%,6.20,yes,page,Mini Highland Cow Experience,index,/mini-highland-cow-experience,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/animals-for-sale,12461,219598,5.67%,6.78,yes,page,Animals for sale,index,/animals-for-sale,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/experiences,10005,345932,2.89%,7.42,yes,page,Experiences,index,/experiences,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/goat-yoga,4972,194703,2.55%,6.90,yes,page,Goat Yoga,index,/goat-yoga,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/private-mini-highland-experience,2876,212375,1.35%,6.75,yes,page,Private Mini Highland Experience,index,/mini-highland-cow-experience,consolidate,implemented,Staging 301 for both slash forms. WordPress page is still separate and indexed in this export.
+/farm-glamping,2039,224731,0.91%,6.22,yes,page,Farm Glamping,index,/farm-glamping,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/alpaca-lunch-picnic,1747,66852,2.61%,8.11,yes,page,Alpaca Lunch Picnic,index,/alpaca-lunch-picnic,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/alpaca-walks,1247,132418,0.94%,10.33,yes,page,Alpaca Walks,index,/alpaca-walks,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/adopt-an-animal/adopt-clara,1049,16330,6.42%,10.46,yes,page,Clara Cow,index,/adopt-an-animal/clara,redirect,proposed,Unpublished adoption draft slug drops the adopt- prefix. Not implemented.
+/goat-cuddles,970,53377,1.82%,13.95,yes,page,Goat Cuddles,index,/goat-cuddles,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/adopt-an-animal,791,17520,4.51%,9.11,yes,page,Adopt An Animal,index,/adopt-an-animal,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/farm-market-store,538,141347,0.38%,6.04,yes,page,Our Farm Market Store,index,/farm-market-store,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/mini-cattle-for-sale,477,11012,4.33%,11.34,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/baby-goat-playtime-and-snuggles,434,247232,0.18%,2.72,yes,page,Baby Goat Playtime & Snuggles,index,/baby-goat-playtime-and-snuggles,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/winston,365,16345,2.23%,8.42,yes,page,Winston,index,/animals-for-sale/winston,redirect,proposed,Legacy path matches the unpublished animal-listing slug. Not implemented. The listing is still a draft.
+/promotions,336,55717,0.60%,8.54,yes,page,Promotions,,,investigate,none,No verified destination. Left blank on purpose.
+/goat-recess,311,55116,0.56%,7.27,yes,page,Goat Recess,index,/goat-recess,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/taste-of-farm-life,299,132412,0.23%,5.32,yes,page,Taste of Farm Life,index,/taste-of-farm-life,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/alpaca-sunset-picnic,258,11548,2.23%,13.35,yes,page,Alpaca Sunset Picnic,index,/alpaca-sunset-picnic,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/adopt-an-animal/adopt-chicken,223,6407,3.48%,11.76,yes,page,Chicken,index,/adopt-an-animal/chicken,redirect,proposed,Unpublished adoption draft slug drops the adopt- prefix. Not implemented.
+/faqs,206,19839,1.04%,4.11,yes,page,FAQs,index,/faq,redirect,proposed,WordPress title is FAQs. Destination route exists. Not implemented.
+/contact,191,87591,0.22%,8.11,yes,page,Contact,index,/contact,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/taste-of-farm-life-family-friendly,187,104499,0.18%,4.07,yes,page,Taste of Farm Life (family friendly),index,/taste-of-farm-life-family-friendly,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/oreo,161,9705,1.66%,8.15,yes,page,Oreo,index,/animals-for-sale/oreo,redirect,proposed,Legacy path matches the unpublished animal-listing slug. Not implemented. The listing is still a draft.
+/our-story,154,57513,0.27%,3.22,yes,page,Our Story,,/our-story,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/cow-wedding,136,5205,2.61%,7.05,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/adopt-an-animal/adopt-banoffee,99,2499,3.96%,10.17,yes,page,Banoffee Goat,index,,investigate,none,No verified destination. Left blank on purpose.
+/team-building-farm-experiences,94,10330,0.91%,8.66,yes,page,Team Building,,,investigate,none,No verified destination. Left blank on purpose.
+/miniature-donkey-visits,85,2108,4.03%,7.13,yes,page,Miniature Donkey Visits,index,/miniature-donkey-visits,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/cheryl-haskett,64,1747,3.66%,7.80,yes,page,Bio Cheryl Haskett,index,,investigate,none,No verified destination. Left blank on purpose.
+/miniature-donkey-sunset-picnic,63,3110,2.03%,3.32,yes,page,Private Miniature Donkey Sunset Picnic,index,/miniature-donkey-sunset-picnic,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/escape-to-the-countryside-farm-glamping,53,1869,2.84%,11.50,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/mini-highland-calf-meet-and-greet,53,19078,0.28%,7.10,yes,page,Limited Time Mini Highland Calf Meet & Greet,index,/mini-highland-calf-meet-and-greet,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/team,51,5373,0.95%,6.84,yes,page,Team,index,/team,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/gift-certificate,36,4019,0.90%,7.59,yes,page,Gift Certificate for Experiences,index,/gift-card,redirect,proposed,WordPress title is Gift Certificate for Experiences. Destination route exists. Not implemented.
+/goatscaping,36,1416,2.54%,8.42,yes,page,GoatScaping,,,investigate,none,No verified destination. Left blank on purpose.
+/paid-volunteer-positions,29,207,14.01%,21.68,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/promotions/senior-discount,22,443,4.97%,8.20,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/miniature-donkey-lunch-picnic,21,467,4.50%,7.03,yes,page,Private Miniature Donkey Lunch Picnic,index,/miniature-donkey-lunch-picnic,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/alpaca-experience-and-fibre-nesting-ball-workshop,19,790,2.41%,9.85,yes,page,Alpaca Experience and Fibre Nesting Ball Workshop,index,/alpaca-experience-and-fibre-nesting-ball-workshop,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/donkey-walk-and-bond,19,1518,1.25%,3.24,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/udderly-ridiculous,18,11456,0.16%,7.70,yes,page,Udderly Ridiculous,index,,investigate,none,No verified destination. Left blank on purpose.
+/ice-cream,17,1162,1.46%,7.90,yes,page,Ice Cream,index,/ice-cream,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/ultimate-honey-bee-encounter,15,248,6.05%,7.02,yes,page,The Ultimate Honey Bee Encounter,index,,investigate,none,No verified destination. Left blank on purpose.
+/donkey-snuggles,13,409,3.18%,11.56,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/team-building,13,1027,1.27%,13.17,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/corporate-training,12,1414,0.85%,6.71,yes,page,Corporate Training,index,/corporate-training,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/contact-pro,11,1993,0.55%,14.86,yes,page,Contact Pro,index,,investigate,none,No verified destination. Left blank on purpose.
+/adopt-an-animal/michael-goat,9,325,2.77%,10.84,yes,page,Michael - Goat,index,,investigate,none,No verified destination. Left blank on purpose.
+/farm-glamping-the-farm-hopping-experience,9,309,2.91%,8.22,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/corporate-training/alpaca-emotional-intelligence,8,1773,0.45%,8.95,yes,page,Alpaca Emotional Intelligence (EQ),index,/corporate-training/alpaca-emotional-intelligence,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/private-miniature-donkey-snuggles,8,201,3.98%,7.70,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/taste-of-farm-life-training,8,1060,0.75%,6.43,yes,page,Taste of Farm Life - Training,index,,investigate,none,No verified destination. Left blank on purpose.
+/urbort-blog/worlds-first-cow-wedding,8,2063,0.39%,6.72,yes,page,Ridiculous Board - World's First Cow Wedding,,/urbort-blog/worlds-first-cow-wedding,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/taste-of-farm-life-glamping-getaway,7,770,0.91%,10.47,yes,page,Taste of Farm Life Glamping Getaway,index,,investigate,none,No verified destination. Left blank on purpose.
+/wreck-the-dress,6,572,1.05%,13.26,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/sitemap,5,372,1.34%,13.19,yes,page,Sitemap,index,,investigate,none,No verified destination. Left blank on purpose.
+/meet-our-herd,4,126,3.17%,9.86,yes,page,Meet our Herd,index,,investigate,none,No verified destination. Left blank on purpose.
+/urbort-blog/april-fools-2025,4,10532,0.04%,6.54,yes,page,Ridiculous Board - April Fools 2025,,,investigate,none,No verified destination. Left blank on purpose.
+/urbort-blog/john-ferguson,4,148,2.70%,9.68,yes,page,Ridiculous Board - John Ferguson Collab,,,investigate,none,No verified destination. Left blank on purpose.
+/adopt-an-animal/adopt-stanley,3,133,2.26%,9.87,yes,page,Stanley - Donkey,index,/adopt-an-animal/stanley,redirect,proposed,Unpublished adoption draft slug drops the adopt- prefix. Not implemented.
+/miniature-donkey-snuggles,3,138,2.17%,7.47,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/phoebe,3,196,1.53%,12.31,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/promotions/military-discount,3,336,0.89%,8.12,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/promotions/the-inner-herd,3,160,1.88%,19.66,yes,page,The Inner Herd,,,investigate,none,No verified destination. Left blank on purpose.
+/tiao-awards-2022,3,57,5.26%,33.65,yes,post,3 awards at the Tourism Industry Association of Ontario,index,,investigate,none,No verified destination. Left blank on purpose.
+/goat-poop-tea,2,172,1.16%,6.98,yes,page,Goat Poop Tea,,,investigate,none,No verified destination. Left blank on purpose.
+/goats-alpacas-and-new-amigos,2,87,2.30%,13.91,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/mini-micro-highland-calf-joe,2,20,10.00%,13.85,yes,page,Mini/Micro Highland Calf - Joe,index,,investigate,none,No verified destination. Left blank on purpose.
+/adopt-an-animal/adopt-greg,1,179,0.56%,8.97,yes,page,Greg,index,/adopt-an-animal/greg,redirect,proposed,Unpublished adoption draft slug drops the adopt- prefix. Not implemented.
+/adopt-an-animal/adopt-sassafras,1,47,2.13%,12.06,yes,page,Sassafras Alpaca,index,/adopt-an-animal/sassafras,redirect,proposed,Unpublished adoption draft slug drops the adopt- prefix. Not implemented.
+/adopt-an-animal/bronee-goat,1,45,2.22%,3.42,yes,page,Bronnie - Goat,index,,investigate,none,No verified destination. Left blank on purpose.
+/alpaca-emotional-intelligence,1,159,0.63%,12.48,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/corporate-training/disc-assessment,1,111,0.90%,24.97,yes,page,DiSC Assessment,,/corporate-training/disc-assessment,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/gift-of-giving-raffle,1,175,0.57%,11.53,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/mini-highland-calf-june,1,24,4.17%,9.21,yes,page,Mini Highland Calf - June,index,,investigate,none,No verified destination. Left blank on purpose.
+/subscribe-to-newsletter,1,49,2.04%,13.16,yes,page,Subscribe to Newsletter,,/newsletter,redirect,proposed,WordPress title is Subscribe to Newsletter. Destination route exists. Not implemented.
+/urbort-blog/alpaca-breeding,1,66,1.52%,12.53,yes,page,Ridiculous Board - Alpaca Sex,,,investigate,none,No verified destination. Left blank on purpose.
+/wp-content/uploads/2022/11/store5-300x300.jpg,1,1,100.00%,4.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/79.png,1,1,100.00%,6.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/adopt-an-animal/bronnee-goat,0,2,0.00%,7.50,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/adopt-clara,0,1,0.00%,2.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/alpaca-starter-herd,0,31,0.00%,15.48,yes,page,Alpaca Starter Herd,index,,investigate,none,No verified destination. Left blank on purpose.
+/alpacas-for-sale,0,46,0.00%,14.46,yes,page,Alpacas for Sale,index,,investigate,none,No verified destination. Left blank on purpose.
+/an-animal/adopt-clara,0,1,0.00%,1.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/category/uncategorized,0,1,0.00%,10.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/clara,,,,,yes,post,Clara,,,investigate,none,No verified destination. Left blank on purpose.
+/clara-cow,0,5,0.00%,1.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/corporate-training/beyond-engagement,0,61,0.00%,19.74,yes,page,Beyond Engagement,,/corporate-training/beyond-engagement,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/corporate-training/innovation-on-the-farm,0,74,0.00%,9.88,yes,page,Innovation on the Farm,index,/corporate-training/innovation-on-the-farm,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/corporate-training/the-power-of-conversation,0,62,0.00%,21.98,yes,page,The Power of Conversation,,/corporate-training/the-power-of-conversation,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/elementor-88110,0,129,0.00%,12.43,yes,page,Sign Up,index,,investigate,none,Builder or test URL. No destination assigned.
+/experiential-tourism-development,0,129,0.00%,23.72,yes,page,Experiential Tourism Development & Coaching,index,/corporate-training/experiential-tourism-development,redirect,proposed,WordPress title matches the corporate program. Destination route exists. Not implemented.
+/highland-calf-macintosh,,,,,yes,page,Highland Calf - Macintosh,index,,investigate,none,No verified destination. Left blank on purpose.
+/innovation-on-the-farm,0,40,0.00%,14.12,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/mini-goats-fezziwig-and-ebenezer,0,1,0.00%,7.00,yes,page,Mini Goats - Fezziwig and Ebenezer,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-goats-kevin-karen,0,3,0.00%,3.33,yes,page,Mini Goats - Kevin & Karen,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-goats-louise-pesto-parmesan,0,1,0.00%,6.00,yes,page,"Mini Goats - Louise, Pesto & Parmesan",index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-goats-marco-polo,0,15,0.00%,28.33,yes,page,Mini Goats - Marco & Polo,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-goats-pekoe-rooibos-matcha,,,,,yes,page,"Mini Goats - Pekoe, Rooibos & Matcha",index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-goats-super-spice,0,9,0.00%,27.11,yes,page,Mini Goats - Super & Spice,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-highland-calf-chewy,0,25,0.00%,8.68,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/mini-highland-calf-mr-t,0,21,0.00%,25.52,yes,page,Mini/Micro Highland Calf - Mr. T,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-highland-experience,0,8,0.00%,1.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/mini-micro-highland-calf-chewy,0,16,0.00%,18.88,yes,page,Mini/Micro Highland Calf - Chewy,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-micro-highland-calf-chinchin,0,7,0.00%,8.43,yes,page,Mini/Micro Highland Calf - Chin Chin,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-micro-highland-calf-ginger,0,1,0.00%,7.00,yes,page,Mini/Micro Highland Calf - Ginger,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-micro-highland-calf-robbie,0,18,0.00%,19.06,yes,page,Mini/Micro Highland Calf - Robby,index,,investigate,none,No verified destination. Left blank on purpose.
+/mini-micro-highland-calf-westley,0,15,0.00%,12.80,yes,page,Mini/Micro Highland Calf - Westley,index,,investigate,none,No verified destination. Left blank on purpose.
+/muriel,,,,,yes,post,Muriel,,,investigate,none,No verified destination. Left blank on purpose.
+/our-vision,0,1174,0.00%,16.97,yes,page,Our Vision,index,/vision-values,redirect,proposed,WordPress title is Our Vision and the stored focus is vision and values. Destination route exists. Not implemented.
+/oxford-tourism-awards-2022,0,58,0.00%,21.14,yes,post,Oxford Tourism Awards,index,,investigate,none,No verified destination. Left blank on purpose.
+/privacy-policy-2,0,200,0.00%,25.79,yes,page,Privacy Policy,index,/privacy-policy,redirect,proposed,WordPress slug is privacy-policy-2. Destination route exists. Not implemented.
+/private-miniature-donkey-lunch-picnic,0,1,0.00%,1.00,no,,,,/miniature-donkey-lunch-picnic,redirect,proposed,Public path is already defined in code and is the published WordPress URL. Not implemented as an HTTP redirect.
+/private-miniature-donkey-sunset-picnic,0,3,0.00%,1.00,no,,,,/miniature-donkey-sunset-picnic,redirect,proposed,Public path is already defined in code and is the published WordPress URL. Not implemented as an HTTP redirect.
+/private-miniature-donkey-visits,0,11,0.00%,5.00,yes,page,Private Miniature Donkey Visits,index,,investigate,none,No verified destination. Left blank on purpose.
+/slide-types/home,0,9,0.00%,8.22,no,,,,,investigate,none,Builder or test URL. No destination assigned.
+/tag/awards,0,2,0.00%,6.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/team-building/the-power-of-conversation,0,3,0.00%,7.67,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/testing-slide-2,0,5,0.00%,12.80,yes,post,Testing Slide 2,,,investigate,none,Builder or test URL. No destination assigned.
+/the-inner-herd-accept,0,14,0.00%,11.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/the-inner-herd-reject,0,5,0.00%,22.00,no,,,,,investigate,none,No verified destination. Left blank on purpose.
+/tower-of-goats,,,,,yes,page,Tower of Goats,,,investigate,none,No verified destination. Left blank on purpose.
+/udderly-ridiculous-ice-cream-open-farm,0,228,0.00%,30.07,yes,post,Udderly Ridiculous Ice Cream makers to open farm gates to visitors,index,,investigate,none,No verified destination. Left blank on purpose.
+/urbort-blog,0,126,0.00%,10.60,yes,page,Udderly Ridiculous Board of Ridiculous Things HOME,,/urbort-blog,preserve,none,Path matches a new-site route. The URL stays unavailable until that route’s Sanity document is published.
+/urbort-blog/wreck-the-dress,0,46,0.00%,10.87,yes,page,Ridiculous Board - Wreck the Dress,,,investigate,none,No verified destination. Left blank on purpose.
+/wp-content/uploads/2021/04/UR-FARMLIFE-LOGO.png,0,158,0.00%,1.55,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2021/05/Udderly-Ridiculous-Farm-Life-Bright-ON-2-1024x1024.jpg,0,1,0.00%,31.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/08/Untitled-design-22.png,0,1,0.00%,29.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/10/June-Ad-Creatives-4-1.png,0,2,0.00%,27.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/10/Screenshot-2024-10-07-161401-1024x610.png,0,6,0.00%,17.67,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/10/Screenshot-2024-10-07-161401.png,0,2,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/1-6.png,0,189,0.00%,18.80,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/10.png,0,1,0.00%,9.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/11.png,0,2,0.00%,16.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/2-3.png,0,1,0.00%,25.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/2-6-1024x1024.png,0,1,0.00%,15.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/3-5-1024x1024.png,0,1,0.00%,20.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/3-5.png,0,11,0.00%,15.82,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/4-3.png,0,1,0.00%,31.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/5-3.png,0,1,0.00%,30.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/6-3.png,0,3,0.00%,9.33,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/6-5.png,0,640,0.00%,19.47,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/11/8.png,0,2,0.00%,16.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/12/TripAdvisor-13-1-1.png,0,1,0.00%,10.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/12/TripAdvisor-14-1-1.png,0,1,0.00%,42.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2024/12/TripAdvisor-8-1-1.png,0,1,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/11-1024x1024.png,0,3,0.00%,14.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/13-1024x1024.png,0,5,0.00%,11.20,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/27-768x768.png,0,1,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/4-1024x1024.png,0,10,0.00%,18.70,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/6-1024x1024.png,0,5,0.00%,11.60,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/7-1024x1024.png,0,2,0.00%,15.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Homepage-Video-Thumbnails-17.png,0,1,0.00%,30.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-11-1-768x768.png,0,1,0.00%,2.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-22-1-1.png,0,1,0.00%,3.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-23-1-1024x1024.png,0,1,0.00%,12.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-27-1-1024x1024.png,0,1,0.00%,20.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-29-1-1024x1024.png,0,2,0.00%,12.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-29-1-768x768.png,0,4,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-5-1-1024x1024.png,0,2,0.00%,23.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/01/Website-Assets-Square-8-1-1024x1024.png,0,1,0.00%,14.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/102.png,0,1,0.00%,19.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/103.png,0,2,0.00%,32.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/108.png,0,2,0.00%,23.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/116.png,0,4,0.00%,20.25,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/118.png,0,1,0.00%,11.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/70.png,0,4,0.00%,18.25,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/71.png,0,5,0.00%,18.40,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/85.png,0,1,0.00%,12.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/86.png,0,1,0.00%,27.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/87.png,0,1,0.00%,23.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/91.png,0,1,0.00%,5.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/92.png,0,1,0.00%,4.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/95.png,0,1,0.00%,20.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/June-Ad-Creatives-31-1-1-1024x1024.png,0,1,0.00%,7.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/Website-Assets-Square-33-1024x1024.png,0,21,0.00%,25.67,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/Website-Assets-Square-35-1.png,0,3,0.00%,15.33,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/Website-Assets-Square-36-1.png,0,1,0.00%,23.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/Website-Assets-Square-38-1-1024x1024.png,0,1,0.00%,60.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/02/Website-Assets-Square-39-1.png,0,1,0.00%,17.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/03/141.png,0,3,0.00%,25.67,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/03/142.png,0,7,0.00%,19.86,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/03/143.png,0,2,0.00%,23.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/03/145.png,0,14,0.00%,23.86,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/03/146.png,0,2,0.00%,26.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/04/Wedding-Invitation-2-768x1075.png,0,1,0.00%,30.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/05/2-3.png,0,2,0.00%,15.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/05/4-2.png,0,1,0.00%,22.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/05/6-1.png,0,38,0.00%,20.05,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/05/7.png,0,1,0.00%,23.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-10-1.png,0,10,0.00%,19.20,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-11.png,0,2,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-4-1-1024x1024.png,0,4,0.00%,11.25,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-4-1-768x768.png,0,2,0.00%,55.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-5-1-1024x1024.png,0,11,0.00%,24.55,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-5-1-768x768.png,0,8,0.00%,19.38,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-7-1.png,0,65,0.00%,21.51,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-9-1-1024x1024.png,0,2,0.00%,22.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/06/cow-9-1.png,0,1057,0.00%,16.73,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/07/Animals-for-Sale-2-1-1024x1024.png,0,17,0.00%,17.18,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/07/Animals-for-Sale-3-1-1024x1024.png,0,5,0.00%,23.60,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/07/Animals-for-Sale-4-1-1024x1024.png,0,1,0.00%,16.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/07/Animals-for-Sale-8-1.png,0,1,0.00%,25.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/08/Untitled-design-2025-08-19T082117.043-1-1024x1024.png,0,1,0.00%,6.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/08/Untitled-design-2025-08-20T212151.718-1-768x768.png,0,2,0.00%,15.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/08/Untitled-design-2025-08-21T074637.876-1.png,0,1,0.00%,10.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/09/Untitled-design-2025-09-01T110837.984-1.png,0,3,0.00%,19.67,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/09/Untitled-design-2025-09-03T225037.802-1-1024x1024.png,0,1,0.00%,31.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/11/Photo-2025-06-06-5-44-46-PM-min-960x720.jpg,0,1,0.00%,1.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/11/Photo-2025-06-06-6-24-04-PM-min-scaled.jpg,0,2,0.00%,19.50,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/11/Snuggles-3-1-1024x1024.png,0,1,0.00%,4.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/11/Snuggles-4-1-1024x1024.png,0,4,0.00%,17.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/11/Snuggles-5-1-1024x1024.png,0,1,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2025/12/Untitled-design-2025-12-13T161158.477.png,0,5,0.00%,18.20,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/01/Rhett-lol-9.png,0,1,0.00%,21.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/02/Rhett-lol.png,0,3,0.00%,25.33,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/1.jpg,0,1,0.00%,77.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/2-5.jpg,0,1,0.00%,26.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/3-5.jpg,0,1,0.00%,24.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/5-2.jpg,0,1,0.00%,34.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/Michael.jpg,0,1,0.00%,32.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/Website-Assets-Square-10-1024x1024.jpg,0,2,0.00%,17.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/03/Website-Assets-Square-5.jpg,0,1,0.00%,22.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/04/ChatGPT-Image-Apr-1-2026-10_46_42-AM-2-1.png,0,1,0.00%,30.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
+/wp-content/uploads/2026/07/3-4.jpg,0,2,0.00%,1.00,no,,,,,no match,none,Media URL in Search Console. Do not redirect it to an HTML page.
