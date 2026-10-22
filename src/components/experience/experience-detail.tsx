@@ -3,7 +3,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
 import { PortableTextRenderer } from '@/components/portable-text/portable-text-renderer'
-import { ButtonLink } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import type { DetailPicture, ExperienceDetailModel } from '@/lib/experiences/detail'
 import { towerOfGoatsLocation } from '@/lib/experiences/tower-of-goats'
 
@@ -39,6 +39,35 @@ function BookLink({ href, label, overlay }: { href?: string; label: string; over
     <ButtonLink href={href} external={!overlay} openInNewTab={overlay ? false : undefined} size="lg" className="mt-8">
       {label}
     </ButtonLink>
+  )
+}
+
+function BookingActions({ page }: { page: ExperienceDetailModel }) {
+  if (!page.bookingChoices) {
+    return <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+  }
+
+  return (
+    <div className="mt-8 flex flex-col gap-3 md:flex-row md:flex-wrap">
+      {page.bookingChoices.map((choice) =>
+        choice.href ? (
+          <ButtonLink
+            key={choice.label}
+            href={choice.href}
+            external={!choice.overlay}
+            openInNewTab={choice.overlay ? false : undefined}
+            size="lg"
+            className="w-full md:w-auto"
+          >
+            {choice.label}
+          </ButtonLink>
+        ) : (
+          <Button key={choice.label} type="button" disabled size="lg" className="w-full cursor-not-allowed opacity-60 md:w-auto">
+            {choice.label}
+          </Button>
+        ),
+      )}
+    </div>
   )
 }
 
@@ -265,7 +294,7 @@ export function ExperienceDetail({
                     <PortableTextRenderer value={page.description} />
                   </div>
                 ) : null}
-                <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+                <BookingActions page={page} />
               </div>
             </div>
             {page.details.length ? (
@@ -281,6 +310,7 @@ export function ExperienceDetail({
                     </li>
                   ))}
                 </ul>
+                {page.bookingNote ? <p className="mt-6 max-w-2xl text-base leading-relaxed">{page.bookingNote}</p> : null}
               </div>
             ) : null}
           </Container>
@@ -327,7 +357,7 @@ export function ExperienceDetail({
               ) : null}
             </div>
             <div className="mt-12 flex justify-center">
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+              <BookingActions page={page} />
             </div>
           </Container>
         </section>
@@ -365,7 +395,7 @@ export function ExperienceDetail({
               </ScrollCarousel>
             </div>
             <div className="mt-10 flex justify-center">
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+              <BookingActions page={page} />
             </div>
           </Container>
         </section>
@@ -428,7 +458,7 @@ export function ExperienceDetail({
                   <PortableTextRenderer value={page.welfare.policy.content} />
                 </div>
               ) : null}
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+              <BookingActions page={page} />
             </div>
           </Container>
         </section>
@@ -442,7 +472,7 @@ export function ExperienceDetail({
               <Lines lead={page.signature.lead} accent={page.signature.accent} className="mt-3 font-display text-[clamp(2.6rem,6vw,5.4rem)] font-black uppercase leading-[0.82] text-headline" />
               {page.signature.paragraphs.map((paragraph) => <p key={paragraph} className="mt-6 max-w-xl text-base leading-relaxed md:text-lg">{paragraph}</p>)}
               {page.signature.href ? <ButtonLink href={page.signature.href} external className="mt-8">Ontario&apos;s Southwest</ButtonLink> : null}
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+              <BookingActions page={page} />
             </div>
             {page.signature.image ? <Photo image={page.signature.image} className="mx-auto h-auto w-full max-w-sm" /> : null}
           </Container>
@@ -458,7 +488,7 @@ export function ExperienceDetail({
               {page.feast.paragraphs.map((paragraph, index) => (
                 <p key={paragraph} className={`${index === 0 ? 'mt-6' : 'mt-4'} max-w-xl text-base leading-relaxed md:text-lg`}>{paragraph}</p>
               ))}
-              <BookLink href={page.bookingUrl} label={page.bookingLabel} overlay={page.bookingOverlay} />
+              <BookingActions page={page} />
             </div>
             {page.feast.image && page.feast.href ? (
               <a href={page.feast.href} target="_blank" rel="noreferrer" className="order-1 mx-auto block w-full max-w-sm lg:order-2">

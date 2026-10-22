@@ -138,6 +138,23 @@ export function resolvePublicBooking(source: BookingSource | null | undefined): 
   }
 }
 
+/**
+ * A second booking button uses only an explicit https URL that an editor marked
+ * verified. It does not reuse the open visit's FareHarbor item ID.
+ */
+export function resolveVerifiedExternalBooking(
+  verified: boolean | null | undefined,
+  url: string | null | undefined,
+): PublicBooking {
+  if (verified !== true) return { overlay: false }
+  const href = publicBookingUrl(url)
+  if (!href) return { overlay: false }
+  return {
+    href,
+    overlay: href.startsWith('https://fareharbor.com/embeds/book/'),
+  }
+}
+
 /** A booking action is allowed only for an absolute http(s) URL from Sanity. */
 export function publicBookingUrl(url: string | null | undefined): string | undefined {
   const trimmed = url?.trim() ?? ''

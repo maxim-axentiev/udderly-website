@@ -445,4 +445,58 @@ describe('experience detail resolution', () => {
     expect(routableExperienceSlug('private-miniature-donkey-lunch-picnic')).toBe('private-miniature-donkey-lunch-picnic')
     expect(routableExperienceSlug('tower-of-goats-discovery-trail')).toBeUndefined()
   })
+
+  it('offers open and private Mini Highland Cow booking without enabling an unverified link', () => {
+    const openUrl = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/111111/'
+    const privateUrl = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/222222/'
+    const base = experience({
+      title: 'Mini Highland Cow Experience',
+      slug: 'mini-highland-cow-experience',
+      priceDisplay: '$45 per person',
+      groupSize: 'Up to 10 guests',
+      fareharborItemId: '999999',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+    })
+    const closed = resolveExperienceDetail(experience({
+      title: 'Mini Highland Cow Experience',
+      slug: 'mini-highland-cow-experience',
+      priceDisplay: '$45 per person',
+      groupSize: 'Up to 10 guests',
+      bookingUrl: openUrl,
+      privateBookingUrl: privateUrl,
+    }), images)
+    const openOnly = resolveExperienceDetail({
+      ...base,
+      privateBookingUrl: privateUrl,
+    }, images)
+    const both = resolveExperienceDetail({
+      ...base,
+      privateBookingVerified: true,
+      privateBookingUrl: privateUrl,
+    }, images)
+    const html = htmlFor({
+      ...base,
+      privateBookingVerified: true,
+      privateBookingUrl: 'javascript:alert(1)',
+    })
+
+    expect(closed.details.find((detail) => detail.label === 'Price')?.lines).toEqual(['$45 per person'])
+    expect(closed.details.find((detail) => detail.label === 'Capacity')?.lines).toEqual(['Up to 10 guests'])
+    expect(closed.details.find((detail) => detail.label === 'Private price')?.lines).toEqual(['$250 for 4 people'])
+    expect(closed.details.find((detail) => detail.label === 'Private capacity')?.lines).toEqual(['4–8 people'])
+    expect(closed.bookingChoices?.every((choice) => choice.href === undefined)).toBe(true)
+    expect(openOnly.bookingChoices?.[0]?.href).toContain('/items/999999/')
+    expect(openOnly.bookingChoices?.[1]?.href).toBeUndefined()
+    expect(both.bookingChoices?.[1]?.href).toBe(privateUrl)
+    expect(html).toContain('Book Open Mini Highland Cow Experience')
+    expect(html).toContain('Book Private Mini Highland Cow Experience')
+    expect(html).toContain('flex-col gap-3 md:flex-row')
+    expect(html).toContain('disabled')
+    expect(html).not.toContain('javascript:alert')
+    expect(html).toContain('Open visits and private sessions are booked separately.')
+    expect(html).not.toContain('$250 covers')
+    expect(experienceBySlugQuery).toContain('privateBookingUrl')
+    expect(experienceBySlugQuery).toContain('privateBookingVerified')
+  })
 })

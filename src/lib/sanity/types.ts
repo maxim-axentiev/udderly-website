@@ -105,6 +105,11 @@ export type ExperiencePageData = {
   fareharborItemId?: string | null
   fareharborFlowId?: string | null
   bookingCtaLabel?: string | null
+  privateBookingUrl?: string | null
+  privateBookingVerified?: boolean | null
+  privateBookingCtaLabel?: string | null
+  privatePriceDisplay?: string | null
+  privateGroupSize?: string | null
   instructor?: {
     heading?: string | null
     body?: string | null

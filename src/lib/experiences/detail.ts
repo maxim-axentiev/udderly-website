@@ -9,7 +9,7 @@ import type {
   TestimonialItem,
 } from '@/lib/sanity/types'
 
-import { FEAST_ON, publicBookingUrl, resolvePublicBooking } from './approved-listing'
+import { FEAST_ON, publicBookingUrl, resolvePublicBooking, resolveVerifiedExternalBooking } from './approved-listing'
 import { LIMITED_TIME_EXPERIENCE_SLUGS, publicExperienceSlug } from './public-paths'
 import type { HubImageKey } from './hub-page'
 
@@ -38,6 +38,8 @@ export type ExperienceDetailModel = {
   bookingUrl?: string
   bookingOverlay: boolean
   bookingLabel: string
+  bookingChoices?: Array<{ label: string; href?: string; overlay: boolean }>
+  bookingNote?: string
   practical?: { lead: string; accent?: string }
   tips: string[]
   visitorInfo?: PortableTextContent
@@ -250,12 +252,23 @@ function animalCards(
   })
 }
 
+export const MINI_HIGHLAND_COW_SLUG = 'mini-highland-cow-experience'
+export const OPEN_HIGHLAND_BOOKING_LABEL = 'Book Open Mini Highland Cow Experience'
+export const PRIVATE_HIGHLAND_BOOKING_LABEL = 'Book Private Mini Highland Cow Experience'
+export const PRIVATE_HIGHLAND_PRICE = '$250 for 4 people'
+export const PRIVATE_HIGHLAND_CAPACITY = '4–8 people'
+
 function detailFacts(experience: ExperiencePageData): ExperienceDetailModel['details'] {
   const season = clean(experience.seasonLabel, 80) ?? (experience.season ? SEASON_LABELS[experience.season] : undefined)
+  const highland = publicExperienceSlug(experience.slug) === MINI_HIGHLAND_COW_SLUG
+  const privatePrice = clean(experience.privatePriceDisplay, 80) ?? (highland ? PRIVATE_HIGHLAND_PRICE : undefined)
+  const privateCapacity = clean(experience.privateGroupSize, 80) ?? (highland ? PRIVATE_HIGHLAND_CAPACITY : undefined)
   const pairs: Array<[string, string[]]> = [
     ['Price', priceLines(experience)],
     ['Duration', [clean(experience.duration, 80)].filter((value): value is string => Boolean(value))],
     ['Capacity', [clean(experience.groupSize, 80)].filter((value): value is string => Boolean(value))],
+    ['Private price', privatePrice ? [privatePrice] : []],
+    ['Private capacity', privateCapacity ? [privateCapacity] : []],
     ['Age', [clean(experience.ageGuidance, 80)].filter((value): value is string => Boolean(value))],
     ['Season', [season].filter((value): value is string => Boolean(value))],
   ]
@@ -280,6 +293,10 @@ export function resolveExperienceDetail(
   const hero = picture(experience.heroImage, 1920) ?? gallery[0]
   const title = titleLines(clean(experience.title, 120) ?? experience.title, clean(experience.titleAccent, 80))
   const booking = resolvePublicBooking(experience)
+  const highland = publicExperienceSlug(slug) === MINI_HIGHLAND_COW_SLUG
+  const privateBooking = highland
+    ? resolveVerifiedExternalBooking(experience.privateBookingVerified, experience.privateBookingUrl)
+    : undefined
   const introduction = clean(experience.introductionHeading, 120)
   const practical = clean(experience.practicalHeading, 120)
   const instructorParagraphs = paragraphs(clean(experience.instructor?.body))
@@ -328,7 +345,22 @@ export function resolveExperienceDetail(
     details: detailFacts(experience),
     bookingUrl: booking.href,
     bookingOverlay: booking.overlay,
-    bookingLabel: clean(experience.bookingCtaLabel, 80) ?? `Book ${clean(experience.title, 120) ?? experience.title}`,
+    bookingLabel: clean(experience.bookingCtaLabel, 80) ?? (highland ? OPEN_HIGHLAND_BOOKING_LABEL : `Book ${clean(experience.title, 120) ?? experience.title}`),
+    bookingChoices: highland
+      ? [
+          {
+            label: clean(experience.bookingCtaLabel, 80) ?? OPEN_HIGHLAND_BOOKING_LABEL,
+            href: booking.href,
+            overlay: booking.overlay,
+          },
+          {
+            label: clean(experience.privateBookingCtaLabel, 80) ?? PRIVATE_HIGHLAND_BOOKING_LABEL,
+            href: privateBooking?.href,
+            overlay: privateBooking?.overlay ?? false,
+          },
+        ]
+      : undefined,
+    bookingNote: highland ? 'Open visits and private sessions are booked separately.' : undefined,
     practical: practical ? designedLines(practical, practical, '') : undefined,
     tips: (experience.practicalTips ?? []).flatMap((tip) => {
       const value = clean(tip, 240)

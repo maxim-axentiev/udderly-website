@@ -1,0 +1,13 @@
+legacy_url,new_route,classification,evidence,notes
+,/,no match,New site route exists. WordPress WXR was not available.,Do not invent a legacy homepage URL or a redirect.
+,/experiences,no match,New Experiences Hub route. No WordPress join.,Preserve as the hub. Do not redirect until a legacy URL is verified.
+,/mini-highland-cow-experience,preserve,Canonical experience route in code and the unpublished draft slug.,Open and private sessions are consolidated on this page in this batch.
+/private-mini-highland-experience,/mini-highland-cow-experience,consolidate,Explicit consolidation approved for this batch. Staging middleware returns 301 for both slash forms.,Not verified from a WordPress export. Do not apply this rule in WordPress or DNS from this repo.
+/private-mini-highland-experience/,/mini-highland-cow-experience,consolidate,Trailing slash normalizes to the same staging rule.,Same destination as the slashless path.
+,/animals-for-sale,no match,New route exists. Legacy animal-sale URLs were not in an accessible export.,Investigate before any redirect.
+,/farm-glamping,no match,New route exists. Earlier site used /stay in homepage content; that homepage field was already updated to /farm-glamping.,Do not add a /stay redirect until the WordPress URL is verified.
+,/farm-market-store,no match,New route exists.,Do not assume /our-farm or another legacy path.
+,/goat-yoga,no match,Unpublished draft slug. Not publicly rendered.,No WordPress URL join.
+,/baby-goat-playtime-and-snuggles,no match,Unpublished draft slug.,No WordPress URL join.
+,/urbort-blog,no match,New board route. Historical blog URLs were not in an accessible export.,Investigate each legacy post before redirecting.
+,animal and blog URLs,investigate,No WXR or GSC page export was accessible.,Do not invent destinations.

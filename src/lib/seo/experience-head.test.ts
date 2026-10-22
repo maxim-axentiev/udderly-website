@@ -60,6 +60,32 @@ describe('createExperienceHead', () => {
     })
   })
 
+  it('keeps the Mini Highland Cow canonical path and adds private intent only when no description exists', () => {
+    const head = createExperienceHead(
+      {
+        ...experience,
+        seo: { title: '', description: '', noIndex: false, image: null },
+        shortDescription: null,
+      },
+      { PUBLIC_CANONICAL_ORIGIN: 'https://staging.udderlyridiculousfarmlife.com' },
+    )
+
+    expect(head.links).toContainEqual({
+      rel: 'canonical',
+      href: 'https://staging.udderlyridiculousfarmlife.com/mini-highland-cow-experience',
+    })
+    expect(head.meta).toContainEqual({
+      name: 'description',
+      content: 'Meet mini Highland cows on an open visit, or book a private session for your group.',
+    })
+
+    const stored = createExperienceHead(experience, {
+      PUBLIC_CANONICAL_ORIGIN: 'https://staging.udderlyridiculousfarmlife.com',
+    })
+    expect(stored.meta).toContainEqual({ name: 'description', content: 'SEO description' })
+    expect(JSON.stringify(stored.meta)).not.toContain('private session')
+  })
+
   it('does not emit a canonical URL without PUBLIC_CANONICAL_ORIGIN', () => {
     const head = createPageHead(
       {

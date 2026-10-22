@@ -155,7 +155,13 @@ describe('approved experiences listing', () => {
   it('reserves the Tower of Goats path and does not activate the shorter redirect', () => {
     expect(documentPath('experience', 'tower-of-goats-discovery-trail')).toBeUndefined()
     expect(routableExperienceSlug('tower-of-goats-discovery-trail')).toBeUndefined()
-    expect(redirects).toEqual([])
+    expect(redirects).toEqual([
+      expect.objectContaining({
+        from: '/private-mini-highland-experience',
+        to: '/mini-highland-cow-experience',
+        status: 301,
+      }),
+    ])
     expect(TOWER_OF_GOATS_FUTURE_REDIRECT).toEqual({
       from: '/tower-of-goats',
       to: '/tower-of-goats-discovery-trail',

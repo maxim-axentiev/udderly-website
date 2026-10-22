@@ -23,7 +23,16 @@ export type RetiredUrl = {
   status: 410
 }
 
-export const redirects: RedirectRule[] = []
+/** Consolidated private Mini Highland Cow URL. Both slash forms match. */
+export const MINI_HIGHLAND_COW_PATH = '/mini-highland-cow-experience'
+
+export const redirects: RedirectRule[] = [
+  {
+    from: '/private-mini-highland-experience',
+    to: MINI_HIGHLAND_COW_PATH,
+    status: 301,
+  },
+]
 
 export const retiredUrls: RetiredUrl[] = []
 

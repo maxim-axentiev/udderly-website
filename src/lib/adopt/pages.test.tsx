@@ -414,7 +414,13 @@ describe('routes and navigation', () => {
         { label: 'Animals for Sale', href: '/animals-for-sale' },
       ]),
     )
-    expect(redirects).toEqual([])
+    expect(redirects).toEqual([
+      expect.objectContaining({
+        from: '/private-mini-highland-experience',
+        to: '/mini-highland-cow-experience',
+        status: 301,
+      }),
+    ])
     expect(FUTURE_INTERNAL_REDIRECTS).toEqual([
       expect.objectContaining({ from: '/adopt', to: '/adopt-an-animal' }),
     ])

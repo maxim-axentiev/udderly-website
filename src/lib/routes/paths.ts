@@ -35,6 +35,7 @@ export const RESERVED_SLUGS = [
   'ice-cream',
   'gift-card',
   'farm-glamping',
+  'private-mini-highland-experience',
   'health',
   'studio',
   'robots.txt',

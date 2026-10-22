@@ -4,17 +4,30 @@ import {
   matchRedirect,
   matchRetiredUrl,
   migrationResponseForPath,
+  MINI_HIGHLAND_COW_PATH,
   redirects,
   retiredUrls,
 } from './redirects'
 
 describe('WordPress redirect infrastructure', () => {
-  it('starts with no invented redirects or retired URLs', () => {
-    expect(redirects).toEqual([])
+  it('redirects only the consolidated private Mini Highland Cow URL', () => {
     expect(retiredUrls).toEqual([])
+    expect(redirects).toEqual([
+      {
+        from: '/private-mini-highland-experience',
+        to: MINI_HIGHLAND_COW_PATH,
+        status: 301,
+      },
+    ])
     expect(matchRedirect('/old-page')).toBeUndefined()
     expect(matchRetiredUrl('/retired')).toBeUndefined()
     expect(migrationResponseForPath('/anything')).toBeUndefined()
+
+    for (const path of ['/private-mini-highland-experience', '/private-mini-highland-experience/']) {
+      const response = migrationResponseForPath(path)
+      expect(response?.status).toBe(301)
+      expect(response?.headers.get('Location')).toBe(MINI_HIGHLAND_COW_PATH)
+    }
   })
 
   it('can match a 301 redirect when rules are supplied later', () => {
