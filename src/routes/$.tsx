@@ -14,6 +14,7 @@ import alpacaWalk from '@/assets/herd/alpaca-walk.jpg'
 import goatIcon2 from '@/assets/herd/goat-icon-2.jpg'
 import donkeyPicnic from '@/assets/herd/donkey-picnic.jpg'
 import highlandHero from '@/assets/herd/highland-hero.jpg'
+import training from '@/assets/home/homepage-training.webp'
 import { routableExperienceSlug } from '@/lib/routes/paths'
 import { getExperienceBySlugFn, getExperienceFoundationFn } from '@/lib/sanity/server'
 import type { ExperienceFoundation, ExperiencePageData } from '@/lib/sanity/types'
@@ -28,6 +29,7 @@ const detailImages = {
   'alpaca-walk': alpacaWalk,
   'donkey-picnic': donkeyPicnic,
   'highland-hero': highlandHero,
+  training,
   feast: feastOnLogo,
 }
 

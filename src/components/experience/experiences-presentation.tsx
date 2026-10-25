@@ -84,7 +84,7 @@ export function ExperiencesPresentation({
 
   return (
     <>
-      {page.cards.some((card) => card.bookingOverlay) ? (
+      {page.cards.some((card) => card.bookingActions?.some((action) => action.overlay) || card.bookingOverlay) ? (
         <script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async />
       ) : null}
       <section className="relative isolate flex min-h-[72vh] items-center justify-center overflow-hidden">
@@ -213,11 +213,17 @@ export function ExperiencesPresentation({
                               Learn More
                             </ButtonLink>
                           ) : null}
-                          {experience.bookingUrl ? (
-                            <ButtonLink href={experience.bookingUrl} external={!experience.bookingOverlay} openInNewTab={experience.bookingOverlay ? false : undefined} className="w-full">
-                              Book Experience
+                          {(experience.bookingActions ?? []).map((action) => (
+                            <ButtonLink
+                              key={action.label}
+                              href={action.href}
+                              external={!action.overlay}
+                              openInNewTab={action.overlay ? false : undefined}
+                              className="w-full"
+                            >
+                              {action.label}
                             </ButtonLink>
-                          ) : null}
+                          ))}
                         </div>
                       </div>
                     </article>

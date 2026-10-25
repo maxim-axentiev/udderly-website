@@ -4,7 +4,13 @@ import { describe, expect, it } from 'vitest'
 
 import { ExperienceDetail } from '@/components/experience/experience-detail'
 import { FEAST_ON } from '@/lib/experiences/approved-listing'
-import { resolveExperienceDetail } from '@/lib/experiences/detail'
+import {
+  OPEN_CALF_BOOKING_LABEL,
+  OPEN_HIGHLAND_BOOKING_LABEL,
+  PRIVATE_CALF_BOOKING_LABEL,
+  PRIVATE_HIGHLAND_BOOKING_LABEL,
+  resolveExperienceDetail,
+} from '@/lib/experiences/detail'
 import { TOWER_OF_GOATS_TITLE } from '@/lib/experiences/tower-of-goats'
 import { experienceBySlugQuery, experienceHubQuery } from '@/lib/sanity/queries'
 import type { ExperiencePageData } from '@/lib/sanity/types'
@@ -21,6 +27,7 @@ const images = {
   'alpaca-walk': '/alpaca.jpg',
   'donkey-picnic': '/donkey.jpg',
   'highland-hero': '/highland.jpg',
+  training: '/training.webp',
   feast: '/feast.webp',
 }
 
@@ -166,8 +173,16 @@ describe('experience detail resolution', () => {
 
     expect(bare.feast).toBeUndefined()
     expect(bare.signature).toBeUndefined()
-    expect(bare.gallery).toEqual([])
-    expect(bare.hero).toBeUndefined()
+    expect(bare.hero).toEqual({
+      src: '/highland.jpg',
+      alt: 'Guests enjoying a long farm tasting experience',
+    })
+    expect(bare.gallery).toEqual([bare.hero])
+    expect(configured.hero).toEqual({
+      src: '/training.webp',
+      alt: 'Family enjoying food and animals under the farm shelter',
+    })
+    expect(configured.gallery).toEqual([configured.hero])
     expect(configured.feast?.paragraphs).toHaveLength(2)
     expect(configured.signature?.paragraphs).toEqual(['This tasting is an official Signature Experience.'])
     expect(configured.signature?.href).toBe('https://www.ontariosouthwest.com/')
@@ -481,22 +496,129 @@ describe('experience detail resolution', () => {
       privateBookingUrl: 'javascript:alert(1)',
     })
 
+    const priced = resolveExperienceDetail(experience({
+      title: 'Mini Highland Cow Experience',
+      slug: 'mini-highland-cow-experience',
+      privatePriceDisplay: '$265 for up to 4 guests, plus $58.30 each extra',
+      privateGroupSize: 'Maximum 8 guests',
+    }), images)
+
     expect(closed.details.find((detail) => detail.label === 'Price')?.lines).toEqual(['$45 per person'])
     expect(closed.details.find((detail) => detail.label === 'Capacity')?.lines).toEqual(['Up to 10 guests'])
-    expect(closed.details.find((detail) => detail.label === 'Private price')?.lines).toEqual(['$250 for 4 people'])
-    expect(closed.details.find((detail) => detail.label === 'Private capacity')?.lines).toEqual(['4–8 people'])
+    expect(closed.details.find((detail) => detail.label === 'Private price')).toBeUndefined()
+    expect(closed.details.find((detail) => detail.label === 'Private capacity')).toBeUndefined()
+    expect(priced.details.find((detail) => detail.label === 'Private price')?.lines).toEqual(['$265 for up to 4 guests, plus $58.30 each extra'])
+    expect(priced.details.find((detail) => detail.label === 'Private capacity')?.lines).toEqual(['Maximum 8 guests'])
+    expect(closed.bookingChoices?.map((choice) => choice.label)).toEqual([
+      OPEN_HIGHLAND_BOOKING_LABEL,
+      PRIVATE_HIGHLAND_BOOKING_LABEL,
+    ])
     expect(closed.bookingChoices?.every((choice) => choice.href === undefined)).toBe(true)
     expect(openOnly.bookingChoices?.[0]?.href).toContain('/items/999999/')
     expect(openOnly.bookingChoices?.[1]?.href).toBeUndefined()
     expect(both.bookingChoices?.[1]?.href).toBe(privateUrl)
+    expect(both.bookingChoices?.[0]?.href).not.toBe(privateUrl)
     expect(html).toContain('Book Open Mini Highland Cow Experience')
     expect(html).toContain('Book Private Mini Highland Cow Experience')
     expect(html).toContain('flex-col gap-3 md:flex-row')
     expect(html).toContain('disabled')
     expect(html).not.toContain('javascript:alert')
     expect(html).toContain('Open visits and private sessions are booked separately.')
-    expect(html).not.toContain('$250 covers')
+    expect(html).not.toContain('$250 for 4 people')
+    expect(html).not.toContain('4–8 people')
     expect(experienceBySlugQuery).toContain('privateBookingUrl')
     expect(experienceBySlugQuery).toContain('privateBookingVerified')
+  })
+
+  it('offers separate Mini Highland Calf buttons and does not reuse the cow booking', () => {
+    const calfOpen = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/333333/?full-items=yes&flow=no'
+    const calfPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/444444/?full-items=yes&flow=573099'
+    const cowPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/222222/'
+    const empty = resolveExperienceDetail(experience({
+      title: 'Mini Highland Calf Meet & Greet',
+      slug: 'mini-highland-calf-meet-and-greet',
+      priceDisplay: '$60/person',
+      privateBookingUrl: cowPrivate,
+    }), images)
+    const openOnly = resolveExperienceDetail(experience({
+      title: 'Mini Highland Calf Meet & Greet',
+      slug: 'mini-highland-calf-meet-and-greet',
+      bookingVerified: true,
+      bookingProvider: 'external',
+      bookingUrl: calfOpen,
+      privateBookingUrl: calfPrivate,
+    }), images)
+    const privateOnly = resolveExperienceDetail(experience({
+      title: 'Mini Highland Calf Meet & Greet',
+      slug: 'mini-highland-calf-meet-and-greet',
+      bookingVerified: false,
+      bookingUrl: calfOpen,
+      privateBookingVerified: true,
+      privateBookingUrl: calfPrivate,
+    }), images)
+    const both = resolveExperienceDetail(experience({
+      title: 'Mini Highland Calf Meet & Greet',
+      slug: 'mini-highland-calf-meet-and-greet',
+      bookingVerified: true,
+      bookingProvider: 'external',
+      bookingUrl: calfOpen,
+      privateBookingVerified: true,
+      privateBookingUrl: calfPrivate,
+      privatePriceDisplay: '$250 for up to 4 guests, plus $55 each extra',
+      privateGroupSize: 'Maximum 8 guests',
+    }), images)
+    const other = resolveExperienceDetail(experience({
+      title: 'Goat Yoga',
+      slug: 'goat-yoga',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      fareharborItemId: '308278',
+      fareharborFlowId: '573099',
+      privateBookingVerified: true,
+      privateBookingUrl: calfPrivate,
+    }), images)
+    const html = htmlFor(experience({
+      title: 'Mini Highland Calf Meet & Greet',
+      slug: 'mini-highland-calf-meet-and-greet',
+      priceDisplay: '$60/person',
+      bookingVerified: true,
+      bookingProvider: 'external',
+      bookingUrl: calfOpen,
+      privateBookingVerified: true,
+      privateBookingUrl: calfPrivate,
+    }))
+
+    expect(empty.details.find((detail) => detail.label === 'Private price')).toBeUndefined()
+    expect(empty.details.find((detail) => detail.label === 'Private capacity')).toBeUndefined()
+    expect(empty.bookingChoices?.map((choice) => choice.label)).toEqual([
+      OPEN_CALF_BOOKING_LABEL,
+      PRIVATE_CALF_BOOKING_LABEL,
+    ])
+    expect(empty.bookingChoices?.every((choice) => choice.href === undefined)).toBe(true)
+    expect(openOnly.bookingChoices?.[0]?.href).toBe(calfOpen)
+    expect(openOnly.bookingChoices?.[0]?.overlay).toBe(true)
+    expect(openOnly.bookingChoices?.[1]?.href).toBeUndefined()
+    expect(privateOnly.bookingChoices?.[0]?.href).toBeUndefined()
+    expect(privateOnly.bookingChoices?.[1]?.href).toBe(calfPrivate)
+    expect(privateOnly.bookingChoices?.[1]?.overlay).toBe(true)
+    expect(both.bookingChoices?.[0]?.href).toBe(calfOpen)
+    expect(both.bookingChoices?.[1]?.href).toBe(calfPrivate)
+    expect(both.bookingNote).toBe('Open visits and private sessions are booked separately.')
+    expect(other.bookingNote).toBeUndefined()
+    expect(both.bookingChoices?.[0]?.href).not.toContain('/items/222222/')
+    expect(both.bookingChoices?.[1]?.href).not.toContain('/items/222222/')
+    expect(both.details.find((detail) => detail.label === 'Private price')?.lines).toEqual([
+      '$250 for up to 4 guests, plus $55 each extra',
+    ])
+    expect(other.bookingChoices).toBeUndefined()
+    expect(other.bookingUrl).toContain('/items/308278/')
+    expect(other.bookingUrl).not.toBe(calfPrivate)
+    expect(html).toContain('Book Open Mini Highland Calf Meet &amp; Greet')
+    expect(html).toContain('Book Private Mini Highland Calf Meet &amp; Greet')
+    expect(html).not.toContain(OPEN_HIGHLAND_BOOKING_LABEL)
+    expect(html).not.toContain(PRIVATE_HIGHLAND_BOOKING_LABEL)
+    expect(html).toContain('Open visits and private sessions are booked separately.')
+    expect(html).not.toContain('$250 for 4 people')
+    expect(html).not.toContain('4–8 people')
   })
 })

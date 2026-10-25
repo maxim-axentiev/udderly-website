@@ -8,7 +8,7 @@ import { homepageHero, homepageSeo } from '@/content/homepage'
 import { EXPERIENCES_HERO, FEAST_ON } from '@/lib/experiences/approved-listing'
 import { resolveExperiencesHubPage } from '@/lib/experiences/hub-page'
 import { buildRobotsTxt } from '@/lib/seo/robots'
-import { experiencesHubContentQuery } from '@/lib/sanity/queries'
+import { experienceHubQuery, experiencesHubContentQuery } from '@/lib/sanity/queries'
 import { ALL_SALE_ANIMALS } from '@/lib/sale/content'
 import type { ExperienceCardData } from '@/lib/sanity/types'
 
@@ -139,6 +139,197 @@ describe('experiences hub page resolution', () => {
 
     expect(page.cards[0]?.href).toBe('/goat-cuddles')
     expect(page.cards[0]?.bookingUrl).toBeUndefined()
+    expect(page.cards[0]?.bookingActions).toBeUndefined()
+  })
+
+  it('uses Lovable booking labels and verified FareHarbor targets', () => {
+    const cowPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/466242/?full-items=yes&flow=573099'
+    const calfOpen = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/751584/?full-items=yes&flow=no'
+    const calfPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/559968/?full-items=yes&flow=573099'
+    const donkeyLunch = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/693411/?full-items=yes&flow=no'
+    const donkeySunset = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/693416/?full-items=yes&flow=no'
+    const unassignedPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/663875/?full-items=yes&flow=573099'
+    const page = resolveExperiencesHubPage(null, [
+      experience({
+        title: 'Goat Yoga',
+        slug: 'goat-yoga',
+        bookingVerified: true,
+        bookingProvider: 'fareharbor',
+        fareharborItemId: '308278',
+        fareharborFlowId: '573099',
+      }),
+      experience({
+        title: 'Mini Highland Cow Experience',
+        slug: 'mini-highland-cow-experience',
+        bookingVerified: true,
+        bookingProvider: 'fareharbor',
+        fareharborItemId: '523759',
+        fareharborFlowId: '573099',
+        privateBookingUrl: cowPrivate,
+      }),
+      experience({
+        title: 'Mini Highland Calf Meet & Greet',
+        slug: 'mini-highland-calf-meet-and-greet',
+        bookingVerified: false,
+        bookingProvider: 'external',
+        bookingUrl: calfOpen,
+        privateBookingVerified: true,
+        privateBookingUrl: calfPrivate,
+      }),
+      experience({
+        title: 'Miniature Donkey Visits',
+        slug: 'miniature-donkey-visits',
+        bookingVerified: true,
+        bookingProvider: 'fareharbor',
+        fareharborItemId: '695971',
+        fareharborFlowId: '573099',
+        privateBookingVerified: true,
+        privateBookingUrl: unassignedPrivate,
+      }),
+      experience({
+        title: 'Private Miniature Donkey Lunch Picnic',
+        slug: 'private-miniature-donkey-lunch-picnic',
+        bookingVerified: true,
+        bookingProvider: 'external',
+        bookingUrl: donkeyLunch,
+        privateBookingVerified: true,
+        privateBookingUrl: unassignedPrivate,
+      }),
+      experience({
+        title: 'Private Miniature Donkey Sunset Picnic',
+        slug: 'private-miniature-donkey-sunset-picnic',
+        bookingVerified: false,
+        bookingProvider: 'external',
+        bookingUrl: donkeySunset,
+      }),
+    ])
+    const card = (slug: string) => page.cards.find((item) => item.slug === slug)
+    const tower = page.cards.find((item) => item.title.startsWith('General Admission'))
+
+    expect(card('goat-yoga')?.bookingActions).toEqual([
+      {
+        label: 'Book Experience',
+        href: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308278/?full-items=yes&flow=573099',
+        overlay: true,
+      },
+    ])
+    expect(card('mini-highland-cow-experience')?.bookingActions).toEqual([
+      {
+        label: 'Book Public Experience',
+        href: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/523759/?full-items=yes&flow=573099',
+        overlay: true,
+      },
+    ])
+    expect(card('mini-highland-calf-meet-and-greet')?.bookingActions).toEqual([
+      { label: 'Book Private Experience', href: calfPrivate, overlay: true },
+    ])
+    expect(card('miniature-donkey-visits')?.bookingActions).toEqual([
+      {
+        label: 'Book Experience',
+        href: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/695971/?full-items=yes&flow=573099',
+        overlay: true,
+      },
+    ])
+    expect(card('private-miniature-donkey-lunch-picnic')?.bookingActions).toEqual([
+      { label: 'Book Private Experience', href: donkeyLunch, overlay: true },
+    ])
+    expect(card('private-miniature-donkey-sunset-picnic')?.bookingActions).toBeUndefined()
+    expect(card('private-miniature-donkey-sunset-picnic')?.href).toBe('/miniature-donkey-sunset-picnic')
+    expect(tower?.href).toBe('/tower-of-goats-discovery-trail')
+    expect(tower?.bookingActions).toBeUndefined()
+    expect(tower?.bookingUrl).toBeUndefined()
+    expect(JSON.stringify(page.cards)).not.toContain('663875')
+    expect(JSON.stringify(page.cards)).not.toContain('#farm-experiences')
+    expect(experienceHubQuery).toContain('privateBookingUrl')
+    expect(experienceHubQuery).toContain('privateBookingVerified')
+
+    const html = renderToStaticMarkup(createElement(ExperiencesPresentation, {
+      page,
+      reviewsFeed: { available: false },
+      images: {},
+    }))
+    expect(html).toContain('Book Experience')
+    expect(html).toContain('Book Public Experience')
+    expect(html).toContain('Book Private Experience')
+    expect(html).toContain('href="/tower-of-goats-discovery-trail"')
+    expect(html).toContain('items/308278/')
+    expect(html).toContain('items/523759/')
+    expect(html).toContain('items/559968/')
+    expect(html).toContain('items/695971/')
+    expect(html).toContain('items/693411/')
+    expect(html).not.toContain('items/693416/')
+    expect(html).not.toContain('items/751584/')
+    expect(html).not.toContain('663875')
+    expect(html).not.toContain('Book Now')
+    expect(html).toContain('Learn More')
+  })
+
+  it('keeps both Highland booking actions independent', () => {
+    const cowPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/466242/?full-items=yes&flow=573099'
+    const calfOpen = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/751584/?full-items=yes&flow=no'
+    const calfPrivate = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/559968/?full-items=yes&flow=573099'
+    const closed = resolveExperiencesHubPage(null, [
+      experience({
+        title: 'Mini Highland Cow Experience',
+        slug: 'mini-highland-cow-experience',
+        bookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/523759/?full-items=yes&flow=573099',
+        privateBookingUrl: cowPrivate,
+      }),
+      experience({
+        title: 'Mini Highland Calf Meet & Greet',
+        slug: 'mini-highland-calf-meet-and-greet',
+        bookingUrl: calfOpen,
+        privateBookingUrl: calfPrivate,
+      }),
+    ])
+    const open = resolveExperiencesHubPage(null, [
+      experience({
+        title: 'Mini Highland Cow Experience',
+        slug: 'mini-highland-cow-experience',
+        bookingVerified: true,
+        bookingProvider: 'fareharbor',
+        fareharborItemId: '523759',
+        fareharborFlowId: '573099',
+        privateBookingVerified: true,
+        privateBookingUrl: cowPrivate,
+      }),
+      experience({
+        title: 'Mini Highland Calf Meet & Greet',
+        slug: 'mini-highland-calf-meet-and-greet',
+        bookingVerified: true,
+        bookingProvider: 'external',
+        bookingUrl: calfOpen,
+        privateBookingVerified: true,
+        privateBookingUrl: calfPrivate,
+      }),
+    ])
+    const actions = (source: ReturnType<typeof resolveExperiencesHubPage>, slug: string) =>
+      source.cards.find((item) => item.slug === slug)?.bookingActions
+
+    expect(actions(closed, 'mini-highland-cow-experience')).toBeUndefined()
+    expect(actions(closed, 'mini-highland-calf-meet-and-greet')).toBeUndefined()
+    expect(actions(open, 'mini-highland-cow-experience')?.map((action) => action.label)).toEqual([
+      'Book Public Experience',
+      'Book Private Experience',
+    ])
+    expect(actions(open, 'mini-highland-cow-experience')?.map((action) => action.href)).toEqual([
+      'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/523759/?full-items=yes&flow=573099',
+      cowPrivate,
+    ])
+    expect(actions(open, 'mini-highland-calf-meet-and-greet')?.map((action) => action.href)).toEqual([
+      calfOpen,
+      calfPrivate,
+    ])
+
+    const html = renderToStaticMarkup(createElement(ExperiencesPresentation, {
+      page: closed,
+      reviewsFeed: { available: false },
+      images: {},
+    }))
+    expect(html).not.toContain('fareharbor.com')
+    expect(html).not.toContain('Book Public Experience')
+    expect(html).not.toContain('Book Private Experience')
+    expect(html).toContain('href="/tower-of-goats-discovery-trail"')
   })
 
   it('links a stored private donkey slug to the approved public path', () => {

@@ -149,6 +149,8 @@ export type ExperienceCardData = {
   bookingProvider?: string | null
   fareharborItemId?: string | null
   fareharborFlowId?: string | null
+  privateBookingUrl?: string | null
+  privateBookingVerified?: boolean | null
   heroImage: SanityImage
   animalSpecies: Array<{ title: string | null }> | null
 }

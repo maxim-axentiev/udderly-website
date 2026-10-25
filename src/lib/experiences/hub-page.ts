@@ -8,6 +8,7 @@ import {
   isFarmHoppingListing,
   publicBookingUrl,
   resolvePublicBooking,
+  resolveVerifiedExternalBooking,
 } from './approved-listing'
 import { experienceSlugAliases, publicExperienceSlug } from './public-paths'
 
@@ -43,6 +44,13 @@ export type HubExperienceCard = {
   href?: string
   bookingUrl?: string
   bookingOverlay?: boolean
+  bookingActions?: HubBookingAction[]
+}
+
+export type HubBookingAction = {
+  label: string
+  href: string
+  overlay: boolean
 }
 
 export type HubCategory = {
@@ -365,10 +373,61 @@ function records(value: unknown): Record<string, unknown>[] | null {
   return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
 }
 
+const DUAL_BOOKING_SLUGS = new Set([
+  'mini-highland-cow-experience',
+  'mini-highland-calf-meet-and-greet',
+])
+
+const PRIVATE_BOOKING_SLUGS = new Set([
+  'miniature-donkey-lunch-picnic',
+  'miniature-donkey-sunset-picnic',
+])
+
 function publishedMatch(slug: string | undefined, published: readonly ExperienceCardData[]) {
   if (!slug) return undefined
   const keys = new Set(experienceSlugAliases(slug))
   return published.find((item) => keys.has(item.slug))
+}
+
+function bookingAction(
+  label: string,
+  booking: { href?: string; overlay: boolean },
+): HubBookingAction | undefined {
+  if (!booking.href) return undefined
+  return { label, href: booking.href, overlay: booking.overlay }
+}
+
+function hubBookingActions(experience: ExperienceCardData): HubBookingAction[] {
+  const slug = publicExperienceSlug(experience.slug)
+  const openBooking = resolvePublicBooking(experience)
+  if (DUAL_BOOKING_SLUGS.has(slug)) {
+    return [
+      bookingAction('Book Public Experience', openBooking),
+      bookingAction(
+        'Book Private Experience',
+        resolveVerifiedExternalBooking(experience.privateBookingVerified, experience.privateBookingUrl),
+      ),
+    ].filter((action): action is HubBookingAction => Boolean(action))
+  }
+  if (PRIVATE_BOOKING_SLUGS.has(slug)) {
+    const action = bookingAction('Book Private Experience', openBooking)
+    return action ? [action] : []
+  }
+  const action = bookingAction('Book Experience', openBooking)
+  return action ? [action] : []
+}
+
+function applyBooking(entry: HubExperienceCard, match: ExperienceCardData): HubExperienceCard {
+  const bookingActions = hubBookingActions(match)
+  return {
+    ...entry,
+    title: match.title.trim() || entry.title,
+    description: text(match.shortDescription, 500) ?? entry.description,
+    href: `/${publicExperienceSlug(match.slug)}`,
+    bookingActions: bookingActions.length ? bookingActions : undefined,
+    bookingUrl: bookingActions[0]?.href,
+    bookingOverlay: bookingActions.some((action) => action.overlay) ? true : undefined,
+  }
 }
 
 function overlayPublished(
@@ -376,16 +435,8 @@ function overlayPublished(
   published: readonly ExperienceCardData[],
 ): HubExperienceCard {
   const match = publishedMatch(entry.slug, published)
-  if (!match) return entry
-  const booking = resolvePublicBooking(match)
-  return {
-    ...entry,
-    title: match.title.trim() || entry.title,
-    description: text(match.shortDescription, 500) ?? entry.description,
-    href: `/${publicExperienceSlug(match.slug)}`,
-    bookingUrl: booking.href,
-    bookingOverlay: booking.overlay,
-  }
+  if (!match) return { ...entry, bookingUrl: undefined, bookingOverlay: undefined, bookingActions: undefined }
+  return applyBooking(entry, match)
 }
 
 function cardsFromCms(
@@ -418,7 +469,6 @@ function cardsFromCms(
       imageKey: local?.imageKey,
       imageAlt: image?.alt ?? local?.imageAlt,
       href: safeHubHref(row.learnMoreHref, publishedSlugs) ?? (slug && publishedSlugs.has(slug) ? `/${slug}` : undefined),
-      bookingUrl: publicBookingUrl(typeof row.bookingUrl === 'string' ? row.bookingUrl : undefined),
     }]
   }).map((entry) => overlayPublished(entry, published))
 }
@@ -537,17 +587,14 @@ export function resolveExperiencesHubPage(
     : visible
         .filter((item) => !experienceSlugAliases(item.slug).some((slug) => used.has(slug)))
         .map((item) => {
-          const booking = resolvePublicBooking(item)
           const slug = publicExperienceSlug(item.slug)
-          return {
+          return applyBooking({
             key: item._id,
             title: item.title.trim(),
             slug,
             description: text(item.shortDescription, 500),
             href: `/${slug}`,
-            bookingUrl: booking.href,
-            bookingOverlay: booking.overlay,
-          }
+          }, item)
         })
 
   const feastFallback: HubStatement = {

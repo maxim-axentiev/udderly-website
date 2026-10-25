@@ -133,6 +133,8 @@ export const experienceHubQuery = `*[_type == "experience" && active != false] |
   bookingProvider,
   fareharborItemId,
   fareharborFlowId,
+  privateBookingUrl,
+  privateBookingVerified,
   heroImage ${altImage},
   animalSpecies[]->{ title }
 }`

@@ -213,6 +213,32 @@ function speciesGallery(slug: string): DetailImageKey[] {
   return []
 }
 
+const TASTE_HERO: Record<string, { key: DetailImageKey; alt: string }> = {
+  'taste-of-farm-life': {
+    key: 'highland-hero',
+    alt: 'Guests enjoying a long farm tasting experience',
+  },
+  'taste-of-farm-life-family-friendly': {
+    key: 'training',
+    alt: 'Family enjoying food and animals under the farm shelter',
+  },
+}
+
+function localGallery(
+  slug: string,
+  images: Partial<Record<DetailImageKey, string>>,
+): DetailPicture[] {
+  const taste = TASTE_HERO[publicExperienceSlug(slug)]
+  if (taste) {
+    const src = images[taste.key]
+    return src ? [{ src, alt: taste.alt }] : []
+  }
+  return speciesGallery(slug).flatMap((key) => {
+    const photo = localPicture(key, images)
+    return photo ? [photo] : []
+  })
+}
+
 function usablePortableText(value: PortableTextContent): PortableTextContent | undefined {
   if (!Array.isArray(value)) return undefined
   const blocks = value.filter((block) => {
@@ -253,16 +279,27 @@ function animalCards(
 }
 
 export const MINI_HIGHLAND_COW_SLUG = 'mini-highland-cow-experience'
+export const MINI_HIGHLAND_CALF_SLUG = 'mini-highland-calf-meet-and-greet'
 export const OPEN_HIGHLAND_BOOKING_LABEL = 'Book Open Mini Highland Cow Experience'
 export const PRIVATE_HIGHLAND_BOOKING_LABEL = 'Book Private Mini Highland Cow Experience'
-export const PRIVATE_HIGHLAND_PRICE = '$250 for 4 people'
-export const PRIVATE_HIGHLAND_CAPACITY = '4–8 people'
+export const OPEN_CALF_BOOKING_LABEL = 'Book Open Mini Highland Calf Meet & Greet'
+export const PRIVATE_CALF_BOOKING_LABEL = 'Book Private Mini Highland Calf Meet & Greet'
+
+function dualBookingCopy(slug: string): { open: string; private: string } | undefined {
+  const publicSlug = publicExperienceSlug(slug)
+  if (publicSlug === MINI_HIGHLAND_COW_SLUG) {
+    return { open: OPEN_HIGHLAND_BOOKING_LABEL, private: PRIVATE_HIGHLAND_BOOKING_LABEL }
+  }
+  if (publicSlug === MINI_HIGHLAND_CALF_SLUG) {
+    return { open: OPEN_CALF_BOOKING_LABEL, private: PRIVATE_CALF_BOOKING_LABEL }
+  }
+  return undefined
+}
 
 function detailFacts(experience: ExperiencePageData): ExperienceDetailModel['details'] {
   const season = clean(experience.seasonLabel, 80) ?? (experience.season ? SEASON_LABELS[experience.season] : undefined)
-  const highland = publicExperienceSlug(experience.slug) === MINI_HIGHLAND_COW_SLUG
-  const privatePrice = clean(experience.privatePriceDisplay, 80) ?? (highland ? PRIVATE_HIGHLAND_PRICE : undefined)
-  const privateCapacity = clean(experience.privateGroupSize, 80) ?? (highland ? PRIVATE_HIGHLAND_CAPACITY : undefined)
+  const privatePrice = clean(experience.privatePriceDisplay, 80)
+  const privateCapacity = clean(experience.privateGroupSize, 80)
   const pairs: Array<[string, string[]]> = [
     ['Price', priceLines(experience)],
     ['Duration', [clean(experience.duration, 80)].filter((value): value is string => Boolean(value))],
@@ -281,20 +318,17 @@ export function resolveExperienceDetail(
   foundation: ExperienceFoundation = null,
 ): ExperienceDetailModel {
   const slug = experience.slug
-  const localGallery = speciesGallery(slug).flatMap((key) => {
-    const photo = localPicture(key, images)
-    return photo ? [photo] : []
-  })
+  const bundledGallery = localGallery(slug, images)
   const cmsGallery = (experience.gallery ?? []).flatMap((image) => {
     const photo = picture(image, 1280)
     return photo ? [photo] : []
   })
-  const gallery = cmsGallery.length ? cmsGallery : localGallery
+  const gallery = cmsGallery.length ? cmsGallery : bundledGallery
   const hero = picture(experience.heroImage, 1920) ?? gallery[0]
   const title = titleLines(clean(experience.title, 120) ?? experience.title, clean(experience.titleAccent, 80))
   const booking = resolvePublicBooking(experience)
-  const highland = publicExperienceSlug(slug) === MINI_HIGHLAND_COW_SLUG
-  const privateBooking = highland
+  const dualBooking = dualBookingCopy(slug)
+  const privateBooking = dualBooking
     ? resolveVerifiedExternalBooking(experience.privateBookingVerified, experience.privateBookingUrl)
     : undefined
   const introduction = clean(experience.introductionHeading, 120)
@@ -345,22 +379,22 @@ export function resolveExperienceDetail(
     details: detailFacts(experience),
     bookingUrl: booking.href,
     bookingOverlay: booking.overlay,
-    bookingLabel: clean(experience.bookingCtaLabel, 80) ?? (highland ? OPEN_HIGHLAND_BOOKING_LABEL : `Book ${clean(experience.title, 120) ?? experience.title}`),
-    bookingChoices: highland
+    bookingLabel: clean(experience.bookingCtaLabel, 80) ?? dualBooking?.open ?? `Book ${clean(experience.title, 120) ?? experience.title}`,
+    bookingChoices: dualBooking
       ? [
           {
-            label: clean(experience.bookingCtaLabel, 80) ?? OPEN_HIGHLAND_BOOKING_LABEL,
+            label: clean(experience.bookingCtaLabel, 80) ?? dualBooking.open,
             href: booking.href,
             overlay: booking.overlay,
           },
           {
-            label: clean(experience.privateBookingCtaLabel, 80) ?? PRIVATE_HIGHLAND_BOOKING_LABEL,
+            label: clean(experience.privateBookingCtaLabel, 80) ?? dualBooking.private,
             href: privateBooking?.href,
             overlay: privateBooking?.overlay ?? false,
           },
         ]
       : undefined,
-    bookingNote: highland ? 'Open visits and private sessions are booked separately.' : undefined,
+    bookingNote: dualBooking ? 'Open visits and private sessions are booked separately.' : undefined,
     practical: practical ? designedLines(practical, practical, '') : undefined,
     tips: (experience.practicalTips ?? []).flatMap((tip) => {
       const value = clean(tip, 240)
