@@ -1,4 +1,5 @@
 import { CONTACT_RECIPIENT } from './model'
+import { deliverContactViaResend, resendConfigured } from './resend'
 import { contactSmtpConfigured, deliverContactEmail, type ContactMail } from './smtp'
 
 export const CONTACT_RATE_LIMIT = 5
@@ -41,7 +42,7 @@ export async function submitContactMessage(
     createTransport?: Parameters<typeof deliverContactEmail>[2]
   },
 ): Promise<ContactSubmitResult> {
-  if (!contactSmtpConfigured(options.env)) return { ok: false, error: 'unavailable' }
+  if (!resendConfigured(options.env) && !contactSmtpConfigured(options.env)) return { ok: false, error: 'unavailable' }
   const parsed = parseSubmission(input)
   const now = options.now ?? Date.now()
   if (parsed.honeypot) {
@@ -51,7 +52,9 @@ export async function submitContactMessage(
   if (!parsed.message) return { ok: false, error: 'invalid' }
   if (!allowAttempt(options.ip || 'unknown', now)) return { ok: false, error: 'rate_limited' }
 
-  const result = await deliverContactEmail(parsed.message, options.env, options.createTransport)
+  const result = resendConfigured(options.env)
+    ? await deliverContactViaResend(parsed.message, options.env)
+    : await deliverContactEmail(parsed.message, options.env, options.createTransport)
   if (result === 'unconfigured') return { ok: false, error: 'unavailable' }
   if (result !== 'accepted') {
     console.error('[contact] delivery was not accepted')

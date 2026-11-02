@@ -3,9 +3,10 @@ import { getRequestHeader, getRequestIP } from '@tanstack/react-start/server'
 
 import { clientAddress, submitContactMessage } from './submit'
 import { contactSmtpConfigured } from './smtp'
+import { resendConfigured } from './resend'
 
 export const getContactDeliveryAvailableFn = createServerFn({ method: 'GET', strict: false }).handler(() =>
-  contactSmtpConfigured(process.env),
+  resendConfigured(process.env) || contactSmtpConfigured(process.env),
 )
 
 export const submitContactFn = createServerFn({ method: 'POST', strict: false })
