@@ -169,7 +169,7 @@ export function ContactPage({
           )}
           {deliveryAvailable ? (
             notice ? (
-              <p id="contact-status" className="mt-4 font-semibold text-headline" role="status">
+              <p id="contact-status" className={notice === CONTACT_SUCCESS ? "mt-6 text-center font-display text-4xl font-black uppercase text-headline" : "mt-4 font-semibold text-headline"} role="status">
                 {notice}
               </p>
             ) : null
