@@ -12,10 +12,14 @@ vi.mock('@/components/ui/button', () => ({
 }))
 
 import { ContactPage } from '@/components/contact/contact-page'
+import { HomepageContentProvider } from '@/components/home/homepage-content'
+import { NewsletterSection } from '@/components/home/newsletter-section'
+import { UrbortSection } from '@/components/home/urbort-section'
 import { LegalPolicyPage } from '@/components/legal/policy-page'
 import { NewsletterPage } from '@/components/newsletter/newsletter-page'
 import { UrbortArticle } from '@/components/urbort/article'
 import { UrbortBoardPage } from '@/components/urbort/board'
+import { localHomepageContent } from '@/lib/homepage/model'
 import { resolveContactPage } from '@/lib/contact/resolve'
 import { resolveLegalPage } from '@/lib/legal/resolve'
 import { resolveNewsletterPage } from '@/lib/newsletter/resolve'
@@ -31,99 +35,93 @@ import {
 } from '@/lib/sanity/queries'
 import { createPageHead } from '@/lib/seo/page-head'
 import { getStaticSitemapEntries } from '@/lib/seo/sitemap'
-import { resolveUrbortArticle, resolveUrbortBoard, type UrbortImages } from '@/lib/urbort/resolve'
+import { resolveUrbortArticle, resolveUrbortBoard } from '@/lib/urbort/resolve'
 
-const images = {
-  'urbort-1': '/urbort-1.webp',
-  'urbort-2': '/urbort-2.webp',
-  'urbort-3': '/urbort-3.webp',
-  'goat-cuddles': '/goats.jpg',
-  'donkey-picnic': '/donkey.jpg',
-  'alpaca-walk': '/alpaca.jpg',
-} satisfies UrbortImages
+const publishedHero = {
+  alt: 'A published farm photo',
+  asset: { _ref: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg' },
+}
 
 function body(text: string) {
   return [{ _type: 'block', children: [{ _type: 'span', text }] }]
 }
 
 describe('URBORT board', () => {
-  it('shows the six approved titles without linking to unpublished articles', () => {
-    const board = resolveUrbortBoard(null, [], images)
+  it('shows the empty board instead of placeholder articles', () => {
+    const board = resolveUrbortBoard({ showPlaceholderCards: true }, [])
     const html = renderToStaticMarkup(<UrbortBoardPage board={board} />)
 
     expect(html).toContain('Udderly Ridiculous Board of Ridiculous Things')
-    expect(html).toContain('World&#x27;s First Cow Wedding')
-    expect(html).toContain('The Alpaca Parade')
-    expect(html).toContain('Placeholder copy.')
-    expect(html).not.toContain('Lorem ipsum')
-    expect(html).not.toContain('/urbort-blog/worlds-first-cow-wedding')
-    expect(html).not.toContain('Read more')
-    expect(board.cards.every((card) => card.published === false)).toBe(true)
-  })
-
-  it('replaces one placeholder and keeps the other titles when a real article is published', () => {
-    const board = resolveUrbortBoard(
-      null,
-      [
-        {
-          _id: 'article-1',
-          title: "World's First Cow Wedding",
-          slug: 'worlds-first-cow-wedding',
-          excerpt: 'A published farm story.',
-          body: body('The ceremony was held in the pasture.'),
-        },
-        {
-          _id: 'drafts.article-2',
-          title: 'Draft story',
-          slug: 'draft-story',
-          body: body('Hidden draft.'),
-        },
-        {
-          _id: 'article-3',
-          title: 'Inactive story',
-          slug: 'inactive-story',
-          active: false,
-          body: body('Hidden inactive.'),
-        },
-      ],
-      images,
-    )
-    const html = renderToStaticMarkup(<UrbortBoardPage board={board} />)
-
-    expect(html).toContain('href="/urbort-blog/worlds-first-cow-wedding"')
-    expect(html).toContain('A published farm story.')
-    expect(html).toContain('The Alpaca Parade')
-    expect(html).not.toContain('Draft story')
-    expect(html).not.toContain('Inactive story')
-    expect(html).not.toContain('Lorem ipsum')
-  })
-
-  it('keeps the heading and hides placeholder cards when the board says so and nothing is published', () => {
-    const board = resolveUrbortBoard({ showPlaceholderCards: false, titleAccent: 'Farm stories' }, [], images)
-    const html = renderToStaticMarkup(<UrbortBoardPage board={board} />)
-
-    expect(html).toContain('Farm stories')
     expect(html).toContain('Published stories will be pinned here.')
     expect(html).not.toContain('World&#x27;s First Cow Wedding')
+    expect(html).not.toContain('The Alpaca Parade')
+    expect(html).not.toContain('Placeholder copy.')
+    expect(html).not.toContain('/goats.jpg')
+    expect(html).not.toContain('/urbort-blog/worlds-first-cow-wedding')
+    expect(board.cards).toEqual([])
+  })
+
+  it('shows only published articles, in the given order, and ignores placeholder photos', () => {
+    const board = resolveUrbortBoard(null, [
+      {
+        _id: 'article-2',
+        title: 'A later story',
+        slug: 'later-story',
+        excerpt: 'A published farm story.',
+        heroImage: publishedHero,
+        body: body('The later story is published.'),
+      },
+      {
+        _id: 'article-1',
+        title: "World's First Cow Wedding",
+        slug: 'worlds-first-cow-wedding',
+        excerpt: 'A published farm story.',
+        body: body('The ceremony was held in the pasture.'),
+      },
+      {
+        _id: 'drafts.article-2',
+        title: 'Draft story',
+        slug: 'draft-story',
+        body: body('Hidden draft.'),
+      },
+      {
+        _id: 'article-3',
+        title: 'Inactive story',
+        slug: 'inactive-story',
+        active: false,
+        body: body('Hidden inactive.'),
+      },
+    ])
+    const html = renderToStaticMarkup(<UrbortBoardPage board={board} />)
+
+    expect(html.indexOf('A later story')).toBeLessThan(html.indexOf('World&#x27;s First Cow Wedding'))
+    expect(html).toContain('href="/urbort-blog/later-story"')
+    expect(html).toContain('cdn.sanity.io')
+    expect(html).toContain('A published farm photo')
+    expect(html).toContain('Photo not available yet')
+    expect(html).not.toContain('The Alpaca Parade')
+    expect(html).not.toContain('Placeholder copy.')
+    expect(html).not.toContain('/goats.jpg')
+    expect(html).not.toContain('/urbort-1.webp')
+    expect(html).not.toContain('Draft story')
+    expect(html).not.toContain('Inactive story')
   })
 
   it('returns null for missing, draft, inactive, and empty articles', () => {
-    expect(resolveUrbortArticle(null, null, images)).toBeNull()
+    expect(resolveUrbortArticle(null, null)).toBeNull()
     expect(
       resolveUrbortArticle(
         { _id: 'drafts.story', title: 'Draft', slug: 'draft', body: body('Hidden') },
         null,
-        images,
       ),
     ).toBeNull()
     expect(
       resolveUrbortArticle(
         { _id: 'story', title: 'Off', slug: 'off', active: false, body: body('Hidden') },
         null,
-        images,
       ),
     ).toBeNull()
-    expect(resolveUrbortArticle({ _id: 'story', title: 'Empty', slug: 'empty', body: [] }, null, images)).toBeNull()
+    expect(resolveUrbortArticle({ _id: 'story', title: 'Empty', slug: 'empty', body: [] }, null)).toBeNull()
   })
 
   it('renders a published article body and leaves the Latin template out', () => {
@@ -139,7 +137,6 @@ describe('URBORT board', () => {
         externalLinks: [{ label: 'Watch', href: 'https://example.com/parade' }],
       },
       null,
-      images,
     )
     expect(article).not.toBeNull()
     const html = renderToStaticMarkup(<UrbortArticle article={article!} />)
@@ -186,6 +183,16 @@ describe('contact page', () => {
     expect(html).toContain('1-548-225-1005')
     expect(html).toContain('906200 Township Rd 12, Bright, ON N0J 1B0')
     expect(html).toContain('Winter Hours (November to April)')
+    expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
+  })
+
+  it('shows a working form only when delivery is configured', () => {
+    const html = renderToStaticMarkup(<ContactPage page={resolveContactPage(null, null)} deliveryAvailable />)
+    expect(html).toContain('type="submit"')
+    expect(html).toContain('name="contact_extra"')
+    expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
+    expect(html).not.toContain('Contact messages are not available yet.')
+    expect(html).not.toContain('The mail server accepted')
   })
 })
 
@@ -197,9 +204,58 @@ describe('newsletter page', () => {
     expect(html).toContain('Farm notes')
     expect(html).toContain('gasp, ooh, aw, and woah')
     expect(html).toContain('Newsletter signup is not available yet.')
+    expect(html).not.toContain('Date of birth')
+    expect(html).not.toContain('dateOfBirth')
     expect(html).not.toContain('nothing is stored')
     expect(html).toContain('disabled')
     expect(html).not.toContain('type="submit"')
+  })
+})
+
+describe('homepage newsletter and URBORT cards', () => {
+  it('disables homepage signup and hides a published confirmation', () => {
+    const content = localHomepageContent()
+    content.newsletter.confirmation =
+      "Thanks for joining the Udderly Update. There's no turning back now. Good luck haha."
+    const html = renderToStaticMarkup(
+      <HomepageContentProvider content={content}>
+        <NewsletterSection />
+      </HomepageContentProvider>,
+    )
+
+    expect(html).toContain('Newsletter signup is not available yet.')
+    expect(html).toContain('name="email"')
+    expect(html).not.toContain('Date of birth')
+    expect(html).not.toContain('dateOfBirth')
+    expect(html).toContain('disabled')
+    expect(html).not.toContain('type="submit"')
+    expect(html).not.toContain('Thanks for joining')
+    expect(html).not.toContain('nothing is stored')
+    expect(html).not.toContain('Placeholder confirmation')
+  })
+
+  it('uses Explore the blog when a card only links to the blog landing page', () => {
+    const content = localHomepageContent()
+    const [first, second, third] = content.urbort.articles
+    if (!first || !second || !third) throw new Error('Homepage URBORT cards are missing.')
+    content.urbort.cardLabel = 'Read the article'
+    content.urbort.articles = [
+      { ...first, href: '/urbort-blog' },
+      { ...second, href: '/urbort-blog/' },
+      { ...third, href: '/urbort-blog/published-story' },
+    ]
+    const html = renderToStaticMarkup(
+      <HomepageContentProvider content={content}>
+        <UrbortSection />
+      </HomepageContentProvider>,
+    )
+
+    expect(html).toContain('Cow Wedding')
+    expect(html).toContain(third.title)
+    expect(html).toContain('Explore the blog')
+    expect(html).toContain('href="/urbort-blog/published-story"')
+    expect(html.match(/Read the article/g)).toHaveLength(1)
+    expect(html).not.toContain('href="/urbort-blog/viral-alpaca')
   })
 })
 

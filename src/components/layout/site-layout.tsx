@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { ConsentManager } from '@/components/consent/consent-manager'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import type { SiteChrome } from '@/lib/site-chrome'
@@ -24,6 +25,7 @@ export function SiteLayout({
         {children}
       </main>
       <SiteFooter chrome={chrome} />
+      <ConsentManager />
     </div>
   )
 }

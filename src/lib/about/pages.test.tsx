@@ -67,19 +67,25 @@ describe('about pages', () => {
     expect(story).toContain('Book an Experience')
 
     const vision = renderToStaticMarkup(<VisionValues page={resolveVisionValues(null, images)} />)
-    expect(vision).toContain('Our vision')
-    expect(vision).toContain('Placeholder copy.')
-    expect(vision).toContain('Value one')
-    expect(vision).toContain('Value five')
+    expect(vision).toContain('Vision &')
+    expect(vision).toContain('Photos from the farm')
     expect(vision).toContain('Come see it all in person.')
+    expect(vision).not.toContain('Our vision')
+    expect(vision).not.toContain('Placeholder copy.')
+    expect(vision).not.toContain('Value one')
+    expect(vision).not.toContain('Value five')
 
-    const team = renderToStaticMarkup(<Team page={resolveTeam(null, [], images)} />)
-    expect(team).toContain('Team member 1')
-    expect(team).toContain('Team member 9')
-    expect(team).toContain('Placeholder bio.')
-    expect(team).toContain('Placeholder role')
-    expect(team).toContain('not a staff portrait')
+    const emptyTeam = resolveTeam(null, [], images)
+    expect(emptyTeam.members).toEqual([])
+    expect(emptyTeam.placeholders).toBe(false)
+    const team = renderToStaticMarkup(<Team page={emptyTeam} />)
+    expect(team).toContain('The')
     expect(team).toContain('The animals would love to meet you.')
+    expect(team).not.toContain('sm:grid-cols-2')
+    expect(team).not.toContain('Team member 1')
+    expect(team).not.toContain('Placeholder bio.')
+    expect(team).not.toContain('Placeholder role')
+    expect(team).not.toContain('not a staff portrait')
 
     const faq = renderToStaticMarkup(<FarmFaq page={resolveFaqPage(null, [], images)} />)
     expect(faq).toContain('You have questions.')
@@ -112,18 +118,67 @@ describe('about pages', () => {
     expect(html).not.toContain('Growing together')
   })
 
-  it('keeps placeholder values until a complete value list is published', () => {
-    const incomplete = resolveVisionValues({ values: [{ title: '', description: '' }], showGallery: false }, images)
-    expect(incomplete.values?.items).toHaveLength(5)
+  it('renders vision and values only from complete published content', () => {
+    const incomplete = resolveVisionValues(
+      {
+        visionHeading: 'Our vision',
+        values: [{ title: '', description: '' }, { title: 'Care', description: '' }],
+        showGallery: false,
+      },
+      images,
+    )
+    expect(incomplete.vision).toBeNull()
+    expect(incomplete.values).toBeNull()
     expect(incomplete.gallery).toBeNull()
-    expect(incomplete.vision?.heading).toBe('Our vision')
+    expect(incomplete.cta?.heading).toBe('Come see it all in person.')
+
+    const placeholders = resolveVisionValues(
+      {
+        visionHeading: 'Placeholder heading',
+        visionParagraphs: ['Placeholder copy. Not a vision statement.'],
+        values: [{ title: 'Placeholder value', description: 'Placeholder copy. Not a value.' }],
+      },
+      images,
+    )
+    expect(placeholders.vision).toBeNull()
+    expect(placeholders.values).toBeNull()
+    expect(placeholders.gallery?.length).toBeGreaterThan(0)
 
     const replaced = resolveVisionValues(
-      { values: [{ title: 'Care', description: 'The animals come first.' }], showVision: false },
+      {
+        visionHeading: 'Where we are headed',
+        visionParagraphs: ['Joy for guests and animals.', ''],
+        values: [
+          { title: 'Care', description: 'The animals come first.' },
+          { title: 'Placeholder value', description: 'A real description should not rescue a placeholder title.' },
+        ],
+        showVision: false,
+      },
       images,
     )
     expect(replaced.vision).toBeNull()
     expect(replaced.values?.items).toEqual([{ title: 'Care', description: 'The animals come first.' }])
+
+    const hiddenValues = resolveVisionValues(
+      {
+        visionHeading: 'Where we are headed',
+        visionParagraphs: ['Joy for guests and animals.'],
+        values: [{ title: 'Care', description: 'The animals come first.' }],
+        showValues: false,
+      },
+      images,
+    )
+    expect(hiddenValues.vision).toEqual({
+      heading: 'Where we are headed',
+      paragraphs: ['Joy for guests and animals.'],
+      image: hiddenValues.vision?.image,
+    })
+    expect(hiddenValues.vision?.image.src).toBe('/highland.jpg')
+    expect(hiddenValues.values).toBeNull()
+    const html = renderToStaticMarkup(<VisionValues page={hiddenValues} />)
+    expect(html).toContain('Where we are headed')
+    expect(html).toContain('Joy for guests and animals.')
+    expect(html).not.toContain('The animals come first.')
   })
 
   it('orders published team members and does not mix them with placeholder profiles', () => {

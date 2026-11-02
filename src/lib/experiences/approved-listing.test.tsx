@@ -13,7 +13,9 @@ import {
   publicBookingUrl,
   TOWER_OF_GOATS_FUTURE_REDIRECT,
   TOWER_OF_GOATS_PATH,
+  towerOfGoatsAliasRedirect,
 } from '@/lib/experiences/approved-listing'
+import { Route as TowerAliasRoute } from '@/routes/tower-of-goats'
 import { towerOfGoatsStories } from '@/lib/experiences/tower-of-goats'
 import { documentPath, routableExperienceSlug } from '@/lib/routes/paths'
 import { redirects } from '@/lib/seo/redirects'
@@ -37,17 +39,6 @@ function card(overrides: Partial<ExperienceCardData> & Pick<ExperienceCardData, 
     ...overrides,
   }
 }
-
-const towerImages = {
-  hero: '/hero.png',
-  gallery: {
-    'goat-cuddles': '/goat-cuddles.jpg',
-    'homepage-experiences': '/experiences.png',
-    'goat-icon-1': '/goat-1.jpg',
-    'goat-icon-3': '/goat-3.jpg',
-  },
-  awards: [{ year: '2026', src: '/award-2026.png' }],
-} as const
 
 const hubImages = {
   hero: '/hero.png',
@@ -152,41 +143,53 @@ describe('approved experiences listing', () => {
     expect(documentPath('experience', 'goat-yoga')).toBe('/goat-yoga')
   })
 
-  it('reserves the Tower of Goats path and does not activate the shorter redirect', () => {
+  it('reserves the Tower of Goats path and redirects the shorter alias', () => {
     expect(documentPath('experience', 'tower-of-goats-discovery-trail')).toBeUndefined()
     expect(routableExperienceSlug('tower-of-goats-discovery-trail')).toBeUndefined()
-    expect(redirects).toEqual([
-      expect.objectContaining({
-        from: '/private-mini-highland-experience',
-        to: '/mini-highland-cow-experience',
-        status: 301,
-      }),
-    ])
+    expect(routableExperienceSlug('tower-of-goats')).toBeUndefined()
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          from: '/private-mini-highland-experience',
+          to: '/mini-highland-cow-experience',
+          status: 301,
+        }),
+      ]),
+    )
     expect(TOWER_OF_GOATS_FUTURE_REDIRECT).toEqual({
       from: '/tower-of-goats',
       to: '/tower-of-goats-discovery-trail',
     })
+    expect(towerOfGoatsAliasRedirect()).toEqual({ href: TOWER_OF_GOATS_PATH })
+    expect(() => TowerAliasRoute.options.beforeLoad?.({} as never)).toThrow()
   })
 })
 
 describe('Tower of Goats page', () => {
   it('renders the approved sections and omits placeholder booking actions', () => {
-    const html = renderToStaticMarkup(<TowerOfGoatsPage images={towerImages} />)
+    const html = renderToStaticMarkup(<TowerOfGoatsPage />)
 
     expect(html).toContain('General')
     expect(html).toContain('Tower of Goats Discovery Trail')
     expect(html).toContain('The whole farm, at goat pace.')
     expect(html).toContain('One tower.')
-    expect(html).toContain('Canada’s only Goat Tower')
-    expect(html).toContain('Sacha Taylor')
-    expect(html).toContain('Three Sisters Garden')
-    expect(html).toContain('Alvin, Marg and their dog Peanut')
-    expect(html).toContain('Hidden throughout the artwork are 20 bees')
+    expect(html).toContain('give them choice')
+    expect(html).toContain('Get directions')
+    expect(html).toContain('Load map')
+    expect(html).not.toContain('output=embed')
     expect(html).toContain('906200 Township Rd 12')
+    expect(html).not.toContain('Canada’s only')
+    expect(html).not.toContain('world’s only')
+    expect(html).not.toContain('Tripadvisor')
+    expect(html).not.toContain('Sacha Taylor')
+    expect(html).not.toContain('Three Sisters')
+    expect(html).not.toContain('Peanut')
+    expect(html).not.toContain('20 bees')
+    expect(html).not.toContain('goat-cuddles')
     expect(html).not.toContain('Placeholder')
     expect(html).not.toContain('#book')
     expect(html).not.toContain('Farm Hopping')
     expect(html).not.toContain('Book General Admission')
-    expect(towerOfGoatsStories).toHaveLength(5)
+    expect(towerOfGoatsStories).toHaveLength(2)
   })
 })

@@ -25,7 +25,8 @@ export function TourismProgram({ page }: { page: TourismPage }) {
     <>
       <CorporateHero lead={page.hero.lead} accent={page.hero.accent} intro={page.hero.intro} image={page.hero.image} />
       <section className="overflow-hidden bg-background py-20 md:py-28">
-        <Container width="brand" className="grid max-w-[1300px] items-center gap-12 lg:grid-cols-2">
+        <Container width="brand" className={`grid max-w-[1300px] items-center gap-12 ${page.introduction.image.src ? 'lg:grid-cols-2' : ''}`}>
+          {page.introduction.image.src ? (
           <figure className="relative m-0">
             <div className="absolute -inset-3 rotate-2 bg-secondary-accent" aria-hidden="true" />
             <img
@@ -37,6 +38,7 @@ export function TourismProgram({ page }: { page: TourismPage }) {
               className="relative aspect-[4/3] w-full border-2 border-headline object-cover"
             />
           </figure>
+          ) : null}
           <div>
             <DisplayHeading
               lead={page.introduction.lead}
@@ -52,12 +54,14 @@ export function TourismProgram({ page }: { page: TourismPage }) {
         </Container>
       </section>
 
+      {page.portrait.src || page.path.length ? (
       <section className="overflow-hidden bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1400px]">
           <h2 className="max-w-4xl font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
             {page.pathHeading}
           </h2>
-          <div className="mt-14 grid items-start gap-12 lg:grid-cols-[1fr_1.3fr]">
+          <div className={`mt-14 grid items-start gap-12 ${page.portrait.src && page.path.length ? 'lg:grid-cols-[1fr_1.3fr]' : ''}`}>
+            {page.portrait.src ? (
             <figure className="relative m-0">
               <div className="absolute -inset-3 -rotate-2 bg-primary-accent" aria-hidden="true" />
               <img
@@ -69,6 +73,8 @@ export function TourismProgram({ page }: { page: TourismPage }) {
                 className="relative aspect-[4/5] w-full border-2 border-headline object-cover"
               />
             </figure>
+            ) : null}
+            {page.path.length ? (
             <div>
               <div className="grid gap-6 sm:grid-cols-2">
                 {page.path.map((step, index) => (
@@ -84,9 +90,11 @@ export function TourismProgram({ page }: { page: TourismPage }) {
               </div>
               <div className="mt-10">{consult}</div>
             </div>
+            ) : null}
           </div>
         </Container>
       </section>
+      ) : null}
 
       {page.credentials.length ? (
         <section aria-label="Credentials" className="bg-background py-16 md:py-20">
@@ -105,6 +113,7 @@ export function TourismProgram({ page }: { page: TourismPage }) {
         </section>
       ) : null}
 
+      {page.services.length ? (
       <section className="bg-farm-blue py-20 md:py-28">
         <Container width="brand" className="max-w-[1400px]">
           <h2 className="font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
@@ -122,6 +131,7 @@ export function TourismProgram({ page }: { page: TourismPage }) {
                 <p className="mt-4 inline-block self-start -rotate-2 border-2 border-headline bg-secondary-accent px-3 py-1 font-display text-lg font-black text-headline">
                   {service.price}
                 </p>
+                {service.items.length ? (
                 <ul className="mt-6 space-y-4">
                   {service.items.map((item) => (
                     <li key={item.title} className="flex gap-3 text-sm leading-relaxed">
@@ -132,12 +142,14 @@ export function TourismProgram({ page }: { page: TourismPage }) {
                     </li>
                   ))}
                 </ul>
+                ) : null}
               </article>
             ))}
           </div>
           <div className="mt-14 text-center">{consult}</div>
         </Container>
       </section>
+      ) : null}
 
       <section className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1300px] text-center">
@@ -155,7 +167,7 @@ export function TourismProgram({ page }: { page: TourismPage }) {
               </li>
             ))}
           </ul>
-          <p className="mx-auto mt-10 max-w-2xl text-lg font-semibold">{page.audienceNote}</p>
+          {page.audienceNote ? <p className="mx-auto mt-10 max-w-2xl text-lg font-semibold">{page.audienceNote}</p> : null}
           <div className="mt-8">{consult}</div>
         </Container>
       </section>

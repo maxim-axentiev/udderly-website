@@ -27,6 +27,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
+import { Route as TowerOfGoatsRouteImport } from './routes/tower-of-goats'
 import { Route as TowerOfGoatsDiscoveryTrailRouteImport } from './routes/tower-of-goats-discovery-trail'
 import { Route as VisionValuesRouteImport } from './routes/vision-values'
 import { Route as AdoptAnAnimalIndexRouteImport } from './routes/adopt-an-animal/index'
@@ -133,6 +134,11 @@ const TeamRoute = TeamRouteImport.update({
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
   path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TowerOfGoatsRoute = TowerOfGoatsRouteImport.update({
+  id: '/tower-of-goats',
+  path: '/tower-of-goats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TowerOfGoatsDiscoveryTrailRoute =
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/team': typeof TeamRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/tower-of-goats': typeof TowerOfGoatsRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
   '/vision-values': typeof VisionValuesRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/team': typeof TeamRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/tower-of-goats': typeof TowerOfGoatsRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
   '/vision-values': typeof VisionValuesRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/team': typeof TeamRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/tower-of-goats': typeof TowerOfGoatsRoute
   '/tower-of-goats-discovery-trail': typeof TowerOfGoatsDiscoveryTrailRoute
   '/vision-values': typeof VisionValuesRoute
   '/adopt-an-animal/$slug': typeof AdoptAnAnimalSlugRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/team'
     | '/terms-of-service'
+    | '/tower-of-goats'
     | '/tower-of-goats-discovery-trail'
     | '/vision-values'
     | '/adopt-an-animal/$slug'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/team'
     | '/terms-of-service'
+    | '/tower-of-goats'
     | '/tower-of-goats-discovery-trail'
     | '/vision-values'
     | '/adopt-an-animal/$slug'
@@ -436,6 +447,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/team'
     | '/terms-of-service'
+    | '/tower-of-goats'
     | '/tower-of-goats-discovery-trail'
     | '/vision-values'
     | '/adopt-an-animal/$slug'
@@ -474,6 +486,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeamRoute: typeof TeamRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
+  TowerOfGoatsRoute: typeof TowerOfGoatsRoute
   TowerOfGoatsDiscoveryTrailRoute: typeof TowerOfGoatsDiscoveryTrailRoute
   VisionValuesRoute: typeof VisionValuesRoute
   AdoptAnAnimalSlugRoute: typeof AdoptAnAnimalSlugRoute
@@ -621,6 +634,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsOfServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tower-of-goats': {
+      id: '/tower-of-goats'
+      path: '/tower-of-goats'
+      fullPath: '/tower-of-goats'
+      preLoaderRoute: typeof TowerOfGoatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tower-of-goats-discovery-trail': {
       id: '/tower-of-goats-discovery-trail'
       path: '/tower-of-goats-discovery-trail'
@@ -762,6 +782,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeamRoute: TeamRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
+  TowerOfGoatsRoute: TowerOfGoatsRoute,
   TowerOfGoatsDiscoveryTrailRoute: TowerOfGoatsDiscoveryTrailRoute,
   VisionValuesRoute: VisionValuesRoute,
   AdoptAnAnimalSlugRoute: AdoptAnAnimalSlugRoute,

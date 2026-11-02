@@ -2,11 +2,14 @@ import { Link } from '@tanstack/react-router'
 
 import { ArrowRightIcon } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/button'
+import { openConsentPreferences } from '@/lib/consent/model'
 import { FOOTER_EMAIL_FALLBACK } from '@/lib/navigation'
 import { chromeLinkProps, type SiteChrome } from '@/lib/site-chrome'
 
 const linkClass =
   'rounded-sm text-sm leading-relaxed text-footer-foreground/85 no-underline transition-colors hover:text-farm-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-farm-blue'
+
+const preferencesClass = `${linkClass} border-0 bg-transparent p-0 text-left`
 
 export function SiteFooter({ chrome }: { chrome: SiteChrome }) {
   const year = new Date().getFullYear()
@@ -68,6 +71,11 @@ export function SiteFooter({ chrome }: { chrome: SiteChrome }) {
                   </a>
                 </li>
               ))}
+              <li>
+                <button type="button" className={preferencesClass} onClick={openConsentPreferences}>
+                  Cookie preferences
+                </button>
+              </li>
             </ul>
           </nav>
         </div>

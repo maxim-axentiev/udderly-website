@@ -76,55 +76,16 @@ export type SaleCard = Omit<SaleAnimal, 'imageKey' | 'species'> & {
   seoDescription?: string
 }
 
-const MOVABLE_STATUSES = new Set(['available', 'sold'])
+function publicText(value: string | null | undefined, max: number): string | undefined {
+  const text = optionalText(value, max)
+  if (!text || /^placeholder\b/i.test(text)) return undefined
+  return text
+}
 
-function cardFrom(animal: SaleAnimal, published: readonly PublishedListing[]): SaleCard {
-  const match = published.find((entry) => entry.slug?.trim() === animal.slug)
-  const status = match?.status?.trim()
-  let sold = animal.sold
-  let groupingNote: string | undefined
-
-  if (status && MOVABLE_STATUSES.has(status)) {
-    const publishedSold = status === 'sold'
-    if (publishedSold !== animal.sold) {
-      sold = publishedSold
-      groupingNote = `${animal.name} is shown as ${publishedSold ? 'sold' : 'available'} because the published listing says ${status}.`
-    }
-  } else if (status) {
-    groupingNote = `${animal.name} stays in the Lovable ${animal.sold ? 'sold' : 'available'} group. Published status “${status}” is not an available/sold value.`
-  }
-
-  const personality = match?.personality?.trim() || undefined
-  const priceDisplay = match?.priceDisplay?.trim() || undefined
-
-  return {
-    ...animal,
-    sold,
-    href: salePath(animal.slug),
-    source: match ? 'sanity' : 'fallback',
-    personality,
-    priceDisplay,
-    speciesTitle: match?.speciesTitle?.trim() || undefined,
-    birthDate: match?.birthDate?.trim() || undefined,
-    birthHeight: match?.birthHeight?.trim() || undefined,
-    birthWeight: match?.birthWeight?.trim() || undefined,
-    sex: match?.sex?.trim() || undefined,
-    genetics: match?.genetics?.trim() || undefined,
-    groupingNote,
-    images: (match?.images ?? [])
-      .map((image) => presentationImage(image, 1280))
-      .filter((image): image is PresentationImage => Boolean(image)),
-    placementIntro: optionalText(match?.placementIntro, 800),
-    placementItems: optionalItems(match?.placementItems, 8, 500),
-    parentDamName: optionalText(match?.parentDamName, 80),
-    parentDamHeight: optionalText(match?.parentDamHeight, 40),
-    parentSireName: optionalText(match?.parentSireName, 80),
-    parentSireHeight: optionalText(match?.parentSireHeight, 40),
-    sizeChart: presentationImage(match?.sizeChart, 1600),
-    seoTitle: optionalText(match?.seo?.title, 120),
-    groupDescription: optionalText(match?.groupDescription, 800),
-    seoDescription: optionalText(match?.seo?.description, 320),
-  }
+function publicPrice(value: string | null | undefined): string | undefined {
+  const text = value?.trim() ?? ''
+  if (!text || text.length > 80 || /^placeholder\b/i.test(text) || text === '$X,XXX') return undefined
+  return text
 }
 
 function optionalText(value: string | null | undefined, max: number): string | undefined {
@@ -137,7 +98,8 @@ function optionalItems(value: string[] | null | undefined, maxItems: number, max
   if (!value?.length || value.length > maxItems) return undefined
   const items = value.map((item) => item.trim())
   if (items.some((item) => !item || item.length > maxLength)) return undefined
-  return items
+  const approved = items.filter((item) => !/^placeholder\b/i.test(item))
+  return approved.length ? approved : undefined
 }
 
 const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -182,15 +144,11 @@ function listingToCard(entry: PublishedListing): SaleCard {
   const known = knownSale(slug)
   const name = entry.title?.trim() || known?.name || ''
   const status = entry.status?.trim()
-  let sold = known?.sold ?? false
+  let sold = false
   let groupingNote: string | undefined
   if (status === 'sold' || status === 'available') {
     sold = status === 'sold'
-    if (known && sold !== known.sold) {
-      groupingNote = `${name} is shown as ${sold ? 'sold' : 'available'} because the published listing says ${status}.`
-    }
   } else if (status) {
-    sold = false
     groupingNote = `${name} is listed with the available animals. Published status “${status}” is not an available/sold value.`
   }
   return {
@@ -198,28 +156,27 @@ function listingToCard(entry: PublishedListing): SaleCard {
     slug,
     species: listingSpecies(entry, known),
     sold,
-    imageKey: known?.imageKey,
     href: salePath(slug),
     source: 'sanity',
-    personality: entry.personality?.trim() || undefined,
-    groupDescription: optionalText(entry.groupDescription, 800),
-    priceDisplay: entry.priceDisplay?.trim() || undefined,
-    speciesTitle: entry.speciesTitle?.trim() || undefined,
-    birthDate: entry.birthDate?.trim() || undefined,
-    birthHeight: entry.birthHeight?.trim() || undefined,
-    birthWeight: entry.birthWeight?.trim() || undefined,
-    sex: entry.sex?.trim() || undefined,
-    genetics: entry.genetics?.trim() || undefined,
+    personality: publicText(entry.personality, 800),
+    groupDescription: publicText(entry.groupDescription, 800),
+    priceDisplay: publicPrice(entry.priceDisplay),
+    speciesTitle: publicText(entry.speciesTitle, 80),
+    birthDate: publicText(entry.birthDate, 40),
+    birthHeight: publicText(entry.birthHeight, 40),
+    birthWeight: publicText(entry.birthWeight, 40),
+    sex: publicText(entry.sex, 40),
+    genetics: publicText(entry.genetics, 80),
     groupingNote,
     images: (entry.images ?? [])
       .map((image) => presentationImage(image, 1280))
       .filter((image): image is PresentationImage => Boolean(image)),
-    placementIntro: optionalText(entry.placementIntro, 800),
+    placementIntro: publicText(entry.placementIntro, 800),
     placementItems: optionalItems(entry.placementItems, 8, 500),
-    parentDamName: optionalText(entry.parentDamName, 80),
-    parentDamHeight: optionalText(entry.parentDamHeight, 40),
-    parentSireName: optionalText(entry.parentSireName, 80),
-    parentSireHeight: optionalText(entry.parentSireHeight, 40),
+    parentDamName: publicText(entry.parentDamName, 80),
+    parentDamHeight: publicText(entry.parentDamHeight, 40),
+    parentSireName: publicText(entry.parentSireName, 80),
+    parentSireHeight: publicText(entry.parentSireHeight, 40),
     sizeChart: presentationImage(entry.sizeChart, 1600),
     seoTitle: optionalText(entry.seo?.title, 120),
     seoDescription: optionalText(entry.seo?.description, 320),
@@ -234,9 +191,8 @@ export function buildSaleLists(
   sold: SaleCard[]
   intro: string
 } {
-  const cards = published.length === 0 && options.manageCollection !== true
-    ? ALL_SALE_ANIMALS.map((animal) => cardFrom(animal, published))
-    : visibleListings(published).map(listingToCard)
+  void options
+  const cards = visibleListings(published).map(listingToCard)
   return {
     available: cards.filter((card) => !card.sold),
     sold: cards.filter((card) => card.sold),
@@ -249,10 +205,7 @@ export function findSaleAnimal(
   published: readonly PublishedListing[] = [],
   manageCollection = false,
 ): SaleCard | undefined {
-  if (published.length === 0 && !manageCollection) {
-    const animal = knownSale(slug)
-    return animal ? cardFrom(animal, published) : undefined
-  }
+  void manageCollection
   const match = visibleListings(published).find((entry) => entry.slug === slug)
   return match ? listingToCard(match) : undefined
 }

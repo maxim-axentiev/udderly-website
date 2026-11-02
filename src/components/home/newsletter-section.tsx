@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import type { FormEvent } from 'react'
 
 import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui/button'
+import { NEWSLETTER_UNAVAILABLE } from '@/lib/newsletter/model'
 import { useHomepageContent } from './homepage-content-context'
 import { HomeImage } from './homepage-content'
 
@@ -10,11 +11,9 @@ const fieldClass =
 
 export function NewsletterSection() {
   const newsletter = useHomepageContent().newsletter
-  const [signedUp, setSignedUp] = useState(false)
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setSignedUp(true)
   }
 
   return (
@@ -70,65 +69,52 @@ export function NewsletterSection() {
               {newsletter.copy}
             </p>
 
-            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" onSubmit={onSubmit}>
-              <div>
-                <label
-                  htmlFor="newsletter-first-name"
-                  className="mb-1 block font-display text-sm font-bold uppercase text-headline"
-                >
-                  {newsletter.firstNameLabel}
-                </label>
-                <input
-                  id="newsletter-first-name"
-                  name="firstName"
-                  type="text"
-                  required
-                  autoComplete="given-name"
-                  placeholder={newsletter.firstNamePlaceholder}
-                  className={fieldClass}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="newsletter-email"
-                  className="mb-1 block font-display text-sm font-bold uppercase text-headline"
-                >
-                  {newsletter.emailLabel}
-                </label>
-                <input
-                  id="newsletter-email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder={newsletter.emailPlaceholder}
-                  className={fieldClass}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="newsletter-dob"
-                  className="mb-1 block font-display text-sm font-bold uppercase text-headline"
-                >
-                  {newsletter.dateOfBirthLabel}
-                </label>
-                <input
-                  id="newsletter-dob"
-                  name="dateOfBirth"
-                  type="date"
-                  required
-                  className={fieldClass}
-                />
-              </div>
-              <Button type="submit" className="mt-2 justify-self-center">
-                {newsletter.submitLabel}
-              </Button>
+            <form
+              className="mx-auto mt-8 grid max-w-md gap-3 text-left"
+              onSubmit={onSubmit}
+              aria-describedby="newsletter-unavailable"
+            >
+              <fieldset disabled className="grid gap-3 border-0 p-0">
+                <div>
+                  <label
+                    htmlFor="newsletter-first-name"
+                    className="mb-1 block font-display text-sm font-bold uppercase text-headline"
+                  >
+                    {newsletter.firstNameLabel}
+                  </label>
+                  <input
+                    id="newsletter-first-name"
+                    name="firstName"
+                    type="text"
+                    autoComplete="given-name"
+                    placeholder={newsletter.firstNamePlaceholder}
+                    className={fieldClass}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="newsletter-email"
+                    className="mb-1 block font-display text-sm font-bold uppercase text-headline"
+                  >
+                    {newsletter.emailLabel}
+                  </label>
+                  <input
+                    id="newsletter-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder={newsletter.emailPlaceholder}
+                    className={fieldClass}
+                  />
+                </div>
+                <Button type="button" className="mt-2 justify-self-center" disabled>
+                  {newsletter.submitLabel}
+                </Button>
+              </fieldset>
             </form>
-            {signedUp && newsletter.confirmation ? (
-              <p className="mt-4 font-accent text-lg italic text-primary-accent">
-                {newsletter.confirmation}
-              </p>
-            ) : null}
+            <p id="newsletter-unavailable" className="mt-4 font-semibold text-headline" role="status">
+              {NEWSLETTER_UNAVAILABLE}
+            </p>
           </div>
         </div>
       </Container>

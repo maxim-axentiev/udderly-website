@@ -63,7 +63,7 @@ describe('homepage CMS content', () => {
     expect(local.hero.badgeLines).toEqual(['Ooh,', 'amazing'])
     expect(local.hero.image.srcSet).toBeUndefined()
     expect(local.seo).toEqual(homepageSeo)
-    expect(local.newsletter.confirmation).toContain('Placeholder confirmation')
+    expect(local.newsletter.confirmation).toBeNull()
     expect(local.experiences.cards.map((card) => card.className)).toEqual(
       homepageExperienceCards.map((card) => card.className),
     )
@@ -84,6 +84,13 @@ describe('homepage CMS content', () => {
     expect(content?.media.videos[7]?.embedUrl).toContain('start=277')
     expect(content?.giftGoat.count).toBe(118)
     expect(content?.newsletter.confirmation).toBeNull()
+    expect(
+      resolveHomepageContent({
+        ...publishedDocument,
+        newsletterConfirmation:
+          "Thanks for joining the Udderly Update. There's no turning back now. Good luck haha.",
+      })?.newsletter.confirmation,
+    ).toBeNull()
     expect(content?.seo.title).toBe(homepageSeo.title)
     expect(JSON.stringify(content)).not.toContain('image-pending')
     expect(JSON.stringify(content)).not.toContain('drafts.homepage')

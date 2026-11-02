@@ -1,6 +1,19 @@
 export const CONTACT_PATH = '/contact'
 
+export const CONTACT_RECIPIENT = 'info@udderlyridiculousfarmlife.com'
+
 export const CONTACT_UNAVAILABLE = 'Contact messages are not available yet.'
+
+export const CONTACT_SUCCESS =
+  'The mail server accepted your message for delivery. That does not guarantee it is already in the inbox. If you do not hear back, email info@udderlyridiculousfarmlife.com.'
+
+export const CONTACT_NOT_SENT =
+  'Your message was not sent. Please try again, or email info@udderlyridiculousfarmlife.com.'
+
+export const CONTACT_INVALID = 'Check your name, email and message. Your message was not sent.'
+
+export const CONTACT_RATE_LIMITED =
+  'Your message was not sent. Please wait before trying again, or email info@udderlyridiculousfarmlife.com.'
 
 export const contactFallback = {
   heroLead: 'Say',

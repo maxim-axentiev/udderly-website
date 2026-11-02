@@ -1,3 +1,4 @@
+import { CONTACT_PATH } from '@/lib/contact/model'
 import type { PortableTextContent } from '@/lib/sanity/types'
 import type { PageSeoInput } from '@/lib/seo/page-head'
 
@@ -212,91 +213,39 @@ export type DiscPage = {
   seo: PageSeoInput
 }
 
-/**
- * Shared design copy for the four ProgramPage routes.
- * These sentences are the approved layout text. They are not separate verified
- * facts about each program. A published program can replace them on its own page.
- */
-export const SHARED_PROGRAM_OUTCOMES = [
-  'Manage emotions and apply strategies for handling tension-filled situations.',
-  'Maximize influence by balancing directness with inquiry.',
-  'Identify key issues by actively listening for what matters most in any given situation.',
-  'Provide feedback in a manner that avoids creating defensiveness.',
-  'Apply these skills to real-life situations for immediate impact.',
-]
-
-const SHARED_INTRO = [
-  'Placeholder description. Most workplace tension isn’t caused by bad people — it’s caused by avoided conversations. This program gives your team a practical, repeatable framework for handling high-stakes dialogue with clarity, empathy and confidence.',
-  'Through facilitated exercises, real-play scenarios and a few unscripted animal moments, participants practice managing emotion, listening for what matters and giving feedback that lands instead of defends. Keep scrolling to learn about the program!',
-]
-
-const SHARED_HERO_INTRO =
-  'Have the conversations that matter — the hard ones, the honest ones, the ones that change everything — with a little help from the farm.'
-
 const FACILITIES: CorporateClose['facility'] = {
   lead: "What's in the",
   accent: 'facility',
-  items: [
-    {
-      icon: 'capacity',
-      title: 'Capacity & Setup',
-      body: 'Our farm market store transforms into a comfortable classroom that can accommodate up to 30 participants. We offer various seating arrangements, including pods of 4-6 people, boardroom style, u-shaped, and classroom style.',
-    },
-    {
-      icon: 'av',
-      title: 'Audio/Visual & Connectivity',
-      body: 'We provide AV equipment, including a projector and screen, to support presentations and training sessions. WIFI connectivity is available, although limited due to the rural setting.',
-    },
-    {
-      icon: 'catering',
-      title: 'Catering Options',
-      body: 'Enhance your session with coffee breaks and a locally-sourced lunch, featuring farm-fresh ingredients. These can be added to your training package upon request.',
-    },
-    {
-      icon: 'parking',
-      title: 'Parking & Restrooms',
-      body: 'Free parking is available for all participants, ensuring easy access to the facility. There are three washrooms onsite to accommodate your team.',
-    },
-    {
-      icon: 'outdoors',
-      title: 'Breaks & Outdoor Access',
-      body: 'We encourage participants to take advantage of the farm’s natural beauty during breaks. A walk around the property provides a refreshing mental reset, perfect for maintaining focus during intensive sessions. For an added mental health benefit, participants can interact with our friendly goats in the barn attached to the training room, offering a unique way to destress and recharge.',
-    },
-  ],
+  items: [],
   gallery: [],
 }
 
-export function corporateFacility(images: CorporateImages): NonNullable<CorporateClose['facility']> {
+export function corporateFacility(_images: CorporateImages): NonNullable<CorporateClose['facility']> {
   return {
     lead: FACILITIES?.lead ?? "What's in the",
     accent: FACILITIES?.accent ?? 'facility',
-    items: FACILITIES?.items ?? [],
-    gallery: [
-      { src: images.farmStore, alt: 'The farm market store set up as a training classroom' },
-      { src: images.training, alt: 'Participants seated in pods during a farm training session' },
-      { src: images.iceCream, alt: 'Locally sourced treats served during a farm coffee break' },
-      { src: images.goatCuddles, alt: 'Goats in the barn attached to the training room' },
-    ],
+    items: [],
+    gallery: [],
   }
 }
 
-export function corporateFacilitator(images: CorporateImages) {
+export function corporateFacilitator(_images: CorporateImages) {
   return {
     eyebrow: 'Meet your facilitator',
-    title: 'Cheryl, in boots',
-    body: 'Placeholder description. Cheryl has spent more than twenty years facilitating corporate training across boardrooms, conference centres and hotel ballrooms — and then decided the best learning happens with straw underfoot. She builds every session around your team’s goals and culture, keeps the energy high, the reflection honest, and lets the animals handle the rest.',
-    image: { src: images.owners, alt: "Cheryl, the farm's corporate training facilitator" },
-    ctaLabel: 'Contact Us',
-    ctaHref: '#contact',
+    title: '',
+    body: '',
+    image: { src: '', alt: '' },
+    ctaLabel: 'Contact',
+    ctaHref: CONTACT_PATH,
   }
 }
 
-export function corporateEnvironment(images: CorporateImages) {
+export function corporateEnvironment(_images: CorporateImages) {
   return {
     lead: 'A learning space with',
     accent: 'hooves outside',
-    body: 'Placeholder description. The farm itself is part of the curriculum: open sky, quiet lanes, and a barn full of goats waiting at the break bell.',
-    image: { src: images.highlandCta, alt: 'The farm at sunset, with the pasture glowing gold' },
+    body: '',
+    image: { src: '', alt: '' },
     label: 'The farm learning environment',
   }
 }
@@ -315,9 +264,6 @@ export function corporateEnquiry(
     unavailable: CORPORATE_ENQUIRY_UNAVAILABLE,
   }
 }
-
-const DEFAULT_ENQUIRY_BODY =
-  'Tell us a little about your group and what you want them to walk away with. We will get back to you with ideas (and probably a goat photo).'
 
 export function sharedProgramFallback(
   slug: Extract<
@@ -368,7 +314,7 @@ export function sharedProgramFallback(
     hero: {
       lead: program.lead,
       accent: program.accent,
-      intro: SHARED_HERO_INTRO,
+      intro: '',
       image: {
         src: images.hero,
         alt: 'A team taking part in a farm-based corporate session',
@@ -377,24 +323,22 @@ export function sharedProgramFallback(
     introduction: {
       lead: 'Conversations that',
       accent: 'actually land',
-      paragraphs: SHARED_INTRO,
-      image: { src: images.training, alt: 'A team learning together in the farm classroom' },
-      ctaLabel: 'Contact Us',
-      ctaHref: '#contact',
+      paragraphs: [],
+      image: { src: '', alt: '' },
+      ctaLabel: 'Contact',
+      ctaHref: CONTACT_PATH,
     },
     outcomes: {
       heading: 'What your team will take away',
-      items: SHARED_PROGRAM_OUTCOMES,
+      items: [],
       durationTitle: 'Duration',
-      durationBody:
-        'The program is flexible and can be offered as a half-day, full-day, or time-spaced session.',
+      durationBody: '',
       enhancementsTitle: 'Enhancements',
-      enhancementsBody:
-        'For an enriched team-building experience, consider integrating our Alpaca EQ training which dives deeper into emotional intelligence.',
+      enhancementsBody: '',
     },
     reviewsHeading: 'Teams that learned to talk — and listen — on the farm',
     contactHeading: "Let's talk training",
-    contactBody: DEFAULT_ENQUIRY_BODY,
+    contactBody: '',
     seo: {
       title: `${program.name} | Corporate Training | Udderly Ridiculous`,
       description: program.description,
@@ -409,7 +353,7 @@ export function landingFallback(images: CorporateImages): Omit<CorporateLandingP
       lead: 'Corporate Training & Team Building with Real Animals on a',
       accent: 'Real Farm',
       intro:
-        'Backed by 20+ years of corporate facilitation, designed to ignite learning, connection, and growth in boots... not boardrooms.',
+        'Designed to ignite learning, connection, and growth in boots... not boardrooms.',
       image: {
         src: images.hero,
         alt: 'A team taking part in a farm-based corporate training session',
@@ -420,11 +364,11 @@ export function landingFallback(images: CorporateImages): Omit<CorporateLandingP
       accent: 'engages and inspires',
       paragraphs: [
         'Forget stale boardrooms and awkward icebreakers. At Udderly Ridiculous Farm Life, we deliver Corporate Training & Team Building experiences that actually stick.',
-        'Led by a seasoned facilitator with over 20 years of corporate training experience, our programs are immersive, interactive, and completely unforgettable—because they happen on a working farm, with real animals as part of the learning environment. Alpacas. Goats. Mini Highland cows. Miniature donkeys. Even chickens. Each session taps into the grounding energy and emotional intelligence these animals naturally bring, creating space for real connection, deeper reflection, and team growth.',
+        'Our programs are immersive, interactive, and completely unforgettable—because they happen on a working farm, with real animals as part of the learning environment. Alpacas. Goats. Mini Highland cows. Miniature donkeys. Even chickens. Each session taps into the grounding energy and emotional intelligence these animals naturally bring, creating space for real connection, deeper reflection, and team growth.',
         'We don’t believe in cookie-cutter workshops or the latest “flavour of the month.” Whether you’re building on existing training or starting fresh, every session is tailored to your team’s goals, culture, and context. The result? More meaningful engagement, more memorable takeaways, and a team that leaves energized, aligned, and maybe a little muddy.',
       ],
       gallery: [
-        { src: images.training, alt: 'A team gathered together for a training session on the farm' },
+        { src: images.training, alt: 'Corporate team enjoying a farm lunch experience with alpacas' },
         { src: images.alpacaWalk, alt: 'Participants walking alpacas along the farm lane' },
         { src: images.experiences, alt: 'Colleagues laughing with goats in the pasture' },
         { src: images.highlandHero, alt: 'Team meeting a mini Highland cow during a break' },
@@ -435,7 +379,7 @@ export function landingFallback(images: CorporateImages): Omit<CorporateLandingP
     featured: {
       eyebrow: 'Not training — pure team building',
       title: 'Team Building Experiences',
-      body: 'Placeholder description. No modules, no assessments, no flip charts. Just your team, the animals, and a few hours of shared ridiculousness that does more for trust than any trust fall ever has.',
+      body: '',
       image: {
         src: images.experiences,
         alt: 'A team laughing together during a farm team building session',
@@ -446,35 +390,35 @@ export function landingFallback(images: CorporateImages): Omit<CorporateLandingP
     cards: [
       {
         title: 'DiSC Assessment',
-        body: 'Placeholder description. Understand how your team communicates, decides and collides, then put it into practice with a few very opinionated animals watching.',
-        image: { src: images.training, alt: 'Facilitator leading a DiSC session in the farm classroom' },
+        body: '',
+        image: { src: images.training, alt: 'Corporate team enjoying a farm lunch experience with alpacas' },
         href: corporateProgramPath('disc-assessment'),
         ctaLabel: 'Learn More',
       },
       {
         title: 'The Power of Conversation',
-        body: 'Placeholder description. Real conversations, the hard ones included, practised in a space where nobody can hide behind a screen.',
+        body: '',
         image: { src: images.goatCuddles, alt: 'Two colleagues talking while a goat looks on' },
         href: corporateProgramPath('the-power-of-conversation'),
         ctaLabel: 'Learn More',
       },
       {
         title: 'Alpaca Emotional Intelligence',
-        body: 'Placeholder description. Alpacas read the room faster than any of us. Learn self-awareness and empathy from the professionals.',
+        body: '',
         image: { src: images.alpacaWalk, alt: 'Alpaca standing calmly beside a workshop participant' },
         href: corporateProgramPath('alpaca-emotional-intelligence'),
         ctaLabel: 'Learn More',
       },
       {
         title: 'Beyond Engagement',
-        body: 'Placeholder description. Move past survey scores to the culture habits that actually keep good people around.',
+        body: '',
         image: { src: images.highlandHero, alt: 'Team working through an exercise outdoors on the farm' },
         href: corporateProgramPath('beyond-engagement'),
         ctaLabel: 'Learn More',
       },
       {
         title: 'Innovation on the Farm',
-        body: 'Placeholder description. Creative problem solving with real constraints, real mud and absolutely no whiteboard clichés.',
+        body: '',
         image: { src: images.donkeyPicnic, alt: 'Group solving a challenge beside the miniature donkeys' },
         href: corporateProgramPath('innovation-on-the-farm'),
         ctaLabel: 'Learn More',
@@ -483,7 +427,7 @@ export function landingFallback(images: CorporateImages): Omit<CorporateLandingP
     tourism: {
       eyebrow: 'For tourism businesses only',
       title: 'Experiential Tourism Development',
-      body: 'Placeholder description. Built specifically for tourism operators, this session helps you turn what you already have into experiences guests will book, photograph and talk about for years.',
+      body: '',
       image: {
         src: images.highlandCta,
         alt: 'Farm owners walking a tourism operator through the property',
@@ -496,12 +440,12 @@ export function landingFallback(images: CorporateImages): Omit<CorporateLandingP
       facilitator: corporateFacilitator(images),
       environment: corporateEnvironment(images),
       facility: corporateFacility(images),
-      enquiry: corporateEnquiry("Let's talk about your team", DEFAULT_ENQUIRY_BODY),
+      enquiry: corporateEnquiry("Let's talk about your team", ''),
     },
     seo: {
       title: 'Corporate Training & Team Building on a Farm | Udderly Ridiculous',
       description:
-        'Corporate training and team building on a working Ontario farm, led by a facilitator with 20+ years of experience, with alpacas, goats, mini Highland cows and donkeys.',
+        'Corporate training and team building on a working Ontario farm, with alpacas, goats, mini Highland cows and donkeys.',
       path: '/corporate-training',
     },
   }
@@ -528,37 +472,37 @@ export function teamBuildingFallback(images: CorporateImages): Omit<TeamBuilding
     activities: [
       {
         title: 'Goat Yoga',
-        body: 'Placeholder description. Stretch, laugh and lose all dignity together while goats climb, nap and supervise.',
-        image: { src: images.goatCuddles, alt: 'Team enjoying Goat Yoga on the farm' },
-        href: '#contact',
+        body: '',
+        image: { src: '', alt: '' },
+        href: CONTACT_PATH,
         ctaLabel: 'Contact Us',
       },
       {
         title: 'Alpaca Walks',
-        body: 'Placeholder description. Lead an alpaca down the farm lane and discover who on your team is the natural leader.',
+        body: '',
         image: { src: images.alpacaWalk, alt: 'Team enjoying Alpaca Walks on the farm' },
-        href: '#contact',
+        href: CONTACT_PATH,
         ctaLabel: 'Contact Us',
       },
       {
         title: 'Mini Highland Cow Experience',
-        body: 'Placeholder description. Brush, cuddle and get to know our fluffy mini Highland cows as a group.',
+        body: '',
         image: { src: images.highlandHero, alt: 'Team enjoying Mini Highland Cow Experience on the farm' },
-        href: '#contact',
+        href: CONTACT_PATH,
         ctaLabel: 'Contact Us',
       },
       {
         title: 'Goat Cuddles',
-        body: 'Placeholder description. A barn full of goats, a team full of stress, and a guaranteed improvement in mood.',
+        body: '',
         image: { src: images.experiences, alt: 'Team enjoying Goat Cuddles on the farm' },
-        href: '#contact',
+        href: CONTACT_PATH,
         ctaLabel: 'Contact Us',
       },
       {
         title: 'Miniature Donkey Visits',
-        body: 'Placeholder description. Gentle, curious and endlessly patient, our donkeys bring the calm your team needs.',
+        body: '',
         image: { src: images.donkeyPicnic, alt: 'Team enjoying Miniature Donkey Visits on the farm' },
-        href: '#contact',
+        href: CONTACT_PATH,
         ctaLabel: 'Contact Us',
       },
     ],
@@ -566,11 +510,11 @@ export function teamBuildingFallback(images: CorporateImages): Omit<TeamBuilding
       title: 'Mix & match',
       body: "Can't pick just one? You can combine team building experiences into one ridiculous day. Contact us and we'll help you build the perfect mix for your team.",
       ctaLabel: 'Contact Us',
-      ctaHref: '#contact',
+      ctaHref: CONTACT_PATH,
     },
     reviewsHeading: 'Teams that bonded on the farm',
     contactHeading: "Let's plan your team day",
-    contactBody: DEFAULT_ENQUIRY_BODY,
+    contactBody: '',
     seo: {
       title: 'Team Building Experiences | Corporate Training | Udderly Ridiculous',
       description:
@@ -592,132 +536,21 @@ export function tourismFallback(images: CorporateImages): TourismPage {
     introduction: {
       lead: 'Your business,',
       accent: 'unforgettable',
-      paragraphs: [
-        'Placeholder description. Experiential tourism coaching helps tourism businesses design, refine and price hands-on experiences that people travel for. Whether you have a spark of an idea or an offering that needs a refresh, Cheryl brings the frameworks and real-world lessons from building Udderly Ridiculous Farm Life.',
-      ],
-      image: {
-        src: images.highlandCta,
-        alt: 'The farm at sunset, a working example of experiential tourism',
-      },
+      paragraphs: [],
+      image: { src: '', alt: '' },
       ctaLabel: 'Contact Me',
-      ctaHref: '#contact',
+      ctaHref: CONTACT_PATH,
     },
-    portrait: { src: images.owners, alt: 'Cheryl, experiential tourism coach' },
+    portrait: { src: '', alt: '' },
     pathHeading: 'Meet Cheryl & her path',
-    path: [
-      {
-        title: 'From boardroom',
-        body: 'Placeholder copy. 20+ years designing and facilitating corporate training for organizations across Canada.',
-      },
-      {
-        title: 'To barnyard',
-        body: 'Placeholder copy. Built Udderly Ridiculous from a goat milk ice cream idea into an award-winning farm destination.',
-      },
-      {
-        title: 'Proven at home',
-        body: "Placeholder copy. Hosts thousands of guests every year and earned TripAdvisor Travellers' Choice recognition.",
-      },
-      {
-        title: 'Now for you',
-        body: 'Placeholder copy. Shares the frameworks, tools and lessons learned so your business can grow its own experiences.',
-      },
-    ],
-    pathCtaLabel: 'Book a Free Consultation',
-    pathCtaHref: '#contact',
-    credentials: [
-      { icon: 'award', label: '14-time award winning' },
-      { icon: 'star', label: "TripAdvisor Travelers' Choice" },
-      { icon: 'people', label: 'Host 5,000+ people per year' },
-      { icon: 'reviews', label: '1500+ 5-star reviews' },
-      { icon: 'sparkle', label: '4.9/5 review rating' },
-      { icon: 'heart', label: '35,000+ social media followers' },
-      { icon: 'views', label: '10+ million global views' },
-      { icon: 'media', label: 'International media coverage' },
-      { icon: 'business', label: 'Woman in business' },
-      { icon: 'experience', label: '20+ years corporate training experience' },
-    ],
+    path: [],
+    pathCtaLabel: 'Contact',
+    pathCtaHref: CONTACT_PATH,
+    credentials: [],
     servicesHeading: 'Services',
-    services: [
-      {
-        name: 'As-Needed Coaching',
-        price: '$125/hour',
-        featured: false,
-        items: [
-          {
-            title: 'Flexible On-Demand Coaching',
-            body: "Access Cheryl's guidance tailored to your specific needs, whenever you need it.",
-          },
-          {
-            title: 'Expert Support',
-            body: 'Get advice on refining offerings, understanding experiential tourism trends, or overcoming challenges.',
-          },
-          {
-            title: 'No Long-Term Commitment',
-            body: 'Benefit from expert coaching without the need for a structured program or ongoing commitment.',
-          },
-        ],
-      },
-      {
-        name: 'Experiential Tourism Elevation',
-        price: '$2500 + HST & travel costs',
-        featured: true,
-        items: [
-          {
-            title: 'Initial Meeting',
-            body: 'Cheryl will discuss your vision, values, and expectations.',
-          },
-          {
-            title: 'Competitive Analysis',
-            body: 'Includes competitive comparisons against market positioning, pricing, social credibility, and more.',
-          },
-          {
-            title: 'Firsthand Experience',
-            body: 'Cheryl will participate in your experience to gather insights and ensure alignment with your goals.',
-          },
-          {
-            title: 'Detailed Report',
-            body: 'Receive a report with actionable recommendations and a customer journey map.',
-          },
-          {
-            title: 'Coaching Sessions',
-            body: 'Includes 1-2 coaching sessions to support the implementation of improvements.',
-          },
-        ],
-      },
-      {
-        name: 'Experiential Tourism Development',
-        price: '$3000 + HST & travel costs',
-        featured: false,
-        items: [
-          {
-            title: 'Guided Development',
-            body: 'Cheryl will lead you through the Unlocked & Inspired framework, using tools, methods, and templates to transform your concept into reality.',
-          },
-          {
-            title: 'Target Market & Storytelling',
-            body: 'Define your target market and craft compelling narratives to enhance the experience.',
-          },
-          {
-            title: 'Infrastructure Development',
-            body: 'Develop the necessary infrastructure for your experience.',
-          },
-          {
-            title: 'Collaborations',
-            body: 'Establish strategic collaborations to strengthen your offering.',
-          },
-          {
-            title: 'Pricing Strategy',
-            body: 'Set effective pricing for your experience.',
-          },
-          {
-            title: 'Resources Included',
-            body: 'Receive a workbook and costing template to refine and develop future experiences.',
-          },
-        ],
-      },
-    ],
-    servicesCtaLabel: 'Book a Free Consultation',
-    servicesCtaHref: '#contact',
+    services: [],
+    servicesCtaLabel: 'Contact',
+    servicesCtaHref: CONTACT_PATH,
     audienceHeading: 'Who I help',
     audiences: [
       { icon: 'farm', label: 'Farms' },
@@ -728,10 +561,9 @@ export function tourismFallback(images: CorporateImages): TourismPage {
       { icon: 'beverage', label: 'Brewery/Winery' },
       { icon: 'specialist', label: 'An individual with a specialization' },
     ],
-    audienceNote:
-      'Is your business not on this list? I could still help! Fill out the form below for a free consultation.',
-    audienceCtaLabel: 'Book a Free Consultation',
-    audienceCtaHref: '#contact',
+    audienceNote: 'Is your business not on this list? I could still help!',
+    audienceCtaLabel: 'Contact',
+    audienceCtaHref: CONTACT_PATH,
     enquiry: corporateEnquiry('Book your free consultation', '', false),
     seo: {
       title: 'Experiential Tourism Coaching & Development | Corporate Training | Udderly Ridiculous',
@@ -761,25 +593,17 @@ export function discFallback(images: CorporateImages): Omit<DiscPage, 'awards' |
     introduction: {
       lead: 'Personality profiles,',
       accent: 'barn included',
-      paragraphs: [
-        'Placeholder description. Everything DiSC gives your team a shared language for how they communicate, make decisions and handle conflict. We take that language out of the boardroom and onto the farm, where the feedback is immediate and nobody can hide behind a slide deck. Keep scrolling to learn about our DiSC programs!',
-      ],
-      image: {
-        src: images.training,
-        alt: 'A facilitator leading a DiSC session with a team on the farm',
-      },
-      ctaLabel: 'Contact Us',
-      ctaHref: '#contact',
+      paragraphs: [],
+      image: { src: '', alt: '' },
+      ctaLabel: 'Contact',
+      ctaHref: CONTACT_PATH,
     },
     offeringsHeading: 'Two ways to DiSC',
     offerings: [
       {
         title: 'Everything DiSC Workplace',
         body: 'The Everything DiSC Workplace assessment dives into the personality and behaviour drivers of you and your coworkers, enhancing communication and collaboration. By exploring your unique DiSC style, you’ll learn to adapt to workplace dynamics for better results.',
-        image: {
-          src: images.training,
-          alt: 'A team working through their DiSC profiles together in the farm classroom',
-        },
+        image: { src: '', alt: '' },
         outcomes: [
           'Discover your DiSC style, priorities, and behavioural drivers.',
           'Identify your motivators and stressors in workplace interactions.',
@@ -787,15 +611,12 @@ export function discFallback(images: CorporateImages): Omit<DiscPage, 'awards' |
           'Build stronger relationships by adapting to others’ styles.',
         ],
         ctaLabel: 'Ask about Everything DiSC Workplace',
-        ctaHref: '#contact',
+        ctaHref: CONTACT_PATH,
       },
       {
         title: 'Everything DiSC Work of Leaders',
         body: 'The Everything DiSC Work of Leaders assessment helps leaders understand their natural style and how it impacts their effectiveness. It focuses on three key areas: crafting a vision, creating alignment, and championing execution, all essential for leading successful teams.',
-        image: {
-          src: images.highlandHero,
-          alt: 'A leadership group debriefing an exercise outdoors on the farm',
-        },
+        image: { src: '', alt: '' },
         outcomes: [
           'Learn how your DiSC style influences your leadership approach.',
           'Discover your leadership priorities and strengths.',
@@ -803,33 +624,17 @@ export function discFallback(images: CorporateImages): Omit<DiscPage, 'awards' |
           'Master the three core responsibilities of leadership: vision, alignment, and execution.',
         ],
         ctaLabel: 'Ask about Everything DiSC Work of Leaders',
-        ctaHref: '#contact',
+        ctaHref: CONTACT_PATH,
       },
     ],
     practicalHeading: 'The practical bits',
-    practical: [
-      { icon: 'duration', label: 'Duration', lines: ['1/2 – Full Day'] },
-      {
-        icon: 'addons',
-        label: 'Add-ons',
-        lines: ['Team building experiences', 'Power of Conversation', 'Alpaca EQ', 'Innovation in a Box'],
-      },
-      {
-        icon: 'custom',
-        label: 'Customization',
-        lines: [
-          'We can build on existing assessments like Myers-Briggs, True Colours, Kolbe, or McQuaig to expand previous learning and maximize your investment.',
-        ],
-      },
-    ],
+    practical: [],
     reviewsHeading: LANDING_REVIEWS_HEADING,
     contactHeading: "Let's talk DiSC",
-    contactBody:
-      'Tell us a little about your team and which DiSC program you’re curious about. We will get back to you with ideas (and probably a goat photo).',
+    contactBody: '',
     seo: {
       title: 'DiSC Assessment Training on a Farm | Udderly Ridiculous',
-      description:
-        'Everything DiSC assessments on a working Ontario farm — Workplace and Work of Leaders programs, facilitated by a trainer with 20+ years of corporate experience.',
+      description: 'Everything DiSC assessments on a working Ontario farm — Workplace and Work of Leaders programs.',
       path: corporateProgramPath('disc-assessment'),
     },
   }

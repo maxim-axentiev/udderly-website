@@ -1,8 +1,5 @@
 import farmStore from '@/assets/home/homepage-store.webp'
 import iceCream from '@/assets/home/homepage-ice-cream.webp'
-import experiences from '@/assets/home/homepage-experiences.webp'
-import urbort2 from '@/assets/home/urbort-2.webp'
-import urbort3 from '@/assets/home/urbort-3.webp'
 import { BookExperienceBand } from '@/components/about/sections'
 import { ArrowRightIcon } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/button'
@@ -11,9 +8,6 @@ import { resolveFarmMarket } from '@/lib/visit/resolve'
 
 const gallery = [
   { src: farmStore, alt: 'Looking through the doorway into the Farm Market Store' },
-  { src: urbort2, alt: 'Visitors browsing the store after their experience' },
-  { src: urbort3, alt: 'A closer look at the local goods in the store' },
-  { src: experiences, alt: 'Guests at the farm after visiting the store' },
 ]
 
 export function FarmMarketPage({ page }: { page: Parameters<typeof resolveFarmMarket>[0] }) {

@@ -159,9 +159,9 @@ const INTERNAL_PATHS = new Set([
 
 const lovableCards: HubExperienceCard[] = [
   card('Goat Yoga', 'goat-yoga', 'May to October', '16+', 'goat-cuddles', 'Goats climbing on guests during a farm yoga class'),
-  card('Goat Recess', 'goat-recess', 'May to October', 'All ages', 'goats', 'Guest surrounded by playful goats in the pasture'),
-  card('Goat Cuddles', 'goat-cuddles', 'November to April', 'All ages', 'goat-cuddles', 'Guest cuddling a goat inside the barn'),
-  card('Baby Goat Playtime & Snuggles', 'baby-goat-playtime-and-snuggles', 'Select dates', 'All ages', 'goat-cuddles', 'Baby goats being cuddled by guests', 'limited'),
+  card('Goat Recess', 'goat-recess', 'May to October', '2+', 'goats', 'Guest surrounded by playful goats in the pasture'),
+  card('Goat Cuddles', 'goat-cuddles', 'November to April', '2+', 'goat-cuddles', 'Guest cuddling a goat inside the barn'),
+  card('Baby Goat Playtime & Snuggles', 'baby-goat-playtime-and-snuggles', 'Select dates', '2+', 'goat-cuddles', 'Baby goats being cuddled by guests', 'limited'),
   card('Mini Highland Cow Experience', 'mini-highland-cow-experience', 'Year-round', '12+', 'highland-hero', 'Guest brushing a fluffy mini Highland cow'),
   card('Mini Highland Calf Meet & Greet', 'mini-highland-calf-meet-and-greet', 'Select dates', 'All ages', 'calves', 'Two mini Highland calves in a sunny pasture', 'limited'),
   card('Alpaca Lunch Picnic', 'alpaca-lunch-picnic', 'May to October', '16+', 'alpaca-walk', 'Alpacas beside a picnic table on the farm'),
@@ -439,17 +439,48 @@ function overlayPublished(
   return applyBooking(entry, match)
 }
 
+type ListedCard = HubExperienceCard & { sourceOrder?: number }
+
+function hiddenFromListing(slug: string | undefined, published: readonly ExperienceCardData[]): boolean {
+  if (!slug) return false
+  return publishedMatch(slug, published)?.active === false
+}
+
+/**
+ * An experience Display order wins. Otherwise the card keeps the order it
+ * already has. A card with neither stays in its current position.
+ */
+function orderListing(cards: ListedCard[], published: readonly ExperienceCardData[]): HubExperienceCard[] {
+  return cards
+    .map((card, index) => {
+      const match = publishedMatch(card.slug, published)
+      const rank =
+        typeof match?.sortOrder === 'number'
+          ? match.sortOrder
+          : typeof card.sourceOrder === 'number'
+            ? card.sourceOrder
+            : index + 1
+      return { card, index, rank }
+    })
+    .sort((left, right) => left.rank - right.rank || left.index - right.index)
+    .map(({ card }) => {
+      const { sourceOrder, ...listed } = card
+      void sourceOrder
+      return listed
+    })
+}
+
 function cardsFromCms(
   value: unknown,
   published: readonly ExperienceCardData[],
   publishedSlugs: ReadonlySet<string>,
-): HubExperienceCard[] {
+): ListedCard[] {
   const rows = records(value) ?? []
   const seen = new Set<string>()
   return byOrder(rows).flatMap((row) => {
     const title = text(row.title, 120)
     const slug = text(row.slug, 80)
-    if (!title || isFarmHoppingListing({ title, slug })) return []
+    if (!title || isFarmHoppingListing({ title, slug }) || hiddenFromListing(slug, published)) return []
     const key = slug || title
     if (seen.has(key)) return []
     seen.add(key)
@@ -457,6 +488,7 @@ function cardsFromCms(
       row.badge === 'limited' || row.badge === 'signature' ? row.badge : undefined
     const image = picture(row.image, 1280)
     const local = image ? undefined : localExperience(slug, title)
+    const sourceOrder = typeof row.sortOrder === 'number' ? row.sortOrder : undefined
     return [{
       key,
       title,
@@ -469,8 +501,9 @@ function cardsFromCms(
       imageKey: local?.imageKey,
       imageAlt: image?.alt ?? local?.imageAlt,
       href: safeHubHref(row.learnMoreHref, publishedSlugs) ?? (slug && publishedSlugs.has(slug) ? `/${slug}` : undefined),
+      sourceOrder,
     }]
-  }).map((entry) => overlayPublished(entry, published))
+  }).map((entry) => ({ ...overlayPublished(entry, published), sourceOrder: entry.sourceOrder }))
 }
 
 function featuresFromCms(
@@ -575,12 +608,14 @@ export function resolveExperiencesHubPage(
   document: RawDocument,
   published: readonly ExperienceCardData[] = [],
 ): ExperiencesHubPageModel {
-  const visible = published.filter((item) => item.title?.trim() && item.slug?.trim() && !isFarmHoppingListing(item))
+  const visible = published.filter((item) => item.title?.trim() && item.slug?.trim() && !isFarmHoppingListing(item) && item.active !== false)
   const publishedSlugs = new Set(visible.map((item) => item.slug))
   const cmsCards = document && Array.isArray(document.experienceCards) ? document.experienceCards : null
   const baseCards = cmsCards
-    ? cardsFromCms(cmsCards, visible, publishedSlugs)
-    : lovableCards.map((entry) => overlayPublished(entry, visible))
+    ? cardsFromCms(cmsCards, published, publishedSlugs)
+    : lovableCards
+        .filter((entry) => !hiddenFromListing(entry.slug, published))
+        .map((entry) => overlayPublished(entry, visible))
   const used = new Set(baseCards.flatMap((entry) => (entry.slug ? experienceSlugAliases(entry.slug) : [])))
   const extras = cmsCards
     ? []
@@ -623,7 +658,7 @@ export function resolveExperiencesHubPage(
     categories: categoriesFromCms(document?.categories, publishedSlugs) ?? fallbackPage.categories,
     experiencesHeading: fieldText(document?.farmExperiencesIntro, 'heading', 120) ?? fallbackPage.experiencesHeading,
     experiencesIntro: fieldText(document?.farmExperiencesIntro, 'copy', 800) ?? fallbackPage.experiencesIntro,
-    cards: [...baseCards, ...extras],
+    cards: orderListing([...baseCards, ...extras], published),
     staysIntro: {
       kicker: fieldText(document?.staysIntro, 'kicker', 80) ?? fallbackPage.staysIntro.kicker,
       heading: fieldText(document?.staysIntro, 'heading', 120) ?? fallbackPage.staysIntro.heading,

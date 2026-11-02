@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react'
 
+import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
 import { PortableTextRenderer } from '@/components/portable-text/portable-text-renderer'
@@ -8,6 +9,7 @@ import type { DetailPicture, ExperienceDetailModel } from '@/lib/experiences/det
 import { towerOfGoatsLocation } from '@/lib/experiences/tower-of-goats'
 
 const REVIEW_LIMIT = 190
+const ADDITIONAL_FEES_NOTE = 'Additional fees may apply at booking.'
 
 function Lines({
   lead,
@@ -310,6 +312,7 @@ export function ExperienceDetail({
                     </li>
                   ))}
                 </ul>
+                <p className="mt-6 max-w-2xl text-base leading-relaxed">{ADDITIONAL_FEES_NOTE}</p>
                 {page.bookingNote ? <p className="mt-6 max-w-2xl text-base leading-relaxed">{page.bookingNote}</p> : null}
               </div>
             ) : null}
@@ -536,7 +539,13 @@ export function ExperienceDetail({
               </address>
               <ButtonLink href={towerOfGoatsLocation.directionsHref} external className="mt-7">Get directions</ButtonLink>
             </div>
-            <iframe title={towerOfGoatsLocation.mapTitle} src={towerOfGoatsLocation.mapSrc} loading="lazy" className="h-[420px] w-full border-2 border-headline md:h-[520px]" />
+            <OptionalEmbed
+              title={towerOfGoatsLocation.mapTitle}
+              src={towerOfGoatsLocation.mapSrc}
+              actionLabel="Load map"
+              description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
+              className="h-[420px] w-full border-2 border-headline md:h-[520px]"
+            />
           </div>
         </Container>
       </section>

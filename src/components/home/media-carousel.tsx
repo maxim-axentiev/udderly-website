@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 
+import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { useHomepageContent } from './homepage-content-context'
 import { HomeImage } from './homepage-content'
@@ -35,11 +36,12 @@ export function MediaCarousel() {
       <div className="relative mx-auto max-w-4xl">
         <div className="relative border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)]">
           <div className="relative aspect-video w-full overflow-hidden bg-headline">
-            <iframe
+            <OptionalEmbed
               key={current.embedUrl}
-              src={current.embedUrl}
               title={`${current.outlet} video`}
-              loading="lazy"
+              src={current.embedUrl}
+              actionLabel="Load video"
+              description="This video stays off until you load it."
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
               className="h-full w-full border-0"

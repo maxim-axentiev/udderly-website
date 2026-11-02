@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { urbortImages } from '@/components/urbort/images'
 import { UrbortBoardPage } from '@/components/urbort/board'
 import { getUrbortArticlesFn, getUrbortBlogPageFn } from '@/lib/sanity/server'
 import { createPageHead } from '@/lib/seo/page-head'
@@ -12,11 +11,11 @@ export const Route = createFileRoute('/urbort-blog/')({
     return { page, articles }
   },
   head: ({ loaderData }) =>
-    createPageHead(resolveUrbortBoard(loaderData?.page ?? null, loaderData?.articles ?? [], urbortImages).seo),
+    createPageHead(resolveUrbortBoard(loaderData?.page ?? null, loaderData?.articles ?? []).seo),
   component: UrbortIndexRoute,
 })
 
 function UrbortIndexRoute() {
   const data = Route.useLoaderData()
-  return <UrbortBoardPage board={resolveUrbortBoard(data.page, data.articles, urbortImages)} />
+  return <UrbortBoardPage board={resolveUrbortBoard(data.page, data.articles)} />
 }

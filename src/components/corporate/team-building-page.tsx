@@ -25,6 +25,7 @@ export function TeamBuildingProgram({ page }: { page: TeamBuildingPage }) {
                 key={activity.title}
                 className="group flex flex-col border-2 border-headline bg-background p-3 shadow-[7px_7px_0_var(--color-headline)] transition-transform duration-200 hover:-translate-y-2"
               >
+                {activity.image.src ? (
                 <div className="overflow-hidden">
                   <img
                     src={activity.image.src}
@@ -35,9 +36,10 @@ export function TeamBuildingProgram({ page }: { page: TeamBuildingPage }) {
                     className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
+                ) : null}
                 <div className="flex flex-1 flex-col p-3 pb-4">
                   <h3 className="font-display text-2xl font-black uppercase leading-none text-headline">{activity.title}</h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed">{activity.body}</p>
+                  {activity.body ? <p className="mt-3 flex-1 text-sm leading-relaxed">{activity.body}</p> : null}
                   <ButtonLink href={activity.href} className="mt-5 w-full">
                     {activity.ctaLabel}
                   </ButtonLink>

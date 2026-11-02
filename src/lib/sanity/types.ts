@@ -137,6 +137,8 @@ export type ExperienceCardData = {
   _id: string
   title: string
   slug: string
+  active?: boolean | null
+  sortOrder?: number | null
   shortDescription: string | null
   priceDisplay: string | null
   duration: string | null

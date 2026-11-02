@@ -8,7 +8,7 @@ import { homepageHero, homepageSeo } from '@/content/homepage'
 import { EXPERIENCES_HERO, FEAST_ON } from '@/lib/experiences/approved-listing'
 import { resolveExperiencesHubPage } from '@/lib/experiences/hub-page'
 import { buildRobotsTxt } from '@/lib/seo/robots'
-import { experienceHubQuery, experiencesHubContentQuery } from '@/lib/sanity/queries'
+import { experienceHubQuery, experienceSitemapSlugsQuery, experiencesHubContentQuery } from '@/lib/sanity/queries'
 import { ALL_SALE_ANIMALS } from '@/lib/sale/content'
 import type { ExperienceCardData } from '@/lib/sanity/types'
 
@@ -46,6 +46,9 @@ describe('experiences hub page resolution', () => {
     expect(page.hero.accent).toBe(EXPERIENCES_HERO.headingAccent)
     expect(page.hero.supporting).toBe(EXPERIENCES_HERO.supporting)
     expect(page.hero.lead).not.toBe(publishedHub.heading)
+    expect(page.cards.find((card) => card.slug === 'goat-recess')?.age).toBe('2+')
+    expect(page.cards.find((card) => card.slug === 'goat-cuddles')?.age).toBe('2+')
+    expect(page.cards.find((card) => card.slug === 'baby-goat-playtime-and-snuggles')?.age).toBe('2+')
     expect(page.cards.map((card) => card.title)).toContain('Goat Cuddles')
     expect(page.cards.map((card) => card.title)).toContain('Taste of Farm Life')
     expect(page.stays.map((stay) => stay.title)).toEqual(['Farm Glamping'])
@@ -242,6 +245,10 @@ describe('experiences hub page resolution', () => {
     expect(JSON.stringify(page.cards)).not.toContain('#farm-experiences')
     expect(experienceHubQuery).toContain('privateBookingUrl')
     expect(experienceHubQuery).toContain('privateBookingVerified')
+    expect(experienceHubQuery).toContain('active')
+    expect(experienceHubQuery).toContain('sortOrder')
+    expect(experienceHubQuery).not.toContain('active != false')
+    expect(experienceSitemapSlugsQuery).toContain('active != false')
 
     const html = renderToStaticMarkup(createElement(ExperiencesPresentation, {
       page,
@@ -513,5 +520,66 @@ describe('experiences hub page resolution', () => {
     expect(page.cards[0]?.image).toBeUndefined()
     expect(page.cards[0]?.imageKey).toBeUndefined()
     expect(page.rainbow.headingAccent).toBe('welcome here.')
+  })
+
+  it('removes a hidden experience from the listing and leaves booking on the others unchanged', () => {
+    const page = resolveExperiencesHubPage({
+      experienceCards: [
+        { title: 'Goat Yoga', slug: 'goat-yoga', sortOrder: 1 },
+        { title: 'Goat Recess', slug: 'goat-recess', sortOrder: 2 },
+        { title: 'General Admission – Tower of Goats Discovery Trail', sortOrder: 3 },
+      ],
+    }, [
+      experience({
+        title: 'Goat Yoga',
+        slug: 'goat-yoga',
+        active: true,
+        bookingVerified: false,
+        bookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308278/',
+      }),
+      experience({
+        title: 'Goat Recess',
+        slug: 'goat-recess',
+        active: false,
+        bookingVerified: true,
+        bookingProvider: 'fareharbor',
+        fareharborItemId: '308264',
+        fareharborFlowId: '573099',
+      }),
+    ])
+
+    expect(page.cards.map((card) => card.title)).toEqual([
+      'Goat Yoga',
+      'General Admission – Tower of Goats Discovery Trail',
+    ])
+    expect(page.cards[0]?.bookingUrl).toBeUndefined()
+    expect(JSON.stringify(page.cards)).not.toContain('308264')
+  })
+
+  it('keeps the current listing order until an experience display order is set', () => {
+    const experienceCards = [
+      { title: 'Goat Yoga', slug: 'goat-yoga', sortOrder: 1 },
+      { title: 'Goat Recess', slug: 'goat-recess', sortOrder: 2 },
+      { title: 'Goat Cuddles', slug: 'goat-cuddles', sortOrder: 3 },
+    ]
+    const published = [
+      experience({ title: 'Goat Yoga', slug: 'goat-yoga', sortOrder: null }),
+      experience({ title: 'Goat Recess', slug: 'goat-recess', sortOrder: 2 }),
+      experience({ title: 'Goat Cuddles', slug: 'goat-cuddles' }),
+    ]
+
+    expect(resolveExperiencesHubPage({ experienceCards }, published).cards.map((card) => card.slug)).toEqual([
+      'goat-yoga',
+      'goat-recess',
+      'goat-cuddles',
+    ])
+    expect(resolveExperiencesHubPage({ experienceCards }, [
+      experience({ title: 'Goat Yoga', slug: 'goat-yoga', sortOrder: 20 }),
+      ...published.slice(1),
+    ]).cards.map((card) => card.slug)).toEqual([
+      'goat-recess',
+      'goat-cuddles',
+      'goat-yoga',
+    ])
   })
 })

@@ -14,13 +14,16 @@ import {
 } from './sections'
 
 export function DiscProgram({ page }: { page: DiscPage }) {
+  const showIntro = Boolean(page.introduction.paragraphs.length || page.introduction.richText || page.introduction.image.src)
   return (
     <>
       <CorporateHero lead={page.hero.lead} accent={page.hero.accent} intro={page.hero.intro} image={page.hero.image} />
       <CorporateAwardsStrip awards={page.awards} />
+      {showIntro ? (
       <section className="overflow-hidden bg-background py-20 md:py-28">
         <Container width="brand" className="max-w-[1300px]">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className={`grid items-center gap-12 ${page.introduction.image.src ? 'lg:grid-cols-2' : ''}`}>
+            {page.introduction.image.src ? (
             <figure className="relative m-0">
               <div className="absolute -inset-3 rotate-2 bg-secondary-accent" aria-hidden="true" />
               <img
@@ -32,6 +35,7 @@ export function DiscProgram({ page }: { page: DiscPage }) {
                 className="relative aspect-[4/3] w-full border-2 border-headline object-cover"
               />
             </figure>
+            ) : null}
             <div>
               <DisplayHeading
                 lead={page.introduction.lead}
@@ -47,7 +51,9 @@ export function DiscProgram({ page }: { page: DiscPage }) {
           </div>
         </Container>
       </section>
+      ) : null}
 
+      {page.offerings.length ? (
       <section className="overflow-hidden bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">
           <h2 className="max-w-3xl font-display text-[clamp(2.6rem,7vw,6rem)] font-black uppercase leading-[0.8] text-headline">
@@ -56,6 +62,7 @@ export function DiscProgram({ page }: { page: DiscPage }) {
           <div className="mt-14 grid gap-10 lg:grid-cols-2">
             {page.offerings.map((offering) => (
               <article key={offering.title} className="flex flex-col border-2 border-headline bg-background p-4 shadow-[10px_10px_0_var(--color-headline)] md:p-6">
+                {offering.image.src ? (
                 <img
                   src={offering.image.src}
                   alt={offering.image.alt}
@@ -64,10 +71,13 @@ export function DiscProgram({ page }: { page: DiscPage }) {
                   loading="lazy"
                   className="aspect-[16/10] w-full border-2 border-headline object-cover"
                 />
+                ) : null}
                 <h3 className="mt-6 font-display text-[clamp(1.8rem,3vw,2.6rem)] font-black uppercase leading-[0.9] text-headline">
                   {offering.title}
                 </h3>
-                <p className="mt-4 text-base leading-relaxed">{offering.body}</p>
+                {offering.body ? <p className="mt-4 text-base leading-relaxed">{offering.body}</p> : null}
+                {offering.outcomes.length ? (
+                <>
                 <p className="mt-6 font-display text-sm font-black uppercase tracking-wide text-primary-accent">Learning outcomes</p>
                 <ul className="mt-3 flex-1 space-y-2">
                   {offering.outcomes.map((outcome) => (
@@ -77,6 +87,8 @@ export function DiscProgram({ page }: { page: DiscPage }) {
                     </li>
                   ))}
                 </ul>
+                </>
+                ) : null}
                 <ButtonLink href={offering.ctaHref} size="lg" className="mt-7">
                   {offering.ctaLabel} <ArrowRightIcon />
                 </ButtonLink>
@@ -85,7 +97,9 @@ export function DiscProgram({ page }: { page: DiscPage }) {
           </div>
         </Container>
       </section>
+      ) : null}
 
+      {page.practical.length ? (
       <section className="overflow-hidden bg-background py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">
           <h2 className="max-w-3xl font-display text-[clamp(2.6rem,7vw,6rem)] font-black uppercase leading-[0.8] text-headline">
@@ -110,6 +124,7 @@ export function DiscProgram({ page }: { page: DiscPage }) {
           </ul>
         </Container>
       </section>
+      ) : null}
       <CorporateCloseSections close={page.close} />
     </>
   )

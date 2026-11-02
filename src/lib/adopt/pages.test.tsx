@@ -10,7 +10,6 @@ import { primaryNav } from '@/lib/navigation'
 import { RESERVED_SLUGS, routableExperienceSlug } from '@/lib/routes/paths'
 import { redirects } from '@/lib/seo/redirects'
 import { FUTURE_INTERNAL_REDIRECTS } from '@/lib/seo/future-redirects'
-import { FOR_SALE, SOLD } from '@/lib/sale/content'
 import { buildSaleLists, findSaleAnimal, resolveSalePageCopy } from '@/lib/sale/resolve'
 import { sanityClient } from '@/lib/sanity/client'
 import { adoptionOfferingsQuery, animalListingsQuery } from '@/lib/sanity/queries'
@@ -34,21 +33,22 @@ const images = {
 } as const
 
 describe('adopt an animal', () => {
-  it('renders the approved names, Clara as a Mini Highland cow, and no checkout link', () => {
+  it('renders the hero and an empty list when nothing is published', () => {
+    expect(buildAdoptionCards()).toEqual([])
     const html = renderToStaticMarkup(
       <AdoptPage copy={resolveAdoptionPageCopy(null)} cards={buildAdoptionCards()} images={images} />,
     )
 
-    for (const animal of ADOPTION_ANIMALS) {
-      expect(html).toContain(animal.name)
-      expect(html).toContain(`href="/adopt-an-animal/${animal.slug}"`)
-    }
-    expect(html).toContain('Clara the Mini Highland cow')
-    expect(html).not.toContain('Clara the goat')
-    expect(html).not.toContain('#adopt')
-    expect(html).not.toContain('fareharbor')
+    expect(html).toContain('Adopt')
     expect(html).toContain('Meet the adoptables.')
-    expect(html).toContain('Placeholder description.')
+    expect(html).toContain('There are no animals in this list right now.')
+    expect(html).not.toContain('sm:grid-cols-2')
+    expect(html).not.toContain('Clara')
+    expect(html).not.toContain('$35')
+    expect(html).not.toContain('$75')
+    expect(html).not.toContain('Placeholder description.')
+    expect(html).not.toContain('Biscuit')
+    expect(html).not.toContain('fareharbor')
   })
 
   it('uses a published introduction and lists only the published offering', () => {
@@ -62,36 +62,38 @@ describe('adopt an animal', () => {
     expect(cards.map((card) => card.slug)).not.toContain('clara')
   })
 
-  it('keeps Clara labeled as a Mini Highland cow when a published species disagrees', () => {
-    const clara = buildAdoptionCards([{ slug: 'clara', speciesTitle: 'Goat', introduction: 'Hello' }]).find(
+  it('does not invent a species label for a published offering', () => {
+    const clara = buildAdoptionCards([{ slug: 'clara', title: 'Clara', speciesTitle: 'Goat', introduction: 'Hello' }]).find(
       (card) => card.slug === 'clara',
     )
-    expect(clara?.alt).toContain('Mini Highland cow')
-    expect(clara?.speciesNote).toContain('Mini Highland cow')
+    expect(clara?.alt).toBe('Clara')
+    expect(clara?.speciesNote).toBeUndefined()
+    expect(clara?.blurb).toBe('Hello')
   })
 
-  it('does not show a Gold package for Chicken', () => {
-    const chicken = ADOPTION_ANIMALS.find((animal) => animal.slug === 'chicken')
+  it('does not show fallback adoption prices without a checkout URL', () => {
+    const chicken = ADOPTION_ANIMALS.find((animal) => animal.slug === 'chicken')!
     const html = renderToStaticMarkup(
       <AnimalAdoptionPage
-        animal={chicken!}
+        animal={chicken}
         copy={resolveAdoptionPageCopy(null)}
-        detail={resolveAdoptionDetail(chicken!)}
+        detail={resolveAdoptionDetail(chicken)}
         images={{ hero: '/hero.webp', gallery: ['/a.jpg'], support: '/b.jpg' }}
       />,
     )
-    expect(html).toContain('$35')
+    expect(html).toContain('Chicken')
+    expect(html).not.toContain('$35')
     expect(html).not.toContain('$75')
+    expect(html).not.toContain('Placeholder description.')
     expect(html).not.toContain('href="#')
   })
 })
 
 describe('animals for sale', () => {
-  it('keeps the Lovable available and sold groups', () => {
+  it('renders the hero and an empty list when nothing is published', () => {
     const lists = buildSaleLists()
-    expect(lists.available.map((animal) => animal.name)).toEqual(FOR_SALE.map((animal) => animal.name))
-    expect(lists.sold.map((animal) => animal.name)).toEqual(SOLD.map((animal) => animal.name))
-    expect(lists.sold.map((animal) => animal.name)).toContain('Copperpot, Puff & Elton John')
+    expect(lists.available).toEqual([])
+    expect(lists.sold).toEqual([])
 
     const html = renderToStaticMarkup(
       <AnimalsForSalePage
@@ -110,12 +112,20 @@ describe('animals for sale', () => {
         }}
       />,
     )
+    expect(html).toContain('Animals')
+    expect(html).toContain('for Sale')
     expect(html).toContain('Available now.')
+    expect(html).toContain('There are no animals in this list right now.')
     expect(html).toContain('Happy homes,')
-    expect(html).toContain('href="/animals-for-sale/macintosh"')
-    expect(html).toContain('href="/animals-for-sale/copperpot-puff-elton-john"')
+    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('sm:grid-cols-2')
+    expect(html).not.toContain('href="/animals-for-sale/macintosh"')
+    expect(html).not.toContain('Macintosh')
+    expect(html).not.toContain('$X,XXX')
+    expect(html).not.toContain('Placeholder copy.')
+    expect(html).not.toContain('Join Waitlist')
+    expect(html).not.toContain('nothing was sent')
     expect(html).not.toContain('fareharbor')
-    expect(html).toContain('Join Waitlist')
   })
 
   it('moves a matching published listing only for available or sold', () => {
@@ -212,9 +222,9 @@ describe('sanity editability', () => {
     expect(copy.seoDescription).toBe(ADOPT_PAGE.intro)
   })
 
-  it('shows package display text without turning on checkout', () => {
-    const clara = findAdoptionAnimal('clara')!
-    const detail = resolveAdoptionDetail(clara, [{
+  it('shows a published package only when checkout is a real URL', () => {
+    const clara = findAdoptionAnimal('clara', [{ slug: 'clara', title: 'Clara' }])!
+    const hidden = resolveAdoptionDetail(clara, [{
       slug: 'clara',
       packages: [{
         name: 'Silver',
@@ -224,9 +234,21 @@ describe('sanity editability', () => {
         checkoutUrl: 'pay-later',
       }],
     }])
+    expect(hidden.packages).toEqual([])
+    const detail = resolveAdoptionDetail(clara, [{
+      slug: 'clara',
+      tagline: 'The pasture regular.',
+      packages: [{
+        name: 'Silver',
+        kicker: 'Silver Pail',
+        priceDisplay: '$35',
+        includes: ['Digital certificate of adoption'],
+        checkoutUrl: 'https://example.com/adopt-clara',
+      }],
+    }])
     expect(detail.packages).toHaveLength(1)
     expect(detail.packages[0]?.price).toBe('$35')
-    expect(detail.packages[0]?.checkoutUrl).toBeUndefined()
+    expect(detail.packages[0]?.checkoutUrl).toBe('https://example.com/adopt-clara')
     const html = renderToStaticMarkup(
       <AnimalAdoptionPage
         animal={clara}
@@ -236,8 +258,10 @@ describe('sanity editability', () => {
       />,
     )
     expect(html).toContain('$35')
-    expect(html).toContain('aria-disabled="true"')
+    expect(html).toContain('href="https://example.com/adopt-clara"')
+    expect(html).not.toContain('aria-disabled')
     expect(html).not.toContain('pay-later')
+    expect(html).not.toContain('$75')
   })
 
   it('leaves unknown animal facts empty', () => {
@@ -248,7 +272,7 @@ describe('sanity editability', () => {
     expect(animal?.sex).toBeUndefined()
     expect(animal?.genetics).toBeUndefined()
     expect(animal?.parentDamName).toBeUndefined()
-    expect(animal?.priceDisplay).toBe('$X,XXX')
+    expect(animal?.priceDisplay).toBeUndefined()
     expect(animal?.images).toEqual([])
   })
 
@@ -263,13 +287,15 @@ describe('sanity editability', () => {
     expect(buildRobotsTxt()).toBe('User-agent: *\nDisallow: /\n')
   })
 
-  it('keeps the Lovable cards only while no published collection exists', () => {
-    expect(buildAdoptionCards().map((card) => card.slug)).toEqual(ADOPTION_ANIMALS.map((animal) => animal.slug))
-    expect(buildSaleLists().available).toHaveLength(5)
-    expect(buildSaleLists().sold).toHaveLength(12)
-    expect(findAdoptionAnimal('clara')?.source).toBe('fallback')
-    expect(findSaleAnimal('pekoe-rooibos-matcha')?.slug).toBe('pekoe-rooibos-matcha')
-    expect(findSaleAnimal('copperpot-puff-elton-john')?.slug).toBe('copperpot-puff-elton-john')
+  it('does not invent listings when nothing is published', () => {
+    expect(buildAdoptionCards()).toEqual([])
+    expect(buildSaleLists().available).toEqual([])
+    expect(buildSaleLists().sold).toEqual([])
+    expect(findAdoptionAnimal('clara')).toBeUndefined()
+    expect(findSaleAnimal('pekoe-rooibos-matcha')).toBeUndefined()
+    expect(findSaleAnimal('macintosh')).toBeUndefined()
+    expect(findSaleAnimal('june')).toBeUndefined()
+    expect(findSaleAnimal('joe')).toBeUndefined()
   })
 
   it('lists a newly published animal and hides one that is not published', () => {
@@ -372,7 +398,7 @@ describe('sanity editability', () => {
     expect(copy.seoSource).toBe('fallback')
   })
 
-  it('uses the editable group description and the Lovable paragraph when that field is empty', () => {
+  it('uses a published group description and omits the fallback paragraph', () => {
     const edited = findSaleAnimal('pekoe-rooibos-matcha', [{
       slug: 'pekoe-rooibos-matcha',
       title: 'Pekoe, Rooibos & Matcha',
@@ -388,17 +414,28 @@ describe('sanity editability', () => {
       />,
     )
     expect(html).toContain('Three goats, one listing.')
-    expect(html).not.toContain('Write about all of Pekoe, Rooibos & Matcha')
+    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Write about all of')
+    expect(html).not.toContain('<form')
+    expect(html).not.toContain('nothing was sent')
+    expect(html).not.toContain('$X,XXX')
 
-    const fallback = findSaleAnimal('pekoe-rooibos-matcha')!
-    const fallbackHtml = renderToStaticMarkup(
+    const unpublished = findSaleAnimal('pekoe-rooibos-matcha', [{
+      slug: 'pekoe-rooibos-matcha',
+      title: 'Pekoe, Rooibos & Matcha',
+      status: 'sold',
+    }])!
+    const emptyHtml = renderToStaticMarkup(
       <SaleAnimalPage
-        animal={fallback}
+        animal={unpublished}
         copy={resolveSalePageCopy(null)}
         images={{ portrait: '/goat.jpg', dam: '/dam.jpg', sire: '/sire.jpg', chart: '/chart.webp' }}
       />,
     )
-    expect(fallbackHtml).toContain('Write about all of Pekoe, Rooibos &amp; Matcha')
+    expect(emptyHtml).not.toContain('Write about all of')
+    expect(emptyHtml).not.toContain('Must be adopted in pairs')
+    expect(emptyHtml).not.toContain('/dam.jpg')
+    expect(emptyHtml).not.toContain('Placeholder')
   })
 })
 
@@ -414,13 +451,15 @@ describe('routes and navigation', () => {
         { label: 'Animals for Sale', href: '/animals-for-sale' },
       ]),
     )
-    expect(redirects).toEqual([
-      expect.objectContaining({
-        from: '/private-mini-highland-experience',
-        to: '/mini-highland-cow-experience',
-        status: 301,
-      }),
-    ])
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          from: '/private-mini-highland-experience',
+          to: '/mini-highland-cow-experience',
+          status: 301,
+        }),
+      ]),
+    )
     expect(FUTURE_INTERNAL_REDIRECTS).toEqual([
       expect.objectContaining({ from: '/adopt', to: '/adopt-an-animal' }),
     ])

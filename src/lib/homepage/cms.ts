@@ -14,8 +14,8 @@ import { localHomepageContent, type HomepageContent, type HomepageImage, type Ho
  * when every required field is present and valid. A missing document, a failed
  * request, or any invalid field returns the complete local fixture. CMS values
  * are never combined with fixture copy. drafts.homepage is not queried.
- * newsletterConfirmation is optional. When it is empty, the CMS page does not
- * invent a signup message. The fixture path keeps its existing placeholder.
+ * newsletterConfirmation is ignored. Signup stays disabled until a mailing-list
+ * provider is connected, and the public page never shows a success message.
  */
 export type CmsHomepageDocument = {
   _id?: string | null
@@ -216,8 +216,6 @@ export function resolveHomepageContent(document: CmsHomepageDocument): HomepageC
       throw new InvalidHomepage('count')
     }
 
-    const confirmation = optionalText(document.newsletterConfirmation, 200).trim()
-
     return {
       source: 'cms',
       seo: {
@@ -356,7 +354,7 @@ export function resolveHomepageContent(document: CmsHomepageDocument): HomepageC
         emailPlaceholder: optionalText(document.newsletterEmailPlaceholder, 80),
         dateOfBirthLabel: requiredText(document.newsletterDateOfBirthLabel, 40),
         submitLabel: requiredText(document.newsletterSubmitLabel, 40),
-        confirmation: confirmation || null,
+        confirmation: null,
         mobileAnimals: [
           document.newsletterMobileFirst,
           document.newsletterMobileSecond,

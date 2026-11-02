@@ -1,6 +1,7 @@
 import { ArrowRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
 import { ButtonLink } from '@/components/ui/button'
+import { urbortLinkLabel } from '@/lib/urbort/model'
 import { useHomepageContent } from './homepage-content-context'
 import { HomeImage } from './homepage-content'
 
@@ -45,7 +46,7 @@ export function UrbortSection() {
                 {article.title}
               </h3>
               <div className="mt-4 px-2">
-                <ButtonLink href={article.href}>{urbort.cardLabel}</ButtonLink>
+                <ButtonLink href={article.href}>{urbortLinkLabel(article.href, urbort.cardLabel)}</ButtonLink>
               </div>
             </li>
           ))}

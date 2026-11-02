@@ -105,12 +105,6 @@ export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
                   </label>
                   <input id="newsletter-page-email" name="email" type="email" autoComplete="email" className={fieldClass} />
                 </div>
-                <div>
-                  <label htmlFor="newsletter-page-dob" className="mb-1 block font-display text-sm font-bold uppercase text-headline">
-                    {page.dateOfBirthLabel}
-                  </label>
-                  <input id="newsletter-page-dob" name="dateOfBirth" type="date" className={fieldClass} />
-                </div>
                 <Button type="button" className="mt-2 justify-self-center" disabled>
                   {page.submitLabel}
                 </Button>

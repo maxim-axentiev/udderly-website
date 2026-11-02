@@ -1,10 +1,8 @@
+import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
 import {
-  towerOfGoatsAwardsTagline,
   towerOfGoatsFacts,
-  towerOfGoatsGallery,
-  towerOfGoatsHeroAlt,
   towerOfGoatsLocation,
   towerOfGoatsPaceHeading,
   towerOfGoatsStories,
@@ -13,25 +11,10 @@ import {
   TOWER_OF_GOATS_TITLE,
 } from '@/lib/experiences/tower-of-goats'
 
-export type TowerOfGoatsImages = {
-  hero: string
-  gallery: Record<(typeof towerOfGoatsGallery)[number]['key'], string>
-  awards: readonly { year: string; src: string }[]
-}
-
-export function TowerOfGoatsPage({ images }: { images: TowerOfGoatsImages }) {
+export function TowerOfGoatsPage() {
   return (
     <>
-      <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden">
-        <img
-          src={images.hero}
-          alt={towerOfGoatsHeroAlt}
-          width={1920}
-          height={1080}
-          fetchPriority="high"
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 -z-10 bg-headline/65" aria-hidden="true" />
+      <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden bg-headline">
         <Container width="brand" className="max-w-4xl py-24 text-center md:py-32">
           <h1 className="font-display text-[clamp(2.6rem,8vw,7rem)] font-black uppercase leading-[0.82] text-background">
             {TOWER_OF_GOATS_TITLE.split(' ')[0]}{' '}
@@ -43,62 +26,19 @@ export function TowerOfGoatsPage({ images }: { images: TowerOfGoatsImages }) {
         </Container>
       </section>
 
-      <section aria-label="TripAdvisor awards" className="border-y-2 border-headline bg-farm-beige py-6">
-        <Container width="brand" className="flex flex-col items-center gap-5 md:flex-row md:justify-between">
-          <div className="text-center md:max-w-[24rem] md:text-left">
-            <p className="font-display text-lg font-black uppercase leading-tight text-headline">
-              TripAdvisor Travellers&apos; Choice
-            </p>
-            <p className="mt-1 text-sm font-semibold">{towerOfGoatsAwardsTagline}</p>
-          </div>
-          <ul className="grid w-full max-w-72 grid-cols-2 place-items-center gap-5 md:flex md:w-auto md:max-w-none md:gap-7">
-            {images.awards.map((award) => (
-              <li key={award.year}>
-                <img
-                  src={award.src}
-                  alt={`TripAdvisor Travellers' Choice Award ${award.year}`}
-                  width={1080}
-                  height={1080}
-                  loading="lazy"
-                  className="size-28 rounded-full border-2 border-headline object-cover md:size-24"
-                />
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </section>
-
       <section className="bg-background py-20 md:py-28">
         <Container width="brand" className="max-w-[1400px]">
-          <div className="grid items-start gap-14 lg:grid-cols-[1.05fr_1fr]">
-            <ul className="grid grid-cols-2 gap-3">
-              {towerOfGoatsGallery.map((image) => (
-                <li key={image.key} className="overflow-hidden border-2 border-headline">
-                  <img
-                    src={images.gallery[image.key]}
-                    alt={image.alt}
-                    width={1024}
-                    height={1024}
-                    loading="lazy"
-                    className="aspect-square w-full object-cover"
-                  />
-                </li>
-              ))}
-            </ul>
-            <div>
-              <h2 className="font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
-                {towerOfGoatsPaceHeading}
-              </h2>
-              <dl className="mt-8 grid gap-4 sm:grid-cols-2">
-                {towerOfGoatsFacts.map((fact) => (
-                  <div key={fact.label}>
-                    <dt className="font-display text-sm font-black uppercase text-headline">{fact.label}</dt>
-                    <dd className="mt-1 font-semibold">{fact.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </div>
+          <h2 className="font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
+            {towerOfGoatsPaceHeading}
+          </h2>
+          <dl className="mt-8 grid gap-4 sm:grid-cols-2">
+            {towerOfGoatsFacts.map((fact) => (
+              <div key={fact.label}>
+                <dt className="font-display text-sm font-black uppercase text-headline">{fact.label}</dt>
+                <dd className="mt-1 font-semibold">{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
         </Container>
       </section>
 
@@ -166,10 +106,11 @@ export function TowerOfGoatsPage({ images }: { images: TowerOfGoatsImages }) {
               </ButtonLink>
             </div>
             <div className="overflow-hidden border-2 border-headline bg-background p-2 shadow-[10px_10px_0_var(--color-secondary-accent)]">
-              <iframe
+              <OptionalEmbed
                 title={towerOfGoatsLocation.mapTitle}
                 src={towerOfGoatsLocation.mapSrc}
-                loading="lazy"
+                actionLabel="Load map"
+                description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
                 referrerPolicy="no-referrer-when-downgrade"
                 className="h-[420px] w-full border-0 md:h-[520px]"
               />

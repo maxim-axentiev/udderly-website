@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ReviewStars } from '@/components/home/review-stars'
 import { ReviewsCarousel } from '@/components/home/reviews-carousel'
 import { Container } from '@/components/layout/container'
@@ -450,7 +451,13 @@ export function ExperiencesPresentation({
                 Get directions
               </ButtonLink>
             </div>
-            <iframe title="Map showing the location of Udderly Ridiculous Farm Life" src={MAPS_EMBED} loading="lazy" className="h-[420px] w-full border-2 border-headline md:h-[520px]" />
+            <OptionalEmbed
+              title="Map showing the location of Udderly Ridiculous Farm Life"
+              src={MAPS_EMBED}
+              actionLabel="Load map"
+              description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
+              className="h-[420px] w-full border-2 border-headline md:h-[520px]"
+            />
           </div>
         </Container>
       </section>

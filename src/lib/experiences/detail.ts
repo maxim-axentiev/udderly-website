@@ -10,6 +10,32 @@ import type {
 } from '@/lib/sanity/types'
 
 import { FEAST_ON, publicBookingUrl, resolvePublicBooking, resolveVerifiedExternalBooking } from './approved-listing'
+
+/** Food experiences hid this section only while the FeastON designation was unconfirmed. */
+const FEAST_ON_FOOD_SLUGS = new Set([
+  'alpaca-lunch-picnic',
+  'alpaca-sunset-picnic',
+  'private-miniature-donkey-lunch-picnic',
+  'miniature-donkey-lunch-picnic',
+  'private-miniature-donkey-sunset-picnic',
+  'miniature-donkey-sunset-picnic',
+  'taste-of-farm-life',
+  'taste-of-farm-life-family-friendly',
+])
+
+export const FEAST_ON_CERTIFICATION = [
+  'FeastON officially verifies that a significant portion of our ingredients and products are sourced right here in Ontario.',
+  FEAST_ON.paragraphs[1],
+] as const
+
+function feastParagraphs(body: string[]) {
+  const withoutCount = body.filter((paragraph) => !/\b140\b|local producers/i.test(paragraph))
+  return withoutCount.some((paragraph) => /FeastON/i.test(paragraph)) ? withoutCount : [...FEAST_ON_CERTIFICATION]
+}
+
+function feastSectionEnabled(slug: string, enabled: boolean) {
+  return enabled || FEAST_ON_FOOD_SLUGS.has(slug) || FEAST_ON_FOOD_SLUGS.has(publicExperienceSlug(slug))
+}
 import { LIMITED_TIME_EXPERIENCE_SLUGS, publicExperienceSlug } from './public-paths'
 import type { HubImageKey } from './hub-page'
 
@@ -342,7 +368,7 @@ export function resolveExperienceDetail(
     const photo = picture(image, 1200)
     return photo ? [photo] : []
   })
-  const feastEnabled = experience.feastOn?.enabled === true
+  const feastEnabled = feastSectionEnabled(slug, experience.feastOn?.enabled === true)
   const signatureEnabled = experience.signatureExperience?.enabled === true
   const feastBody = paragraphs(clean(experience.feastOn?.body))
   const feastHeading = clean(experience.feastOn?.heading, 120)
@@ -442,7 +468,7 @@ export function resolveExperienceDetail(
           ...(feastHeading
             ? designedLines(feastHeading, FEAST_ON.headingLead, FEAST_ON.headingAccent)
             : { lead: FEAST_ON.headingLead, accent: FEAST_ON.headingAccent }),
-          paragraphs: feastBody.length ? feastBody : [...FEAST_ON.paragraphs],
+          paragraphs: feastParagraphs(feastBody),
           href: publicBookingUrl(experience.feastOn?.href) ?? FEAST_ON.href,
           image: localPicture('feast', images),
         }

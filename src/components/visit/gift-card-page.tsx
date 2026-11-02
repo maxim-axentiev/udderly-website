@@ -1,39 +1,18 @@
 import { useState } from 'react'
 
 import feastOn from '@/assets/experiences/feast-on-logo.webp'
-import goatCuddles from '@/assets/experiences/goat-cuddles.jpg'
-import alpacaWalk from '@/assets/herd/alpaca-walk.jpg'
-import donkeyPicnic from '@/assets/herd/donkey-picnic.jpg'
-import highlandHero from '@/assets/herd/highland-hero.jpg'
-import glamping from '@/assets/home/homepage-glamping.webp'
-import iceCream from '@/assets/home/homepage-ice-cream.webp'
-import store from '@/assets/home/homepage-store.webp'
-import experiences from '@/assets/home/homepage-experiences.webp'
 import { GIFT_CARD_UNAVAILABLE } from '@/lib/visit/model'
 import { resolveGiftCard } from '@/lib/visit/resolve'
 
-const gallery = [
-  { src: goatCuddles, alt: 'Guest cuddling a mini goat in the barn' },
-  { src: experiences, alt: 'Goats crowding around a laughing visitor' },
-  { src: alpacaWalk, alt: 'Alpacas walking with guests along the farm path' },
-  { src: iceCream, alt: 'Tubs of Udderly Ridiculous goat milk ice cream' },
-  { src: highlandHero, alt: 'Mini Highland cow with a very impressive fringe' },
-  { src: donkeyPicnic, alt: 'Miniature donkeys beside a picnic spread' },
-  { src: store, alt: 'Inside the farm market store' },
-  { src: glamping, alt: 'Farm glamping stay at golden hour' },
-]
-
 export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard>[0] }) {
   const content = resolveGiftCard(page)
-  const photos = content.gallery ?? gallery
+  const photos = content.gallery ?? []
   const [open, setOpen] = useState<number | null>(null)
   const current = open === null ? null : photos[open]
 
   return (
     <>
-      <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden">
-        <img src={experiences} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />
-        <div className="absolute inset-0 -z-10 bg-headline/65" aria-hidden="true" />
+      <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden bg-headline">
         <div className="mx-auto max-w-4xl px-5 py-24 text-center">
           <h1 className="font-display text-[clamp(2.6rem,8vw,7rem)] font-black uppercase leading-[0.82] text-background">
             {content.heroLead} <span className="text-secondary-accent">{content.heroAccent}</span>
@@ -42,8 +21,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
         </div>
       </section>
       <section className="bg-background py-20 md:py-28">
-        <div className="mx-auto grid max-w-[1100px] items-center gap-10 px-5 md:px-8 lg:grid-cols-2">
-          <img src={goatCuddles} alt="Guest cuddling a mini goat. Gift card artwork is added in Sanity when a file is available." className="w-full border-2 border-headline object-cover" />
+        <div className="mx-auto max-w-[1100px] px-5 md:px-8">
           <div>
             <h2 className="font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
               {content.offerHeadingLead}<br /><span className="text-stroke">{content.offerHeadingAccent}</span>
@@ -65,7 +43,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
           </div>
         </div>
       </section>
-      {content.showGallery ? (
+      {content.showGallery && photos.length ? (
       <section className="bg-background pb-20" aria-label="Gift card photos">
         <ul className="mx-auto grid max-w-[1400px] grid-cols-2 gap-5 px-5 md:grid-cols-4 md:px-8">
           {photos.map((image, index) => (
@@ -84,7 +62,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
         ) : null}
       </section>
       ) : null}
-      {content.showThings ? (
+      {content.showThings && content.things.length ? (
       <section className="bg-farm-beige py-20 md:py-28">
         <div className="mx-auto max-w-[1100px] px-5 md:px-8">
           <h2 className="font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.8] text-headline">{content.thingsHeading}</h2>
@@ -97,7 +75,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
         </div>
       </section>
       ) : null}
-      {content.showRainbow ? (
+      {content.showRainbow && content.rainbowCopy ? (
         <section className="bg-background py-20">
           <div className="mx-auto max-w-3xl px-5">
             <p className="font-accent text-xl italic text-primary-accent">{content.rainbowKicker}</p>
@@ -107,7 +85,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
           </div>
         </section>
       ) : null}
-      {content.showFeast ? (
+      {content.showFeast && content.feastCopy && content.feastHref ? (
         <section className="bg-farm-beige py-20">
           <div className="mx-auto grid max-w-[1100px] items-center gap-10 px-5 md:grid-cols-2">
             <div>

@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
 
-import { Button, ButtonLink } from '@/components/ui/button'
+import { ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
-import { ADOPTION_ANIMALS } from '@/lib/adopt/content'
 import { fillName, type AdoptionDetail, type AdoptionPageCopy, type AdoptionPackageView } from '@/lib/adopt/resolve'
 
 export function AnimalAdoptionPage({
@@ -18,12 +17,7 @@ export function AnimalAdoptionPage({
   images: { hero: string; gallery: readonly string[]; support: string }
   newsletter?: ReactNode
 }) {
-  const galleryAlts = [
-    `${animal.name} standing on a straw bale like they own the barn`,
-    `${animal.name} giving the camera their full attention`,
-    `${animal.name} being held by a visitor during cuddle time`,
-  ]
-
+  const gallery = detail.gallery
   return (
     <>
       <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden">
@@ -40,26 +34,20 @@ export function AnimalAdoptionPage({
           <h1 className="font-display text-[clamp(2.6rem,8vw,7rem)] font-black uppercase leading-[0.82] text-background">
             Adopt <span className="text-secondary-accent">{animal.name}</span>
           </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">
-            {detail.tagline}
-          </p>
+          {detail.tagline ? (
+            <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">
+              {detail.tagline}
+            </p>
+          ) : null}
         </Container>
       </section>
 
       <section className="bg-background py-20 md:py-28">
         <Container width="brand" className="grid max-w-[1400px] items-start gap-14 lg:grid-cols-[1.05fr_1fr]">
+          {gallery.length ? (
           <ul className="grid grid-cols-2 gap-3">
-            {(detail.gallery.length
-              ? detail.gallery.map((image) => ({ key: image.src, src: image.src, alt: image.alt }))
-              : ADOPTION_ANIMALS.some((entry) => entry.slug === animal.slug)
-                ? galleryAlts.map((alt, index) => ({
-                    key: alt,
-                    src: images.gallery[index] ?? images.gallery[0] ?? '',
-                    alt,
-                  }))
-                : []
-            ).map((image) => (
-              <li key={image.key} className="overflow-hidden border-2 border-headline">
+            {gallery.map((image) => (
+              <li key={image.src} className="overflow-hidden border-2 border-headline">
                 <img
                   src={image.src}
                   alt={image.alt}
@@ -71,6 +59,7 @@ export function AnimalAdoptionPage({
               </li>
             ))}
           </ul>
+          ) : null}
           <div>
             <h2 className="font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
               {copy.meetLead}
@@ -86,6 +75,7 @@ export function AnimalAdoptionPage({
         </Container>
       </section>
 
+      {detail.packages.length ? (
       <section className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1200px]">
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
@@ -109,7 +99,9 @@ export function AnimalAdoptionPage({
           </div>
         </Container>
       </section>
+      ) : null}
 
+      {detail.terms.length ? (
       <section className="bg-background py-20 md:py-28">
         <Container width="brand" className="max-w-3xl">
           <h2 className="text-center font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.8] text-headline">
@@ -132,6 +124,7 @@ export function AnimalAdoptionPage({
           </ul>
         </Container>
       </section>
+      ) : null}
 
       <section className="relative overflow-hidden bg-farm-blue py-20 md:py-28">
         <Container width="brand" className="grid max-w-[1300px] items-center gap-8 lg:grid-cols-2 lg:gap-14">
@@ -141,6 +134,7 @@ export function AnimalAdoptionPage({
               <br />
               {fillName(copy.detailSupportAccent, animal.name)}
             </h2>
+            {detail.support.length ? (
             <div className="mt-8 border-2 border-headline bg-background p-7 shadow-[12px_12px_0_var(--color-headline)] md:p-9">
               {detail.support.map((paragraph) => (
                 <p key={paragraph} className="mt-4 text-base leading-relaxed first:mt-0 md:text-lg">
@@ -148,10 +142,11 @@ export function AnimalAdoptionPage({
                 </p>
               ))}
             </div>
+            ) : null}
           </div>
           <img
             src={images.support}
-            alt={`${animal.name} being held by a visitor during cuddle time`}
+            alt="Visitors enjoying time with animals at Udderly Ridiculous Farm Life"
             width={1024}
             height={1024}
             loading="lazy"
@@ -201,11 +196,7 @@ function PackageCard({
           <ButtonLink href={pkg.checkoutUrl} external size="lg" className="mt-8 w-full">
             {label}
           </ButtonLink>
-        ) : (
-          <Button type="button" aria-disabled="true" size="lg" className="mt-8 w-full">
-            {label}
-          </Button>
-        )}
+        ) : null}
       </div>
     </article>
   )

@@ -11,7 +11,7 @@ import { corporateProgramBySlugQuery, corporateProgramCardsQuery, corporateTrain
 import { createPageHead } from '@/lib/seo/page-head'
 
 import type { CorporateImages } from './images'
-import { CORPORATE_ENQUIRY_UNAVAILABLE, SHARED_PROGRAM_OUTCOMES } from './model'
+import { CORPORATE_ENQUIRY_UNAVAILABLE } from './model'
 import {
   resolveCorporateLanding,
   resolveDisc,
@@ -34,6 +34,11 @@ const images: CorporateImages = {
   farmStore: '/store.webp',
   iceCream: '/ice.webp',
   awards: [{ year: '2026', src: '/award.png' }],
+}
+
+const publishedImage = {
+  alt: 'A published farm photo',
+  asset: { _ref: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg' },
 }
 
 const routes = [
@@ -75,20 +80,23 @@ describe('corporate training pages', () => {
     expect(html).toContain('Innovation on')
     expect(html).toContain('Pick your')
     expect(html).toContain('Mix &amp; match')
-    expect(html).toContain('$125/hour')
-    expect(html).toContain('$2500 + HST &amp; travel costs')
     expect(html).toContain('Two ways to DiSC')
-    expect(html).toContain('The practical bits')
-    expect(html).toContain('Capacity &amp; Setup')
+    expect(html).toContain('Everything DiSC Workplace')
     expect(html).toContain('906200 Township Rd 12')
     expect(html).not.toContain('Priya')
     expect(html).not.toContain('Placeholder review')
+    expect(html).not.toContain('$125/hour')
+    expect(html).not.toContain('Capacity &amp; Setup')
     expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
-    expect(html).toContain('disabled=""')
+    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('name="email"')
     expect(html).not.toContain('nothing was sent')
+    expect(html).toContain('Corporate team enjoying a farm lunch experience with alpacas')
+    expect(html).not.toContain('farm classroom')
+    expect(html).not.toContain('training session on the farm')
   })
 
-  it('keeps the four shared programs on one design without treating the outcomes as unique facts', () => {
+  it('keeps the four shared programs on one design without placeholder copy', () => {
     const pages = [
       resolveSharedProgram('the-power-of-conversation', null, null, images),
       resolveSharedProgram('alpaca-emotional-intelligence', null, null, images),
@@ -96,8 +104,9 @@ describe('corporate training pages', () => {
       resolveSharedProgram('innovation-on-the-farm', null, null, images),
     ]
     for (const page of pages) {
-      expect(page.outcomes.items).toEqual(SHARED_PROGRAM_OUTCOMES)
-      expect(page.introduction.paragraphs[0]).toMatch(/^Placeholder description/)
+      expect(page.outcomes.items).toEqual([])
+      expect(page.introduction.paragraphs).toEqual([])
+      expect(page.hero.intro).toBe('')
     }
     expect(pages.map((page) => page.seo.title)).toEqual([
       'The Power of Conversation | Corporate Training | Udderly Ridiculous',
@@ -123,7 +132,7 @@ describe('corporate training pages', () => {
     expect(page.hero.lead).toBe('Conversation')
     expect(page.hero.accent).toBe('Practice')
     expect(page.hero.intro).toBe('A published hero introduction.')
-    expect(page.outcomes.items).toEqual([...SHARED_PROGRAM_OUTCOMES, 'One published outcome.'])
+    expect(page.outcomes.items).toEqual(['One published outcome.'])
     expect(page.seo).toMatchObject({
       title: 'Published conversation title',
       description: 'Published conversation description',
@@ -167,8 +176,10 @@ describe('corporate training pages', () => {
     expect(unapproved.close.reviews).toBeNull()
     const html = renderToStaticMarkup(<DiscProgram page={unapproved} />)
     expect(html).not.toContain('Not approved yet')
-    expect(html).toContain('Program Selection')
-    expect(html).toContain('Phone Number')
+    expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
+    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Program Selection')
+    expect(html).not.toContain('Phone Number')
   })
 
   it('shows only approved testimonials and can hide the facilitator', () => {
@@ -193,38 +204,72 @@ describe('corporate training pages', () => {
     expect(html).not.toContain('Cheryl, in boots')
   })
 
-  it('keeps the tourism enquiry free of a phone field and uses design prices until replaced', () => {
+  it('hides unverified tourism prices and credentials, and restores a published list without the design prices', () => {
     const page = resolveTourism(null, null, images)
     expect(page.enquiry.showPhone).toBe(false)
+    expect(page.services).toEqual([])
+    expect(page.credentials).toEqual([])
     const html = renderToStaticMarkup(<TourismProgram page={page} />)
-    expect(html).not.toContain('Phone Number')
-    expect(html).toContain('14-time award winning')
+    expect(html).toContain('Your business,')
+    expect(html).toContain('Who I help')
+    expect(html).toContain('Farms')
     expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
+    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Phone Number')
+    expect(html).not.toContain('14-time award winning')
+    expect(html).not.toContain('$125/hour')
+    expect(html).not.toContain('$2500')
+    expect(html).not.toContain('$3000')
+    expect(html).not.toContain('Placeholder')
+    expect(html).not.toContain('Cheryl, experiential tourism coach')
+    expect(html).not.toContain('name="email"')
 
     const replaced = resolveTourism(
       {
         title: 'Experiential Tourism',
         slug: 'experiential-tourism-development',
         active: true,
+        introParagraphs: ['Placeholder description. Hidden.', 'A published tourism introduction.'],
         services: [
+          {
+            name: 'Placeholder package',
+            price: '$125/hour',
+            items: [{ title: 'Hidden', body: 'Placeholder promise.' }],
+          },
           {
             name: 'Coaching',
             price: 'Ask for the current fee',
             featured: true,
-            items: [{ title: 'Session', body: 'One working session.' }],
+            items: [{ title: 'Session', body: 'One working session.' }, { title: 'Placeholder item', body: 'Placeholder detail.' }],
           },
         ],
-        credentials: [{ icon: 'award', label: 'Confirmed recognition' }],
+        credentials: [
+          { icon: 'award', label: 'Placeholder recognition' },
+          { icon: 'star', label: 'Confirmed recognition' },
+        ],
+        pathSteps: [{ title: 'From boardroom', body: 'Placeholder copy. Hidden years.' }, { title: 'Now', body: 'A published step.' }],
       },
       null,
       images,
     )
-    expect(replaced.services.map((service) => service.price)).toEqual(
-      expect.arrayContaining(['$125/hour', '$2500 + HST & travel costs', 'Ask for the current fee']),
-    )
-    expect(replaced.credentials.map((item) => item.label)).toEqual(
-      expect.arrayContaining(['14-time award winning', 'Confirmed recognition']),
-    )
+    expect(replaced.introduction.paragraphs).toEqual(['A published tourism introduction.'])
+    expect(replaced.services).toEqual([
+      {
+        name: 'Coaching',
+        price: 'Ask for the current fee',
+        featured: true,
+        items: [{ title: 'Session', body: 'One working session.' }],
+      },
+    ])
+    expect(replaced.credentials.map((item) => item.label)).toEqual(['Confirmed recognition'])
+    expect(replaced.path).toEqual([{ title: 'Now', body: 'A published step.' }])
+    const publishedHtml = renderToStaticMarkup(<TourismProgram page={replaced} />)
+    expect(publishedHtml).toContain('Ask for the current fee')
+    expect(publishedHtml).toContain('One working session.')
+    expect(publishedHtml).toContain('Confirmed recognition')
+    expect(publishedHtml).not.toContain('$125/hour')
+    expect(publishedHtml).not.toContain('14-time')
+    expect(publishedHtml).not.toContain('Placeholder')
   })
 
   it('keeps approved sections when a published corporate document is only partial', () => {
@@ -272,8 +317,199 @@ describe('corporate training pages', () => {
       null,
       images,
     )
-    expect(shared.introduction.paragraphs[0]).toContain('Placeholder description')
+    expect(shared.introduction.paragraphs).toEqual([])
     expect(shared.close.reviews).toBeNull()
+  })
+
+  it('removes unverified landing and team claims, then restores published content', () => {
+    const landing = resolveCorporateLanding(null, [], null, images)
+    const team = resolveTeamBuilding(null, null, images)
+    expect(landing.awards.show).toBe(false)
+    expect(landing.seo.description).not.toMatch(/20\+/)
+    const landingHtml = renderToStaticMarkup(<CorporateLanding page={landing} />)
+    const teamHtml = renderToStaticMarkup(<TeamBuildingProgram page={team} />)
+    for (const html of [landingHtml, teamHtml]) {
+      expect(html).not.toContain('Placeholder')
+      expect(html).not.toContain('20+ years')
+      expect(html).not.toContain('14-time')
+      expect(html).not.toContain('Top 10%')
+      expect(html).not.toContain('Cheryl, the farm')
+      expect(html).not.toContain('Capacity')
+      expect(html).not.toContain('name="email"')
+      expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
+      expect(html).toContain('href="/contact"')
+    }
+    expect(landingHtml).toContain('Team Building Experiences')
+    expect(landingHtml).toContain('href="/corporate-training/team-building-experiences"')
+    expect(teamHtml).toContain('Goat Yoga')
+    expect(teamHtml).not.toContain('/goats.jpg')
+    expect(team.activities.find((activity) => activity.title === 'Goat Yoga')?.image.src).toBe('')
+
+    const published = resolveTeamBuilding(
+      {
+        title: 'Team Building Experiences',
+        slug: 'team-building-experiences',
+        active: true,
+        activities: [
+          { title: 'Goat Yoga', body: 'A published activity description.', image: publishedImage },
+          { title: 'Placeholder activity', body: 'Placeholder description. Hidden.' },
+        ],
+        facility: {
+          enabled: true,
+          items: [
+            { icon: 'capacity', title: 'Capacity & Setup', body: 'Placeholder room for 30.' },
+            { icon: 'av', title: 'Meeting room', body: 'A published room description.' },
+          ],
+        },
+        facilitator: {
+          enabled: true,
+          title: 'Placeholder portrait title',
+          body: 'A published facilitator biography.',
+          image: publishedImage,
+        },
+      },
+      {
+        experienceAwardsEnabled: true,
+        experienceAwardsTitle: 'Published recognition',
+        experienceAwardsTagline: 'Placeholder claim',
+        experienceAwardImages: [publishedImage],
+      },
+      images,
+    )
+    expect(published.activities.find((activity) => activity.title === 'Goat Yoga')).toMatchObject({
+      body: 'A published activity description.',
+      href: '/contact',
+    })
+    expect(published.activities.find((activity) => activity.title === 'Goat Yoga')?.image.src).not.toBe('')
+    expect(published.activities.some((activity) => activity.title === 'Alpaca Walks')).toBe(true)
+    expect(published.activities.some((activity) => activity.title === 'Placeholder activity')).toBe(false)
+    expect(published.close.facility?.items).toEqual([
+      { icon: 'av', title: 'Meeting room', body: 'A published room description.' },
+    ])
+    expect(published.close.facilitator).toMatchObject({
+      body: 'A published facilitator biography.',
+      title: '',
+    })
+    expect(published.close.facilitator?.image.alt).toBe('A published farm photo')
+    expect(published.awards.show).toBe(true)
+    expect(published.awards.title).toBe('Published recognition')
+    expect(published.awards.tagline).toBe('')
+    const publishedHtml = renderToStaticMarkup(<TeamBuildingProgram page={published} />)
+    expect(publishedHtml).toContain('A published activity description.')
+    expect(publishedHtml).toContain('A published room description.')
+    expect(publishedHtml).toContain('A published facilitator biography.')
+    expect(publishedHtml).toContain('Published recognition')
+    expect(publishedHtml).not.toContain('Capacity')
+    expect(publishedHtml).not.toContain('Placeholder')
+    expect(publishedHtml).not.toContain('TripAdvisor')
+  })
+
+  it('removes placeholder copy from the five program pages and restores published content', () => {
+    const disc = resolveDisc(null, null, images)
+    const sharedSlugs = [
+      'the-power-of-conversation',
+      'alpaca-emotional-intelligence',
+      'beyond-engagement',
+      'innovation-on-the-farm',
+    ] as const
+    const sharedPages = sharedSlugs.map((slug) => resolveSharedProgram(slug, null, null, images))
+    const html = [
+      renderToStaticMarkup(<DiscProgram page={disc} />),
+      ...sharedPages.map((page) => renderToStaticMarkup(<SharedCorporateProgram page={page} />)),
+    ].join('\n')
+
+    expect(disc.seo).toMatchObject({
+      title: 'DiSC Assessment Training on a Farm | Udderly Ridiculous',
+      description: 'Everything DiSC assessments on a working Ontario farm — Workplace and Work of Leaders programs.',
+      path: '/corporate-training/disc-assessment',
+    })
+    expect(disc.seo.description).not.toMatch(/20\+/)
+    expect(sharedPages.map((page) => page.seo.path)).toEqual([
+      '/corporate-training/the-power-of-conversation',
+      '/corporate-training/alpaca-emotional-intelligence',
+      '/corporate-training/beyond-engagement',
+      '/corporate-training/innovation-on-the-farm',
+    ])
+    expect(html).toContain('Everything DiSC Workplace')
+    expect(html).toContain('Everything DiSC Work of Leaders')
+    expect(html).toContain('The Power of')
+    expect(html).toContain('Alpaca Emotional')
+    expect(html).toContain('Beyond')
+    expect(html).toContain('Innovation on')
+    expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
+    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Placeholder')
+    expect(html).not.toContain('20+ years')
+    expect(html).not.toContain('farm classroom')
+    expect(html).not.toContain('Myers-Briggs')
+    expect(html).not.toContain('Innovation in a Box')
+    expect(html).not.toContain('name="email"')
+    expect(html).not.toContain('We will get back to you')
+
+    const publishedDisc = resolveDisc(
+      {
+        title: 'DiSC Assessment',
+        slug: 'disc-assessment',
+        active: true,
+        introParagraphs: ['Placeholder description. Hidden DiSC intro.', 'A published DiSC introduction.'],
+        offerings: [
+          {
+            title: 'Everything DiSC Workplace',
+            body: 'A published Workplace description.',
+            outcomes: ['Placeholder outcome.', 'One published Workplace outcome.'],
+          },
+          { title: 'Placeholder offering', body: 'Placeholder description. Hidden offering.' },
+        ],
+        practicalItems: [
+          { icon: 'duration', label: 'Duration', lines: ['Placeholder schedule.', 'A published half day.'] },
+          { icon: 'custom', label: 'Placeholder extra', lines: ['Placeholder promise.'] },
+        ],
+        seo: { description: 'Placeholder description. Hidden SEO.' },
+      },
+      null,
+      images,
+    )
+    expect(publishedDisc.introduction.paragraphs).toEqual(['A published DiSC introduction.'])
+    expect(publishedDisc.offerings.map((offering) => offering.title)).toEqual([
+      'Everything DiSC Workplace',
+      'Everything DiSC Work of Leaders',
+    ])
+    expect(publishedDisc.offerings[0]?.body).toBe('A published Workplace description.')
+    expect(publishedDisc.offerings[0]?.outcomes).toEqual(['One published Workplace outcome.'])
+    expect(publishedDisc.offerings[1]?.body).toContain('Work of Leaders')
+    expect(publishedDisc.practical).toEqual([{ icon: 'duration', label: 'Duration', lines: ['A published half day.'] }])
+    expect(publishedDisc.seo.description).toBe(disc.seo.description)
+    const publishedDiscHtml = renderToStaticMarkup(<DiscProgram page={publishedDisc} />)
+    expect(publishedDiscHtml).toContain('A published DiSC introduction.')
+    expect(publishedDiscHtml).toContain('A published half day.')
+    expect(publishedDiscHtml).not.toContain('Placeholder')
+    expect(publishedDiscHtml).not.toContain('20+ years')
+
+    const publishedShared = resolveSharedProgram(
+      'innovation-on-the-farm',
+      {
+        title: 'Innovation on the Farm',
+        slug: 'innovation-on-the-farm',
+        active: true,
+        heroIntro: 'A published innovation introduction.',
+        introParagraphs: ['Placeholder description. Hidden.', 'A published program description.'],
+        learningOutcomes: ['Placeholder outcome.', 'One published innovation outcome.'],
+        durationDetail: 'A published full day.',
+        enhancementsNote: 'Placeholder enhancement.',
+      },
+      null,
+      images,
+    )
+    expect(publishedShared.hero.intro).toBe('A published innovation introduction.')
+    expect(publishedShared.introduction.paragraphs).toEqual(['A published program description.'])
+    expect(publishedShared.outcomes.items).toEqual(['One published innovation outcome.'])
+    expect(publishedShared.outcomes.durationBody).toBe('A published full day.')
+    expect(publishedShared.outcomes.enhancementsBody).toBe('')
+    const publishedSharedHtml = renderToStaticMarkup(<SharedCorporateProgram page={publishedShared} />)
+    expect(publishedSharedHtml).toContain('One published innovation outcome.')
+    expect(publishedSharedHtml).toContain('A published full day.')
+    expect(publishedSharedHtml).not.toContain('Placeholder')
+    expect(publishedSharedHtml).not.toContain('Manage emotions')
   })
 
   it('builds metadata for every corporate path', () => {

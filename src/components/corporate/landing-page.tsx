@@ -68,7 +68,7 @@ export function CorporateLanding({ page }: { page: CorporateLandingPage }) {
                 <h3 className="mt-5 font-display text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-[0.85]">
                   {page.featured.title}
                 </h3>
-                <p className="mt-4 text-base leading-relaxed md:text-lg">{page.featured.body}</p>
+                {page.featured.body ? <p className="mt-4 text-base leading-relaxed md:text-lg">{page.featured.body}</p> : null}
                 <ButtonLink href={page.featured.href} size="lg" variant="outline" className="mt-7">
                   {page.featured.ctaLabel} <ArrowRightIcon />
                 </ButtonLink>
@@ -93,7 +93,7 @@ export function CorporateLanding({ page }: { page: CorporateLandingPage }) {
                 </div>
                 <div className="flex flex-1 flex-col p-3 pb-4">
                   <h3 className="font-display text-2xl font-black uppercase leading-none text-headline">{card.title}</h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed">{card.body}</p>
+                  {card.body ? <p className="mt-3 flex-1 text-sm leading-relaxed">{card.body}</p> : null}
                   <ButtonLink href={card.href} variant="outline" className="mt-5 w-full">
                     {card.ctaLabel}
                   </ButtonLink>
@@ -118,7 +118,7 @@ export function CorporateLanding({ page }: { page: CorporateLandingPage }) {
                 <h3 className="mt-5 font-display text-[clamp(2rem,4.5vw,3.4rem)] font-black uppercase leading-[0.85] text-headline">
                   {page.tourism.title}
                 </h3>
-                <p className="mt-4 text-base leading-relaxed md:text-lg">{page.tourism.body}</p>
+                {page.tourism.body ? <p className="mt-4 text-base leading-relaxed md:text-lg">{page.tourism.body}</p> : null}
                 <ButtonLink href={page.tourism.href} size="lg" className="mt-7">
                   {page.tourism.ctaLabel} <ArrowRightIcon />
                 </ButtonLink>

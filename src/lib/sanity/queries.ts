@@ -12,7 +12,7 @@ const altImage = `{
   }
 }`
 
-export const experienceBySlugQuery = `*[_type == "experience" && slug.current in $slugs && active != false] | order(select(slug.current == $slug => 0, 1))[0]{
+export const experienceBySlugQuery = `*[_type == "experience" && slug.current in $slugs] | order(select(slug.current == $slug => 0, 1))[0]{
   _id,
   title,
   titleAccent,
@@ -117,10 +117,12 @@ export const experienceBySlugQuery = `*[_type == "experience" && slug.current in
   }
 }`
 
-export const experienceHubQuery = `*[_type == "experience" && active != false] | order(sortOrder asc, title asc) {
+export const experienceHubQuery = `*[_type == "experience"] | order(sortOrder asc, title asc) {
   _id,
   title,
   "slug": slug.current,
+  active,
+  sortOrder,
   shortDescription,
   priceDisplay,
   duration,

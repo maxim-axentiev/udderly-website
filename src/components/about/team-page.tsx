@@ -12,6 +12,7 @@ export function Team({ page }: { page: TeamPage }) {
         intro={page.hero.intro}
         image={page.hero.image}
       />
+      {page.members.length ? (
       <section className="overflow-hidden bg-background py-20 md:py-28">
         <div className="mx-auto max-w-[1500px] px-5 md:px-8">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -60,6 +61,7 @@ export function Team({ page }: { page: TeamPage }) {
           </div>
         </div>
       </section>
+      ) : null}
       {page.cta ? <BookExperienceBand cta={page.cta} /> : null}
     </>
   )

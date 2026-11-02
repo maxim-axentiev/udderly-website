@@ -1,3 +1,8 @@
+import { corporateProgramPath } from '@/lib/corporate/slugs'
+import { publicExperienceSlug } from '@/lib/experiences/public-paths'
+import { NEWSLETTER_PATH } from '@/lib/newsletter/model'
+import { GIFT_CARD_PATH } from '@/lib/visit/model'
+
 /**
  * WordPress URL migration redirects.
  *
@@ -26,10 +31,33 @@ export type RetiredUrl = {
 /** Consolidated private Mini Highland Cow URL. Both slash forms match. */
 export const MINI_HIGHLAND_COW_PATH = '/mini-highland-cow-experience'
 
+const DONKEY_LUNCH_STORED = '/private-miniature-donkey-lunch-picnic'
+const DONKEY_SUNSET_STORED = '/private-miniature-donkey-sunset-picnic'
+
 export const redirects: RedirectRule[] = [
   {
     from: '/private-mini-highland-experience',
     to: MINI_HIGHLAND_COW_PATH,
+    status: 301,
+  },
+  {
+    from: DONKEY_LUNCH_STORED,
+    to: `/${publicExperienceSlug(DONKEY_LUNCH_STORED.slice(1))}`,
+    status: 301,
+  },
+  {
+    from: DONKEY_SUNSET_STORED,
+    to: `/${publicExperienceSlug(DONKEY_SUNSET_STORED.slice(1))}`,
+    status: 301,
+  },
+  { from: '/faqs', to: '/faq', status: 301 },
+  { from: '/gift-certificate', to: GIFT_CARD_PATH, status: 301 },
+  { from: '/subscribe-to-newsletter', to: NEWSLETTER_PATH, status: 301 },
+  { from: '/our-vision', to: '/vision-values', status: 301 },
+  { from: '/privacy-policy-2', to: '/privacy-policy', status: 301 },
+  {
+    from: '/experiential-tourism-development',
+    to: corporateProgramPath('experiential-tourism-development'),
     status: 301,
   },
 ]

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { Button, ButtonLink } from '@/components/ui/button'
+import { ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
 import type { AdoptionCard } from '@/lib/adopt/resolve'
 import type { AdoptionPageCopy } from '@/lib/adopt/resolve'
@@ -24,6 +24,8 @@ export function AdoptPage({
   images: AdoptImages
   newsletter?: ReactNode
 }) {
+  const sponsorParagraphs = copy.sponsorParagraphs.filter((paragraph) => !/^placeholder\b/i.test(paragraph))
+  const supportParagraphs = copy.supportParagraphs.filter((paragraph) => !/^placeholder\b/i.test(paragraph))
   return (
     <>
       <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden">
@@ -82,7 +84,7 @@ export function AdoptPage({
         <Container width="brand" className="grid max-w-[1400px] items-start gap-14 lg:grid-cols-[1.05fr_1fr]">
           <img
             src={copy.sponsorImage?.src ?? images.sponsor}
-            alt={copy.sponsorImage?.alt ?? 'Biscuit the goat standing on a straw bale in the barn'}
+            alt={copy.sponsorImage?.alt ?? 'Visitors enjoying time with animals at Udderly Ridiculous Farm Life'}
             width={1024}
             height={1024}
             loading="lazy"
@@ -94,7 +96,7 @@ export function AdoptPage({
               <br />
               <span className="text-stroke">{copy.sponsorAccent}</span>
             </h2>
-            {copy.sponsorParagraphs.map((paragraph) => (
+            {sponsorParagraphs.map((paragraph) => (
               <p key={paragraph} className="mt-6 text-base leading-relaxed md:text-lg">
                 {paragraph}
               </p>
@@ -111,10 +113,12 @@ export function AdoptPage({
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
             {copy.animalsHeading}
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed">{copy.animalsIntro}</p>
-          {cards.length === 0 ? (
+          {cards.length ? (
+            <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed">{copy.animalsIntro}</p>
+          ) : (
             <p className="mt-14 text-center text-lg">There are no animals in this list right now.</p>
-          ) : null}
+          )}
+          {cards.length ? (
           <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((animal, index) => {
               const photo = animal.portrait?.src ?? (animal.imageKey ? images.cards[animal.imageKey] : undefined)
@@ -139,14 +143,13 @@ export function AdoptPage({
                     <h3 className="font-display text-4xl font-black uppercase leading-none text-headline">
                       {animal.name}
                     </h3>
-                    <p className="mt-2 flex-1 font-accent text-lg italic leading-snug">{animal.blurb}</p>
+                    {animal.blurb ? (
+                      <p className="mt-2 flex-1 font-accent text-lg italic leading-snug">{animal.blurb}</p>
+                    ) : null}
                     <div className="mt-5 flex flex-wrap gap-3">
                       <ButtonLink href={animal.href} variant="outline">
                         {copy.learnMoreLabel}
                       </ButtonLink>
-                      <Button type="button" aria-disabled="true">
-                        {copy.adoptButtonLabel} {animal.name}
-                      </Button>
                     </div>
                   </div>
                 </article>
@@ -154,6 +157,7 @@ export function AdoptPage({
               )
             })}
           </ul>
+          ) : null}
         </Container>
       </section>
 
@@ -167,7 +171,7 @@ export function AdoptPage({
               {copy.supportAccent}
             </h2>
             <div className="mt-8 flex flex-col border-2 border-headline bg-background p-7 text-left shadow-[12px_12px_0_var(--color-headline)] md:p-9">
-              {copy.supportParagraphs.map((paragraph) => (
+              {supportParagraphs.map((paragraph) => (
                 <p key={paragraph} className="mt-4 text-base leading-relaxed first:mt-0 md:text-lg">
                   {paragraph}
                 </p>
@@ -179,7 +183,7 @@ export function AdoptPage({
           </div>
           <img
             src={copy.supportImage?.src ?? images.support}
-            alt={copy.supportImage?.alt ?? 'Marshmallow the goat being held by a visitor'}
+            alt={copy.supportImage?.alt ?? 'Visitors enjoying time with animals at Udderly Ridiculous Farm Life'}
             width={1024}
             height={1024}
             loading="lazy"

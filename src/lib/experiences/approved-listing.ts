@@ -26,11 +26,15 @@ export const FEAST_ON = {
 
 export const TOWER_OF_GOATS_PATH = '/tower-of-goats-discovery-trail'
 
-/** Future launch redirect only. This path is not registered. */
+/** Short path alias. Registered by src/routes/tower-of-goats.tsx. */
 export const TOWER_OF_GOATS_FUTURE_REDIRECT = {
   from: '/tower-of-goats',
   to: TOWER_OF_GOATS_PATH,
 } as const
+
+export function towerOfGoatsAliasRedirect() {
+  return { href: TOWER_OF_GOATS_FUTURE_REDIRECT.to }
+}
 
 type ApprovedExperience = {
   name: string

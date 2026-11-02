@@ -1,3 +1,4 @@
+import { CONTACT_PATH } from '@/lib/contact/model'
 import { cmsImageUrl } from '@/lib/sanity/image'
 import type { ExperienceFoundation, PortableTextContent, SanityImage } from '@/lib/sanity/types'
 import { hasPortableText } from '@/lib/portable-text'
@@ -16,7 +17,6 @@ import type { CorporateImages } from './images'
 import {
   DISC_PROGRAM_OPTIONS,
   LANDING_REVIEWS_HEADING,
-  SHARED_PROGRAM_OUTCOMES,
   corporateEnquiry,
   corporateEnvironment,
   corporateFacilitator,
@@ -71,8 +71,25 @@ function clean(value: string | null | undefined): string | undefined {
   return trimmed || undefined
 }
 
+function approvedText(value: string | null | undefined): string | undefined {
+  const text = clean(value)
+  if (!text || /^placeholder\b/i.test(text)) return undefined
+  return text
+}
+
 function lines(value: string[] | null | undefined): string[] {
   return (value ?? []).map((item) => item.trim()).filter(Boolean)
+}
+
+function publishedLines(value: string[] | null | undefined): string[] {
+  return (value ?? []).flatMap((item) => {
+    const line = approvedText(item)
+    return line ? [line] : []
+  })
+}
+
+function publicCopy(value: string | null | undefined, fallback = ''): string {
+  return approvedText(value) ?? approvedText(fallback) ?? ''
 }
 
 /** A shorter published list updates matching items and keeps the rest of the approved section. */
@@ -94,7 +111,7 @@ function mergeSection<T>(fallback: readonly T[], incoming: readonly T[], key: (i
 }
 
 function text(value: string | null | undefined, fallback: string): string {
-  return clean(value) ?? fallback
+  return approvedText(value) ?? fallback
 }
 
 function rich(value: PortableTextContent | undefined): PortableTextContent | undefined {
@@ -107,8 +124,9 @@ function picture(
   width = 1600,
 ): CorporatePicture {
   const src = cmsImageUrl(image ?? undefined, width)
-  if (!src) return fallback
-  return { src, alt: image?.alt?.trim() || fallback.alt }
+  const alt = approvedText(image?.alt)
+  if (!src || !alt) return fallback
+  return { src, alt }
 }
 
 function gallery(
@@ -118,7 +136,7 @@ function gallery(
 ): CorporatePicture[] {
   const resolved = (images ?? []).flatMap((image) => {
     const src = cmsImageUrl(image, width)
-    const alt = image?.alt?.trim()
+    const alt = approvedText(image?.alt)
     return src && alt ? [{ src, alt }] : []
   })
   return resolved.length ? resolved : fallback
@@ -140,25 +158,21 @@ function href(value: string | null | undefined, fallback: string): string {
 
 function awardsFor(
   foundation: ExperienceFoundation,
-  images: CorporateImages,
+  _images: CorporateImages,
   pageShow?: boolean | null,
 ): CorporateAwards {
-  const show = typeof pageShow === 'boolean' ? pageShow : foundation?.experienceAwardsEnabled !== false
-  const cmsImages = (foundation?.experienceAwardImages ?? []).flatMap((image) => {
+  const title = approvedText(foundation?.experienceAwardsTitle)
+  const tagline = approvedText(foundation?.experienceAwardsTagline)
+  const images = (foundation?.experienceAwardImages ?? []).flatMap((image) => {
     const src = cmsImageUrl(image, 320)
-    const alt = image?.alt?.trim()
+    const alt = approvedText(image?.alt)
     return src && alt ? [{ src, alt }] : []
   })
   return {
-    show,
-    title: text(foundation?.experienceAwardsTitle, "TripAdvisor Travellers' Choice"),
-    tagline: text(foundation?.experienceAwardsTagline, 'Top 10% of attractions worldwide by Tripadvisor.'),
-    images: cmsImages.length
-      ? cmsImages
-      : images.awards.map((award) => ({
-          src: award.src,
-          alt: `TripAdvisor Travellers' Choice Award ${award.year}`,
-        })),
+    show: pageShow !== false && foundation?.experienceAwardsEnabled === true && images.length > 0 && Boolean(title || tagline),
+    title: title ?? '',
+    tagline: tagline ?? '',
+    images,
   }
 }
 
@@ -173,8 +187,8 @@ function seoFor(fallback: PageSeoInput, seo?: { title?: string | null; descripti
 function quotes(items: CmsCorporateQuote[] | null | undefined) {
   return (items ?? [])
     .map((item) => ({
-      name: clean(item.guestName),
-      quote: clean(item.quote),
+      name: approvedText(item.guestName),
+      quote: approvedText(item.quote),
     }))
     .filter((item): item is { name: string; quote: string } => Boolean(item.name && item.quote))
 }
@@ -211,7 +225,7 @@ function cardFrom(
 ): CorporateCard {
   return {
     title: text(source?.title, fallback.title),
-    body: text(source?.body, fallback.body),
+    body: publicCopy(source?.body, fallback.body),
     image: picture(source?.image, fallback.image, 1200),
     href: href(source?.href, fallback.href),
     ctaLabel: text(source?.ctaLabel, fallback.ctaLabel),
@@ -223,7 +237,7 @@ function overlayProgram<T extends CorporateCard>(card: T, program: CmsCorporateP
   return {
     ...card,
     title: text(program.title, card.title),
-    body: text(program.shortDescription, card.body),
+    body: publicCopy(program.shortDescription, card.body),
     image: picture(program.heroImage, card.image, 1200),
   }
 }
@@ -239,13 +253,16 @@ function person(
   fallback: NonNullable<CorporateClose['facilitator']>,
 ): CorporateClose['facilitator'] {
   if (source?.enabled === false) return null
+  const body = approvedText(source?.body) ?? approvedText(fallback.body)
+  if (!body) return null
+  const image = picture(source?.image, { src: '', alt: '' }, 1200)
   return {
     eyebrow: text(source?.eyebrow, fallback.eyebrow),
-    title: text(source?.title, fallback.title),
-    body: text(source?.body, fallback.body),
-    image: picture(source?.image, fallback.image, 1200),
-    ctaLabel: text(source?.ctaLabel, fallback.ctaLabel),
-    ctaHref: href(source?.ctaHref, fallback.ctaHref),
+    title: approvedText(source?.title) ?? approvedText(fallback.title) ?? '',
+    body,
+    image,
+    ctaLabel: text(source?.ctaLabel, fallback.ctaLabel || 'Contact'),
+    ctaHref: href(source?.ctaHref, CONTACT_PATH),
   }
 }
 
@@ -254,11 +271,14 @@ function banner(
   fallback: NonNullable<CorporateClose['environment']>,
 ): CorporateClose['environment'] {
   if (source?.enabled === false) return null
+  const body = approvedText(source?.body) ?? approvedText(fallback.body)
+  const image = picture(source?.image, { src: '', alt: '' }, 1920)
+  if (!body || !image.src) return null
   return {
     lead: text(source?.headingLead, fallback.lead),
     accent: text(source?.headingAccent, fallback.accent),
-    body: text(source?.body, fallback.body),
-    image: picture(source?.image, fallback.image, 1920),
+    body,
+    image,
     label: fallback.label,
   }
 }
@@ -269,21 +289,25 @@ function facility(
 ): CorporateClose['facility'] {
   if (source?.enabled === false) return null
   const items = (source?.items ?? [])
-    .map((item, index) => {
-      const title = clean(item.title)
-      const body = clean(item.body)
+    .map((item) => {
+      const title = approvedText(item.title)
+      const body = approvedText(item.body)
       if (!title || !body) return null
-      const icon = FACILITY_ICONS.has(item.icon as FacilityIcon)
-        ? (item.icon as FacilityIcon)
-        : fallback.items[index]?.icon ?? 'capacity'
+      const icon = FACILITY_ICONS.has(item.icon as FacilityIcon) ? (item.icon as FacilityIcon) : 'capacity'
       return { icon, title, body }
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item))
+  const photos = (source?.gallery ?? []).flatMap((image) => {
+    const src = cmsImageUrl(image, 1400)
+    const alt = approvedText(image?.alt)
+    return src && alt ? [{ src, alt }] : []
+  })
+  if (!items.length && !photos.length) return null
   return {
     lead: text(source?.headingLead, fallback.lead),
     accent: text(source?.headingAccent, fallback.accent),
-    items: mergeSection(fallback.items, items, (item) => item.title),
-    gallery: gallery(source?.gallery, fallback.gallery),
+    items,
+    gallery: photos,
   }
 }
 
@@ -390,7 +414,7 @@ export function resolveCorporateLanding(
         },
         programByHref(published, href(page?.tourismProgram?.href, fallback.tourism!.href)),
       )
-  const introParagraphs = lines(page?.introParagraphs)
+  const introParagraphs = publishedLines(page?.introParagraphs)
 
   return {
     hero: {
@@ -441,14 +465,15 @@ function sharedIntroduction(
   program: CmsCorporateProgram | null,
   fallback: ReturnType<typeof sharedProgramFallback>['introduction'],
 ) {
+  const paragraphs = publishedLines(program?.introParagraphs)
   return {
     lead: text(program?.introHeading, fallback.lead),
     accent: text(program?.introHeadingAccent, fallback.accent),
-    paragraphs: lines(program?.introParagraphs).length ? lines(program?.introParagraphs) : fallback.paragraphs,
+    paragraphs: paragraphs.length ? paragraphs : publishedLines(fallback.paragraphs),
     richText: rich(program?.programDescription),
     image: picture(program?.introImage, fallback.image, 1400),
     ctaLabel: text(program?.introCtaLabel, fallback.ctaLabel),
-    ctaHref: '#contact',
+    ctaHref: CONTACT_PATH,
   }
 }
 
@@ -466,7 +491,7 @@ export function resolveSharedProgram(
 ): SharedProgramPage {
   const fallback = sharedProgramFallback(slug, images)
   const published = publishedProgram(program, slug)
-  const outcomes = lines(published?.learningOutcomes)
+  const outcomes = publishedLines(published?.learningOutcomes)
   return {
     hero: {
       lead: text(published?.heroLead, fallback.hero.lead),
@@ -478,12 +503,16 @@ export function resolveSharedProgram(
     introduction: sharedIntroduction(published, fallback.introduction),
     outcomes: {
       heading: text(published?.outcomesHeading, fallback.outcomes.heading),
-      items: mergeSection(SHARED_PROGRAM_OUTCOMES, outcomes, (item) => item),
+      items: outcomes,
       durationTitle: fallback.outcomes.durationTitle,
-      durationBody: text(published?.durationDetail ?? published?.duration, fallback.outcomes.durationBody),
+      durationBody:
+        approvedText(published?.durationDetail) ??
+        approvedText(published?.duration) ??
+        approvedText(fallback.outcomes.durationBody) ??
+        '',
       enhancementsTitle: fallback.outcomes.enhancementsTitle,
       enhancementsRich: rich(published?.enhancements),
-      enhancementsBody: text(published?.enhancementsNote, fallback.outcomes.enhancementsBody),
+      enhancementsBody: publicCopy(published?.enhancementsNote, fallback.outcomes.enhancementsBody),
     },
     close: closeFor(published ?? {}, images, {
       reviewsHeading: fallback.reviewsHeading,
@@ -510,11 +539,19 @@ export function resolveTeamBuilding(
   )
   const activities = (published?.activities ?? [])
     .filter((activity) => activity.enabled !== false)
-    .map((activity, index) => {
-      const title = clean(activity.title)
+    .map((activity) => {
+      const title = approvedText(activity.title)
       if (!title) return null
-      const base = fallback.activities[index] ?? fallback.activities[0]!
-      return cardFrom(activity, { ...base, title, href: '#contact', ctaLabel: 'Contact Us' })
+      const base =
+        fallback.activities.find((item) => item.title === title) ??
+        ({
+          title,
+          body: '',
+          image: { src: '', alt: '' },
+          href: CONTACT_PATH,
+          ctaLabel: 'Contact Us',
+        } as const)
+      return cardFrom(activity, { ...base, title, href: CONTACT_PATH, ctaLabel: 'Contact Us' })
     })
     .filter((activity): activity is CorporateCard => Boolean(activity))
   return {
@@ -534,9 +571,9 @@ export function resolveTeamBuilding(
     ),
     mix: {
       title: text(published?.mixHeading, fallback.mix.title),
-      body: text(published?.mixBody, fallback.mix.body),
+      body: publicCopy(published?.mixBody, fallback.mix.body),
       ctaLabel: text(published?.mixCtaLabel, fallback.mix.ctaLabel),
-      ctaHref: '#contact',
+      ctaHref: CONTACT_PATH,
     },
     close: closeFor(published ?? {}, images, {
       reviewsHeading: fallback.reviewsHeading,
@@ -558,30 +595,28 @@ export function resolveTourism(
   void foundation
   const steps = (published?.pathSteps ?? [])
     .map((step) => {
-      const title = clean(step.title)
-      const body = clean(step.body)
+      const title = approvedText(step.title)
+      const body = approvedText(step.body)
       return title && body ? { title, body } : null
     })
     .filter((step): step is { title: string; body: string } => Boolean(step))
   const credentials = (published?.credentials ?? [])
-    .map((item, index) => {
-      const label = clean(item.label)
+    .map((item) => {
+      const label = approvedText(item.label)
       if (!label) return null
-      const icon = CREDENTIAL_ICONS.has(item.icon as CredentialIcon)
-        ? (item.icon as CredentialIcon)
-        : fallback.credentials[index]?.icon ?? 'award'
+      const icon = CREDENTIAL_ICONS.has(item.icon as CredentialIcon) ? (item.icon as CredentialIcon) : 'award'
       return { icon, label }
     })
     .filter((item): item is { icon: CredentialIcon; label: string } => Boolean(item))
   const services = (published?.services ?? [])
     .map((service) => {
-      const name = clean(service.name)
-      const price = clean(service.price)
+      const name = approvedText(service.name)
+      const price = approvedText(service.price)
       if (!name || !price) return null
       const items = (service.items ?? [])
         .map((item) => {
-          const title = clean(item.title)
-          const body = clean(item.body)
+          const title = approvedText(item.title)
+          const body = approvedText(item.body)
           return title && body ? { title, body } : null
         })
         .filter((item): item is { title: string; body: string } => Boolean(item))
@@ -594,12 +629,10 @@ export function resolveTourism(
     })
     .filter((service): service is TourismPage['services'][number] => Boolean(service))
   const audiences = (published?.audiences ?? [])
-    .map((item, index) => {
-      const label = clean(item.label)
+    .map((item) => {
+      const label = approvedText(item.label)
       if (!label) return null
-      const icon = AUDIENCE_ICONS.has(item.icon as AudienceIcon)
-        ? (item.icon as AudienceIcon)
-        : fallback.audiences[index]?.icon ?? 'farm'
+      const icon = AUDIENCE_ICONS.has(item.icon as AudienceIcon) ? (item.icon as AudienceIcon) : 'farm'
       return { icon, label }
     })
     .filter((item): item is { icon: AudienceIcon; label: string } => Boolean(item))
@@ -613,23 +646,25 @@ export function resolveTourism(
     },
     introduction: {
       ...sharedIntroduction(published, fallback.introduction),
+      paragraphs: publishedLines(published?.introParagraphs),
       ctaLabel: text(published?.introCtaLabel, fallback.introduction.ctaLabel),
+      ctaHref: CONTACT_PATH,
     },
     portrait: picture(published?.facilitator?.image, fallback.portrait, 1200),
     pathHeading: text(published?.pathHeading, fallback.pathHeading),
-    path: mergeSection(fallback.path, steps, (step) => step.title),
+    path: steps,
     pathCtaLabel: consultation,
-    pathCtaHref: '#contact',
-    credentials: mergeSection(fallback.credentials, credentials, (item) => item.label),
+    pathCtaHref: CONTACT_PATH,
+    credentials,
     servicesHeading: text(published?.servicesHeading, fallback.servicesHeading),
-    services: mergeSection(fallback.services, services, (service) => service.name),
+    services,
     servicesCtaLabel: consultation,
-    servicesCtaHref: '#contact',
+    servicesCtaHref: CONTACT_PATH,
     audienceHeading: text(published?.audienceHeading, fallback.audienceHeading),
-    audiences: mergeSection(fallback.audiences, audiences, (item) => item.label),
-    audienceNote: text(published?.audienceNote, fallback.audienceNote),
+    audiences: audiences.length ? audiences : fallback.audiences,
+    audienceNote: publicCopy(published?.audienceNote, fallback.audienceNote),
     audienceCtaLabel: consultation,
-    audienceCtaHref: '#contact',
+    audienceCtaHref: CONTACT_PATH,
     enquiry: corporateEnquiry(
       text(published?.contactHeading, fallback.enquiry.heading),
       text(published?.contactIntro, fallback.enquiry.body),
@@ -648,30 +683,26 @@ export function resolveDisc(
   const fallback = discFallback(images)
   const published = publishedProgram(program, 'disc-assessment')
   const offerings = (published?.offerings ?? [])
-    .map((offering, index) => {
-      const title = clean(offering.title)
-      const body = clean(offering.body)
+    .map((offering) => {
+      const title = approvedText(offering.title)
+      const body = approvedText(offering.body)
       if (!title || !body) return null
-      const base = fallback.offerings[index] ?? fallback.offerings[0]!
-      const outcomes = lines(offering.outcomes)
       return {
         title,
         body,
-        image: picture(offering.image, base.image, 1200),
-        outcomes: outcomes.length ? outcomes : base.outcomes,
+        image: picture(offering.image, { src: '', alt: '' }, 1200),
+        outcomes: publishedLines(offering.outcomes),
         ctaLabel: text(offering.ctaLabel, `Ask about ${title}`),
-        ctaHref: '#contact',
+        ctaHref: CONTACT_PATH,
       }
     })
     .filter((offering): offering is DiscPage['offerings'][number] => Boolean(offering))
   const practical = (published?.practicalItems ?? [])
-    .map((item, index) => {
-      const label = clean(item.label)
-      const itemLines = lines(item.lines)
+    .map((item) => {
+      const label = approvedText(item.label)
+      const itemLines = publishedLines(item.lines)
       if (!label || !itemLines.length) return null
-      const icon = PRACTICAL_ICONS.has(item.icon as PracticalIcon)
-        ? (item.icon as PracticalIcon)
-        : fallback.practical[index]?.icon ?? 'duration'
+      const icon = PRACTICAL_ICONS.has(item.icon as PracticalIcon) ? (item.icon as PracticalIcon) : 'duration'
       return { icon, label, lines: itemLines }
     })
     .filter((item): item is DiscPage['practical'][number] => Boolean(item))
@@ -688,7 +719,7 @@ export function resolveDisc(
     offeringsHeading: text(published?.offeringsHeading, fallback.offeringsHeading),
     offerings: mergeSection(fallback.offerings, offerings, (offering) => offering.title),
     practicalHeading: text(published?.practicalHeading, fallback.practicalHeading),
-    practical: mergeSection(fallback.practical, practical, (item) => item.label),
+    practical,
     close: closeFor(published ?? {}, images, {
       reviewsHeading: fallback.reviewsHeading,
       contactHeading: fallback.contactHeading,

@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react'
 
+import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { PortableTextRenderer } from '@/components/portable-text/portable-text-renderer'
 import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
-import { Button, ButtonLink } from '@/components/ui/button'
+import { ButtonLink } from '@/components/ui/button'
+import { CONTACT_PATH } from '@/lib/contact/model'
 import type {
   CorporateAwards,
   CorporateClose,
@@ -113,11 +115,13 @@ export function CorporateHero({
 export function CorporateAwardsStrip({ awards }: { awards: CorporateAwards }) {
   if (!awards.show || !awards.images.length) return null
   return (
-    <section aria-label="TripAdvisor awards" className="border-y-2 border-headline bg-farm-beige py-6">
+    <section aria-label="Recognition" className="border-y-2 border-headline bg-farm-beige py-6">
       <Container width="brand" className="flex max-w-[1500px] flex-col items-center gap-5 md:flex-row md:justify-between">
         <div className="text-center md:max-w-[24rem] md:text-left">
-          <p className="font-display text-lg font-black uppercase leading-tight text-headline">{awards.title}</p>
-          <p className="mt-1 text-sm font-medium">{awards.tagline}</p>
+          {awards.title ? (
+            <p className="font-display text-lg font-black uppercase leading-tight text-headline">{awards.title}</p>
+          ) : null}
+          {awards.tagline ? <p className="mt-1 text-sm font-medium">{awards.tagline}</p> : null}
         </div>
         <ul className="flex flex-wrap items-center justify-center gap-4">
           {awards.images.map((image) => (
@@ -192,59 +196,16 @@ export function PhotoCarousel({ images, label }: { images: CorporatePicture[]; l
   )
 }
 
-const inputClass =
-  'border-2 border-headline bg-farm-beige px-4 py-3 text-base outline-none focus-visible:ring-4 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-70'
-const labelClass = 'font-display text-sm font-black uppercase tracking-wide text-headline'
-
 export function CorporateEnquiryForm({ enquiry }: { enquiry: CorporateEnquiry }) {
   return (
-    <form
-      className="mt-10 border-2 border-headline bg-background p-6 shadow-[12px_12px_0_var(--color-headline)] md:p-10"
-      onSubmit={(event) => event.preventDefault()}
-      aria-describedby="corporate-enquiry-status"
-    >
-      <fieldset disabled className="grid gap-6 md:grid-cols-2">
-        <label className="flex flex-col gap-2">
-          <span className={labelClass}>Name</span>
-          <input type="text" name="name" autoComplete="name" className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-2">
-          <span className={labelClass}>Email</span>
-          <input type="email" name="email" autoComplete="email" className={inputClass} />
-        </label>
-        {enquiry.showPhone ? (
-          <label className="flex flex-col gap-2">
-            <span className={labelClass}>Phone Number</span>
-            <input type="tel" name="phone" autoComplete="tel" className={inputClass} />
-          </label>
-        ) : null}
-        {enquiry.programOptions.length ? (
-          <label className="flex flex-col gap-2">
-            <span className={labelClass}>Program Selection</span>
-            <select name="program" defaultValue="" className={inputClass}>
-              <option value="">Select a DiSC program</option>
-              {enquiry.programOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-        <label className="flex flex-col gap-2 md:col-span-2">
-          <span className={labelClass}>Message</span>
-          <textarea name="message" rows={6} className={inputClass} />
-        </label>
-      </fieldset>
-      <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-        <Button type="button" disabled size="lg">
-          Send Message <ArrowRightIcon />
-        </Button>
-        <p id="corporate-enquiry-status" className="font-accent text-lg italic text-primary-accent">
-          {enquiry.unavailable}
-        </p>
-      </div>
-    </form>
+    <div className="mt-10 border-2 border-headline bg-background p-6 shadow-[12px_12px_0_var(--color-headline)] md:p-10">
+      <p id="corporate-enquiry-status" className="font-accent text-lg italic text-primary-accent" role="status">
+        {enquiry.unavailable}
+      </p>
+      <ButtonLink href={CONTACT_PATH} size="lg" className="mt-8">
+        Contact <ArrowRightIcon />
+      </ButtonLink>
+    </div>
   )
 }
 
@@ -363,7 +324,8 @@ export function CorporateCloseSections({ close }: { close: CorporateClose }) {
       {close.facilitator ? (
         <section className="overflow-hidden bg-background py-20 md:py-28">
           <Container width="brand" className="max-w-[1300px]">
-            <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
+            <div className={`grid items-center gap-12 ${close.facilitator.image.src ? 'lg:grid-cols-[1fr_1.1fr]' : ''}`}>
+              {close.facilitator.image.src ? (
               <figure className="relative m-0">
                 <div className="absolute -inset-3 -rotate-2 bg-secondary-accent" aria-hidden="true" />
                 <img
@@ -375,11 +337,14 @@ export function CorporateCloseSections({ close }: { close: CorporateClose }) {
                   className="relative aspect-[4/5] w-full border-2 border-headline object-cover"
                 />
               </figure>
+              ) : null}
               <div>
                 <p className="font-accent text-xl italic text-primary-accent">{close.facilitator.eyebrow}</p>
+                {close.facilitator.title ? (
                 <h2 className="mt-3 font-display text-[clamp(2.4rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">
                   {close.facilitator.title}
                 </h2>
+                ) : null}
                 <p className="mt-6 text-base leading-relaxed md:text-lg">{close.facilitator.body}</p>
                 <ButtonLink href={close.facilitator.ctaHref} size="lg" className="mt-8">
                   {close.facilitator.ctaLabel} <ArrowRightIcon />
@@ -417,7 +382,7 @@ export function CorporateCloseSections({ close }: { close: CorporateClose }) {
       {close.facility ? (
         <section className="overflow-hidden bg-farm-beige py-20 md:py-28">
           <Container width="brand" className="max-w-[1400px]">
-            <div className="grid items-start gap-14 lg:grid-cols-[1fr_1.05fr]">
+            <div className={`grid items-start gap-14 ${close.facility.items.length && close.facility.gallery.length ? 'lg:grid-cols-[1fr_1.05fr]' : ''}`}>
               <div>
                 <DisplayHeading
                   lead={close.facility.lead}
@@ -425,6 +390,7 @@ export function CorporateCloseSections({ close }: { close: CorporateClose }) {
                   accentClassName="text-stroke"
                   className="font-display text-[clamp(2.2rem,5.2vw,4.4rem)] font-black uppercase leading-[0.85] text-headline"
                 />
+                {close.facility.items.length ? (
                 <ul className="mt-10 space-y-7">
                   {close.facility.items.map((item) => (
                     <li key={item.title} className="flex gap-4">
@@ -438,6 +404,7 @@ export function CorporateCloseSections({ close }: { close: CorporateClose }) {
                     </li>
                   ))}
                 </ul>
+                ) : null}
               </div>
               <PhotoCarousel images={close.facility.gallery} label="Training facility photos" />
             </div>
@@ -491,10 +458,11 @@ export function CorporateLocation() {
               Get directions <ArrowRightIcon />
             </ButtonLink>
           </div>
-          <iframe
+          <OptionalEmbed
             title={towerOfGoatsLocation.mapTitle}
             src={towerOfGoatsLocation.mapSrc}
-            loading="lazy"
+            actionLabel="Load map"
+            description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
             className="h-[420px] w-full border-2 border-headline md:h-[520px]"
           />
         </div>

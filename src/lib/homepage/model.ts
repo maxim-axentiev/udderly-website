@@ -338,7 +338,7 @@ export function localHomepageContent(): HomepageContent {
       emailPlaceholder: 'you@example.com',
       dateOfBirthLabel: 'Date of birth (required)',
       submitLabel: 'Sign me up',
-      confirmation: homepageNewsletter.confirmation,
+      confirmation: null,
       mobileAnimals: homepageNewsletter.mobileAnimals.map((animal) => ({
         ...localImage(animal.src, '', 768, 768),
         rotate: animal.rotate,
@@ -355,7 +355,7 @@ export function localHomepageContent(): HomepageContent {
     urbort: {
       title: homepageUrbort.title,
       copy: homepageUrbort.copy,
-      cardLabel: 'Read the article',
+      cardLabel: 'Explore the blog',
       cta: homepageUrbort.cta,
       articles: homepageUrbort.articles.map((article) => ({
         id: article.title,

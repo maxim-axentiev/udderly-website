@@ -1,7 +1,14 @@
-import type { FormEvent, ReactNode } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
+import {
+  CONTACT_INVALID,
+  CONTACT_NOT_SENT,
+  CONTACT_RATE_LIMITED,
+  CONTACT_SUCCESS,
+} from '@/lib/contact/model'
 import type { ContactPageContent } from '@/lib/contact/resolve'
+import { submitContactFn } from '@/lib/contact/server'
 
 const field =
   'mt-2 w-full border-2 border-headline bg-background px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-70'
@@ -36,9 +43,41 @@ function Fact({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return <li className="flex items-center gap-3">{icon}<span>{children}</span></li>
 }
 
-export function ContactPage({ page }: { page: ContactPageContent }) {
-  const submit = (event: FormEvent) => {
+export function ContactPage({
+  page,
+  deliveryAvailable = false,
+}: {
+  page: ContactPageContent
+  deliveryAvailable?: boolean
+}) {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [status, setStatus] = useState<'idle' | 'sending' | 'accepted' | 'error'>('idle')
+  const [notice, setNotice] = useState('')
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!deliveryAvailable || status === 'sending') return
+    setStatus('sending')
+    setNotice('')
+    const extra = String(new FormData(event.currentTarget).get('contact_extra') ?? '')
+    try {
+      const result = await submitContactFn({ data: { name, email, message, contactExtra: extra } })
+      if (result.ok) {
+        setStatus('accepted')
+        setNotice(CONTACT_SUCCESS)
+        setName('')
+        setEmail('')
+        setMessage('')
+        return
+      }
+      setStatus('error')
+      setNotice(result.error === 'invalid' ? CONTACT_INVALID : result.error === 'rate_limited' ? CONTACT_RATE_LIMITED : CONTACT_NOT_SENT)
+    } catch {
+      setStatus('error')
+      setNotice(CONTACT_NOT_SENT)
+    }
   }
 
   return (
@@ -81,30 +120,64 @@ export function ContactPage({ page }: { page: ContactPageContent }) {
         </div>
         <form
           onSubmit={submit}
-          className="self-start border-4 border-headline bg-background p-7 shadow-[12px_12px_0_var(--color-headline)] md:p-10"
-          aria-describedby="contact-unavailable"
+          className="relative self-start border-4 border-headline bg-background p-7 shadow-[12px_12px_0_var(--color-headline)] md:p-10"
+          aria-describedby={deliveryAvailable ? 'contact-status' : 'contact-unavailable'}
         >
           <h2 className="font-display text-4xl font-black uppercase text-headline">{page.formHeading}</h2>
-          <fieldset disabled className="mt-6 min-w-0 border-0 p-0">
-            <label className="block font-semibold">
-              {page.nameLabel}
-              <input name="name" autoComplete="name" className={field} />
-            </label>
-            <label className="mt-5 block font-semibold">
-              {page.emailLabel}
-              <input name="email" type="email" autoComplete="email" className={field} />
-            </label>
-            <label className="mt-5 block font-semibold">
-              {page.messageLabel}
-              <textarea name="message" rows={6} className={field} />
-            </label>
-            <Button type="button" size="lg" className="mt-7 w-full" disabled>
-              {page.submitLabel}
-            </Button>
-          </fieldset>
-          <p id="contact-unavailable" className="mt-4 font-semibold text-headline" role="status">
-            {page.unavailable}
-          </p>
+          {deliveryAvailable ? (
+            <fieldset className="mt-6 min-w-0 border-0 p-0">
+              <p className="sr-only" aria-hidden="true">
+                <label>
+                  Leave this field empty
+                  <input name="contact_extra" tabIndex={-1} autoComplete="off" className={field} />
+                </label>
+              </p>
+              <label className="block font-semibold">
+                {page.nameLabel}
+                <input name="name" autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} className={field} />
+              </label>
+              <label className="mt-5 block font-semibold">
+                {page.emailLabel}
+                <input name="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className={field} />
+              </label>
+              <label className="mt-5 block font-semibold">
+                {page.messageLabel}
+                <textarea name="message" rows={6} value={message} onChange={(event) => setMessage(event.target.value)} className={field} />
+              </label>
+              <Button type="submit" size="lg" className="mt-7 w-full" disabled={status === 'sending'}>
+                {page.submitLabel}
+              </Button>
+            </fieldset>
+          ) : (
+            <fieldset disabled className="mt-6 min-w-0 border-0 p-0">
+              <label className="block font-semibold">
+                {page.nameLabel}
+                <input name="name" autoComplete="name" className={field} />
+              </label>
+              <label className="mt-5 block font-semibold">
+                {page.emailLabel}
+                <input name="email" type="email" autoComplete="email" className={field} />
+              </label>
+              <label className="mt-5 block font-semibold">
+                {page.messageLabel}
+                <textarea name="message" rows={6} className={field} />
+              </label>
+              <Button type="button" size="lg" className="mt-7 w-full" disabled>
+                {page.submitLabel}
+              </Button>
+            </fieldset>
+          )}
+          {deliveryAvailable ? (
+            notice ? (
+              <p id="contact-status" className="mt-4 font-semibold text-headline" role="status">
+                {notice}
+              </p>
+            ) : null
+          ) : (
+            <p id="contact-unavailable" className="mt-4 font-semibold text-headline" role="status">
+              {page.unavailable}
+            </p>
+          )}
         </form>
       </div>
     </section>

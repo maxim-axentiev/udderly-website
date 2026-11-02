@@ -15,7 +15,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "migrate:homepage-faqs:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/lib/migration/homepage-faqs-preview.ts",
-    "migrate:homepage:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning --import ./src/lib/migration/register-homepage-loader.mjs src/lib/migration/homepage-preview.ts"
+    "migrate:homepage:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning --import ./src/lib/migration/register-homepage-loader.mjs src/lib/migration/homepage-preview.ts",
+    "migrate:experiences:first-batch:dry-run": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/lib/migration/experiences-first-batch-preview.ts"
   },
   "dependencies": {
     "@portabletext/react": "^8.0.1",
@@ -25,6 +26,7 @@
     "@tanstack/react-start": "^1.168.50",
     "clsx": "^2.1.1",
     "nitro": "^3.0.260903-beta",
+    "nodemailer": "^10.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tailwind-merge": "^3.6.0"

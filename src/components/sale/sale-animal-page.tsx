@@ -1,24 +1,11 @@
-import { useState } from 'react'
-
-import { Button, ButtonLink } from '@/components/ui/button'
+import { OptionalEmbed } from '@/components/consent/optional-embed'
+import { ButtonLink } from '@/components/ui/button'
 import { Container } from '@/components/layout/container'
+import { CONTACT_PATH } from '@/lib/contact/model'
 import { towerOfGoatsLocation } from '@/lib/experiences/tower-of-goats'
-import {
-  ALPACA_POLICY,
-  CONTACT_DEMO_MESSAGE,
-  COW_FACTS,
-  COW_PLACEMENT,
-  GOAT_POLICY,
-  PRICE_PLACEHOLDER,
-  SPECIES_LABEL,
-  saleGroupDescription,
-} from '@/lib/sale/content'
+import { SPECIES_LABEL } from '@/lib/sale/content'
 import type { SaleCard, SalePageCopy } from '@/lib/sale/resolve'
 import { WaitlistSection } from './waitlist-form'
-
-const inputClass =
-  'border-2 border-headline bg-farm-beige px-4 py-3 text-base outline-none focus-visible:ring-4 focus-visible:ring-ring'
-const labelClass = 'font-display text-sm font-black uppercase tracking-wide text-headline'
 
 export function SaleAnimalPage({
   animal,
@@ -34,26 +21,22 @@ export function SaleAnimalPage({
   const label = animal.speciesTitle || (animal.species === 'other' ? '' : SPECIES_LABEL[animal.species])
   const portrait = animal.images[0]?.src ?? images.portrait
   const portraitAlt = animal.images[0]?.alt ?? (label ? `${animal.name}, ${label}` : animal.name)
-  const placementIntro = animal.placementIntro || (isCow ? COW_PLACEMENT : '')
-  const placementItems =
-    animal.placementItems ??
-    (animal.species === 'goat' ? [...GOAT_POLICY] : animal.species === 'alpaca' ? [...ALPACA_POLICY] : undefined)
-  const groupCopy =
-    animal.groupDescription || (isPair ? saleGroupDescription(animal.name) : undefined)
-  const personality =
-    animal.personality ||
-    (animal.species === 'other'
-      ? undefined
-      : `Placeholder description. ${animal.name} ${isCow ? 'is' : 'are'} gentle, curious and well socialized from day one. Raised on our farm with plenty of attention, snacks and herd time, ${isCow ? 'this calf is' : "they're"} ready to bring a little ridiculousness to the right home.`)
-  const facts = COW_FACTS.map(([name, fallback]) => {
-    if (name === 'Birthdate' && animal.birthDate) return [name, animal.birthDate] as const
-    if (name === 'Height at birth' && animal.birthHeight) return [name, animal.birthHeight] as const
-    if (name === 'Weight at birth' && animal.birthWeight) return [name, animal.birthWeight] as const
-    if (name === 'Chondro Status' && animal.genetics) return [name, animal.genetics] as const
-    if (name === 'Sex' && animal.sex) return [name, animal.sex] as const
-    return [name, fallback] as const
-  })
-  const price = animal.priceDisplay || PRICE_PLACEHOLDER
+  const placementIntro = animal.placementIntro
+  const placementItems = animal.placementItems
+  const groupCopy = animal.groupDescription
+  const personality = animal.personality
+  const facts = [
+    ['Birthdate', animal.birthDate],
+    ['Height at birth', animal.birthHeight],
+    ['Weight at birth', animal.birthWeight],
+    ['Chondro Status', animal.genetics],
+    ['Sex', animal.sex],
+  ].flatMap(([fact, value]) => (value ? [[fact, value] as const] : []))
+  const price = animal.priceDisplay
+  const parents = [
+    { role: 'Dam', name: animal.parentDamName, height: animal.parentDamHeight },
+    { role: 'Sire', name: animal.parentSireName, height: animal.parentSireHeight },
+  ].filter((parent) => parent.name || parent.height)
 
   return (
     <>
@@ -122,17 +105,19 @@ export function SaleAnimalPage({
                 <h2 className="font-display text-[clamp(2rem,4.5vw,3.6rem)] font-black uppercase leading-[0.85] text-headline">
                   {isCow ? `All about ${animal.name}` : isPair ? `Meet the ${animal.species === 'goat' ? 'goats' : 'alpacas'}` : `Meet ${animal.name}`}
                 </h2>
+                {animal.sold || price ? (
                 <div className="inline-flex -rotate-3 flex-col items-center border-4 border-headline bg-secondary-accent px-6 py-3">
                   <span className="font-display text-xs font-black uppercase tracking-widest">{animal.sold ? 'Status' : 'Price'}</span>
                   <span className="font-display text-4xl font-black uppercase leading-none">{animal.sold ? 'Sold' : price}</span>
-                  {animal.sold ? (
+                  {animal.sold && price ? (
                     <span className="mt-2 text-center font-display text-base font-black uppercase">
-                      Sold for {price} <span className="block text-xs">Placeholder amount</span>
+                      Sold for {price}
                     </span>
                   ) : null}
                 </div>
+                ) : null}
               </div>
-              {isCow ? (
+              {isCow && facts.length ? (
                 <dl className="mt-8 grid gap-4 sm:grid-cols-2">
                   {facts.map(([fact, value]) => (
                     <div key={fact} className="border-2 border-headline bg-farm-beige p-4">
@@ -149,27 +134,21 @@ export function SaleAnimalPage({
         </Container>
       </section>
 
-      {isCow ? (
+      {parents.length ? (
         <section className="bg-background py-20 md:py-28">
           <Container width="brand" className="max-w-[1300px]">
             <h2 className="text-center font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
               Meet the parents
             </h2>
             <div className="mt-14 grid gap-10 md:grid-cols-2">
-              {[
-                ['Dam', images.dam],
-                ['Sire', images.sire],
-              ].map(([role, src], index) => (
-                <figure key={role} className={`m-0 border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)] ${index ? 'rotate-1' : '-rotate-1'}`}>
-                  <img src={src} alt={`${animal.name}'s ${role.toLowerCase()}`} width={1024} height={768} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+              {parents.map((parent, index) => (
+                <figure key={parent.role} className={`m-0 border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)] ${index ? 'rotate-1' : '-rotate-1'}`}>
                   <figcaption className="p-4">
-                    <p className="font-display text-4xl font-black uppercase text-primary-accent">{role}</p>
-                    <p className="mt-2 font-display text-xl font-black uppercase text-headline">
-                      Name: {role === 'Dam' ? animal.parentDamName || 'Placeholder' : animal.parentSireName || 'Placeholder'}
-                    </p>
-                    <p className="text-base">
-                      Height: {role === 'Dam' ? animal.parentDamHeight || 'Placeholder' : animal.parentSireHeight || 'Placeholder'}
-                    </p>
+                    <p className="font-display text-4xl font-black uppercase text-primary-accent">{parent.role}</p>
+                    {parent.name ? (
+                      <p className="mt-2 font-display text-xl font-black uppercase text-headline">Name: {parent.name}</p>
+                    ) : null}
+                    {parent.height ? <p className="text-base">Height: {parent.height}</p> : null}
                   </figcaption>
                 </figure>
               ))}
@@ -178,6 +157,7 @@ export function SaleAnimalPage({
         </section>
       ) : null}
 
+      {placementIntro || animal.sizeChart || placementItems?.length ? (
       <section className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1300px]">
           <h2 className="font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
@@ -185,22 +165,23 @@ export function SaleAnimalPage({
           </h2>
           {isCow ? (
             <div className="mt-12 grid gap-10 lg:grid-cols-2">
+              {placementIntro ? (
               <article className="border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
                 <h3 className="font-display text-2xl font-black uppercase text-headline">Placement policy</h3>
                 <p className="mt-4 text-base leading-relaxed">{placementIntro}</p>
               </article>
+              ) : null}
+              {animal.sizeChart ? (
               <article className="border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
                 <h3 className="font-display text-2xl font-black uppercase text-headline">Size chart</h3>
                 <img
-                  src={animal.sizeChart?.src ?? images.chart}
-                  alt={
-                    animal.sizeChart?.alt ??
-                    'Size chart comparing standard cattle, mid-size miniature cattle, miniature cattle and micro miniature cattle heights'
-                  }
+                  src={animal.sizeChart.src}
+                  alt={animal.sizeChart.alt}
                   className="mt-4 w-full border-2 border-headline object-contain"
                   loading="lazy"
                 />
               </article>
+              ) : null}
             </div>
           ) : placementItems?.length ? (
             <ul className="mt-12 space-y-4 border-2 border-headline bg-background p-6 shadow-[10px_10px_0_var(--color-headline)] md:p-8">
@@ -214,6 +195,7 @@ export function SaleAnimalPage({
           ) : null}
         </Container>
       </section>
+      ) : null}
 
       {animal.sold ? null : (
         <ContactForm
@@ -234,43 +216,15 @@ function ContactForm({
   heading: string
   buttonLabel: string
 }) {
-  const [sent, setSent] = useState(false)
   return (
     <section id="contact" className="scroll-mt-20 bg-farm-beige py-20 md:py-28">
       <Container width="brand" className="max-w-[1000px]">
         <h2 className="font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
           {heading}
         </h2>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            setSent(true)
-          }}
-          className="mt-10 border-2 border-headline bg-background p-6 shadow-[12px_12px_0_var(--color-headline)] md:p-10"
-        >
-          <div className="grid gap-6 md:grid-cols-2">
-            <label className="flex flex-col gap-2">
-              <span className={labelClass}>Name *</span>
-              <input required name="name" maxLength={100} autoComplete="name" className={inputClass} />
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className={labelClass}>Email *</span>
-              <input required type="email" name="email" maxLength={255} autoComplete="email" className={inputClass} />
-            </label>
-            <label className="flex flex-col gap-2 md:col-span-2">
-              <span className={labelClass}>Message *</span>
-              <textarea required name="message" rows={6} maxLength={2000} className={inputClass} />
-            </label>
-          </div>
-          <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <Button type="submit" size="lg">
-              {buttonLabel}
-            </Button>
-            <p aria-live="polite" className="font-accent text-lg italic text-primary-accent">
-              {sent ? CONTACT_DEMO_MESSAGE : ''}
-            </p>
-          </div>
-        </form>
+        <ButtonLink href={CONTACT_PATH} size="lg" className="mt-10">
+          {buttonLabel}
+        </ButtonLink>
       </Container>
     </section>
   )
@@ -299,10 +253,11 @@ function LocationBlock() {
               Get directions
             </ButtonLink>
           </div>
-          <iframe
+          <OptionalEmbed
             title={towerOfGoatsLocation.mapTitle}
             src={towerOfGoatsLocation.mapSrc}
-            loading="lazy"
+            actionLabel="Load map"
+            description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
             className="h-[420px] w-full border-2 border-headline"
           />
         </div>

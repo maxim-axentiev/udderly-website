@@ -42,6 +42,16 @@ function clean(value: string | null | undefined): string | undefined {
   return text ? text : undefined
 }
 
+function approvedText(value: string | null | undefined): string | undefined {
+  const text = clean(value)
+  if (!text || /^placeholder\b/i.test(text)) return undefined
+  return text
+}
+
+function approvedLines(value: Array<string | null> | null | undefined): string[] {
+  return (value ?? []).map((item) => approvedText(item)).filter((item): item is string => Boolean(item))
+}
+
 function text(value: string | null | undefined, fallback: string): string {
   return clean(value) ?? fallback
 }
@@ -222,14 +232,13 @@ export function resolveVisionValues(
   images: AboutImages,
 ): VisionValuesPage {
   const fallback = visionValuesFallback(images)
-  const paragraphs = lines(page?.visionParagraphs)
-  const values = (page?.values ?? [])
-    .map((value) => {
-      const title = clean(value.title)
-      const description = clean(value.description)
-      return title && description ? { title, description } : null
-    })
-    .filter((value): value is { title: string; description: string } => Boolean(value))
+  const visionHeading = approvedText(page?.visionHeading)
+  const visionParagraphs = approvedLines(page?.visionParagraphs)
+  const valueItems = (page?.values ?? []).flatMap((value) => {
+    const title = approvedText(value.title)
+    const description = approvedText(value.description)
+    return title && description ? [{ title, description }] : []
+  })
   return {
     hero: {
       lead: text(page?.heroLead, fallback.hero.lead),
@@ -237,11 +246,11 @@ export function resolveVisionValues(
       image: picture(page?.heroImage, fallback.hero.image, 1920),
     },
     vision:
-      page?.showVision === false || !fallback.vision
+      page?.showVision === false || !visionHeading || !visionParagraphs.length || !fallback.vision
         ? null
         : {
-            heading: text(page?.visionHeading, fallback.vision.heading),
-            paragraphs: paragraphs.length ? paragraphs : fallback.vision.paragraphs,
+            heading: visionHeading,
+            paragraphs: visionParagraphs,
             image: picture(page?.visionImage, fallback.vision.image, 1400),
           },
     gallery:
@@ -249,12 +258,12 @@ export function resolveVisionValues(
         ? null
         : galleryPictures(page?.gallery, fallback.gallery),
     values:
-      page?.showValues === false || !fallback.values
+      page?.showValues === false || !valueItems.length || !fallback.values
         ? null
         : {
-            heading: text(page?.valuesHeading, fallback.values.heading),
+            heading: approvedText(page?.valuesHeading) ?? fallback.values.heading,
             image: picture(page?.valuesImage, fallback.values.image, 1400),
-            items: values.length ? values : fallback.values.items,
+            items: valueItems,
           },
     cta: ctaFor(page, fallback.cta),
     seo: seoFor(page?.seo, fallback.seo),
@@ -310,8 +319,8 @@ export function resolveTeam(
       image: picture(page?.heroImage, fallback.hero.image, 1920),
     },
     factLabel,
-    members: published.length ? published : fallback.members,
-    placeholders: published.length === 0,
+    members: published,
+    placeholders: false,
     cta: ctaFor(page, fallback.cta),
     seo: seoFor(page?.seo, fallback.seo),
   }

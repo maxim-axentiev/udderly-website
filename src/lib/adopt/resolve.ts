@@ -4,14 +4,7 @@ import type { SanityImage } from '@/lib/sanity/types'
 import {
   ADOPTION_ANIMALS,
   ADOPT_PAGE,
-  GOLD_PRICE,
-  SILVER_PRICE,
   adoptionPath,
-  adoptionStory,
-  adoptionSupportCopy,
-  goldItems,
-  importantInfo,
-  silverItems,
   type AdoptionAnimal,
 } from './content'
 
@@ -85,7 +78,6 @@ export type AdoptionCard = Omit<AdoptionAnimal, 'imageKey'> & {
 
 export type CollectionOptions = { manageCollection?: boolean }
 
-const CLARA_SPECIES = 'Mini Highland cow'
 const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const SEO_TITLE_MAX = 120
 
@@ -117,40 +109,26 @@ function cardFromOffering(entry: PublishedAdoption): AdoptionCard {
   const slug = entry.slug?.trim() ?? ''
   const known = knownAdoption(slug)
   const name = entry.title?.trim() || known?.name || ''
-  const species = entry.speciesTitle?.trim()
   const introduction = entry.introduction?.trim()
+  const tagline = entry.tagline?.trim()
   return {
     name,
     slug,
-    alt: known?.alt ?? entry.cardImage?.alt?.trim() ?? name,
-    imageKey: known?.imageKey,
-    tagline: entry.tagline?.trim() || known?.tagline || '',
-    showGold: known?.showGold ?? false,
+    alt: entry.cardImage?.alt?.trim() || name,
+    tagline: tagline && !/^placeholder\b/i.test(tagline) ? tagline : '',
+    showGold: false,
     href: adoptionPath(slug),
-    blurb: introduction || (known ? ADOPT_PAGE.cardBlurb : ''),
+    blurb: introduction && !/^placeholder\b/i.test(introduction) ? introduction : '',
     source: 'sanity',
-    speciesNote:
-      slug === 'clara' && species && !/highland/i.test(species)
-        ? `${name} is a ${CLARA_SPECIES}. Published species “${species}” is not used on this card.`
-        : undefined,
     portrait: presentationImage(entry.cardImage, 1024),
   }
-}
-
-function fallbackAdoptionCards(): AdoptionCard[] {
-  return ADOPTION_ANIMALS.map((animal) => ({
-    ...animal,
-    href: adoptionPath(animal.slug),
-    blurb: ADOPT_PAGE.cardBlurb,
-    source: 'fallback' as const,
-  }))
 }
 
 export function buildAdoptionCards(
   published: readonly PublishedAdoption[] = [],
   options: CollectionOptions = {},
 ): AdoptionCard[] {
-  if (published.length === 0 && options.manageCollection !== true) return fallbackAdoptionCards()
+  void options
   return visibleOfferings(published).map(cardFromOffering)
 }
 
@@ -159,12 +137,7 @@ export function findAdoptionAnimal(
   published: readonly PublishedAdoption[] = [],
   manageCollection = false,
 ): AdoptionCard | undefined {
-  if (published.length === 0 && !manageCollection) {
-    const animal = knownAdoption(slug)
-    return animal
-      ? { ...animal, href: adoptionPath(animal.slug), blurb: ADOPT_PAGE.cardBlurb, source: 'fallback' }
-      : undefined
-  }
+  void manageCollection
   const match = visibleOfferings(published).find((entry) => entry.slug === slug)
   return match ? cardFromOffering(match) : undefined
 }
@@ -375,41 +348,24 @@ export type AdoptionDetail = {
   seoDescription?: string
 }
 
-function localPackages(animal: { name: string; showGold: boolean }): AdoptionPackageView[] {
-  const silver: AdoptionPackageView = {
-    name: 'Silver',
-    kicker: 'Silver Pail',
-    subtitle: 'The classic farm supporter.',
-    price: SILVER_PRICE,
-    items: silverItems(animal.name),
-  }
-  if (!animal.showGold) return [silver]
-  return [
-    silver,
-    {
-      name: 'Gold',
-      kicker: 'Gold Hay Bale',
-      subtitle: 'The royal treatment.',
-      price: GOLD_PRICE,
-      items: goldItems(animal.name),
-    },
-  ]
-}
-
 function publishedPackages(packages: PublishedAdoption['packages']): AdoptionPackageView[] | null {
   if (!packages?.length) return null
   const views = packages.flatMap((item) => {
     const name = item.name?.trim() ?? ''
     const price = item.priceDisplay?.trim() ?? ''
-    const items = (item.includes ?? []).map((entry) => entry.trim()).filter(Boolean)
-    if (!name || name.length > 40 || !price || price.length > 40 || items.length < 1) return []
+    const items = (item.includes ?? []).map((entry) => entry.trim()).filter((entry) => entry && !/^placeholder\b/i.test(entry))
+    const checkoutUrl = checkoutHref(item.checkoutUrl)
+    if (
+      !name || name.length > 40 || !price || price.length > 40 || /^placeholder\b/i.test(price) || price === '$X,XXX' ||
+      items.length < 1 || !checkoutUrl
+    ) return []
     return [{
       name,
       kicker: item.kicker?.trim() || name,
       subtitle: item.subtitle?.trim() || '',
       price,
       items,
-      checkoutUrl: checkoutHref(item.checkoutUrl),
+      checkoutUrl,
     }]
   })
   return views.length ? views : null
@@ -423,7 +379,8 @@ function publishedParagraphs(
   if (!value?.length || value.length > maxItems) return null
   const paragraphs = value.map((item) => item.trim())
   if (paragraphs.some((item) => !item || item.length > maxLength)) return null
-  return paragraphs
+  const approved = paragraphs.filter((item) => !/^placeholder\b/i.test(item))
+  return approved.length ? approved : null
 }
 
 export function resolveAdoptionDetail(
@@ -431,16 +388,15 @@ export function resolveAdoptionDetail(
   published: readonly PublishedAdoption[] = [],
 ): AdoptionDetail {
   const match = published.find((entry) => entry.slug?.trim() === animal.slug)
-  const known = knownAdoption(animal.slug)
   const tagline = match?.tagline?.trim()
   const seoTitle = match?.seo?.title?.trim()
   const seoDescription = match?.seo?.description?.trim()
   return {
-    tagline: tagline && tagline.length <= 80 ? tagline : animal.tagline,
-    story: publishedParagraphs(match?.storyParagraphs, 4) ?? (known ? adoptionStory(animal.name) : []),
-    support: publishedParagraphs(match?.supportParagraphs, 4) ?? (known ? adoptionSupportCopy(animal.name) : []),
-    terms: publishedParagraphs(match?.termsItems, 8, 300) ?? (known ? importantInfo(animal.name) : []),
-    packages: publishedPackages(match?.packages) ?? (known ? localPackages(animal) : []),
+    tagline: tagline && tagline.length <= 80 && !/^placeholder\b/i.test(tagline) ? tagline : '',
+    story: publishedParagraphs(match?.storyParagraphs, 4) ?? [],
+    support: publishedParagraphs(match?.supportParagraphs, 4) ?? [],
+    terms: publishedParagraphs(match?.termsItems, 8, 300) ?? [],
+    packages: publishedPackages(match?.packages) ?? [],
     gallery: imageList(match?.galleryOverride, 1024, 6),
     seoTitle: seoTitle && seoTitle.length <= SEO_TITLE_MAX ? seoTitle : undefined,
     seoDescription: seoDescription && seoDescription.length <= SEO_DESCRIPTION_MAX ? seoDescription : undefined,

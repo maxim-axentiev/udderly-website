@@ -6,15 +6,7 @@ import type { PageSeoInput } from '@/lib/seo/page-head'
 import type { PortableTextContent } from '@/lib/sanity/types'
 
 import type { CmsUrbortArticle, CmsUrbortBlogPage, CmsUrbortLink } from './cms'
-import {
-  URBORT_PATH,
-  urbortBoardFallback,
-  urbortPlaceholders,
-  urbortRotations,
-  type UrbortImageKey,
-} from './model'
-
-export type UrbortImages = Record<UrbortImageKey, string>
+import { URBORT_PATH, urbortBoardFallback, urbortRotations } from './model'
 
 export type UrbortCard = {
   slug: string
@@ -130,37 +122,20 @@ function galleryFor(article: NonNullable<CmsUrbortArticle>) {
   })
 }
 
-function cardFromArticle(
-  article: NonNullable<CmsUrbortArticle>,
-  images: UrbortImages,
-  index: number,
-): UrbortCard {
+function cardFromArticle(article: NonNullable<CmsUrbortArticle>, index: number): UrbortCard {
   const slug = clean(article.slug) ?? ''
   const title = clean(article.title) ?? ''
-  const placeholder = urbortPlaceholders.find((item) => item.slug === slug)
   const cmsSrc = cmsImageUrl(article.heroImage, 1024)
   const cmsAlt = clean(article.heroImage?.alt)
   return {
     slug,
     title,
     excerpt: clean(article.excerpt) ?? '',
-    imageSrc: cmsSrc ?? (placeholder ? images[placeholder.imageKey] : undefined),
+    imageSrc: cmsSrc,
     imageAlt: cmsAlt ?? `${title}. Photo from the URBORT board.`,
-    rotate: placeholder?.rotate ?? urbortRotations[index % urbortRotations.length],
+    rotate: urbortRotations[index % urbortRotations.length],
     href: `${URBORT_PATH}/${slug}`,
     published: true,
-  }
-}
-
-function placeholderCard(images: UrbortImages, item: (typeof urbortPlaceholders)[number]): UrbortCard {
-  return {
-    slug: item.slug,
-    title: item.title,
-    excerpt: item.excerpt,
-    imageSrc: images[item.imageKey],
-    imageAlt: `${item.title}. Placeholder board photo, not a published article.`,
-    rotate: item.rotate,
-    published: false,
   }
 }
 
@@ -176,30 +151,8 @@ function ctaFor(page: CmsUrbortBlogPage): UrbortBoard['cta'] {
 export function resolveUrbortBoard(
   page: CmsUrbortBlogPage,
   articles: CmsUrbortArticle[] | null | undefined,
-  images: UrbortImages,
 ): UrbortBoard {
-  const published = (articles ?? []).filter(isPublicArticle)
-  const used = new Set<string>()
-  const cards: UrbortCard[] = []
-  const showPlaceholders = page?.showPlaceholderCards !== false
-
-  if (showPlaceholders) {
-    urbortPlaceholders.forEach((item) => {
-      const match = published.find((article) => clean(article.slug) === item.slug)
-      if (match) {
-        cards.push(cardFromArticle(match, images, cards.length))
-        used.add(item.slug)
-      } else {
-        cards.push(placeholderCard(images, item))
-      }
-    })
-  }
-
-  published.forEach((article) => {
-    const slug = clean(article.slug) ?? ''
-    if (used.has(slug)) return
-    cards.push(cardFromArticle(article, images, cards.length))
-  })
+  const cards = (articles ?? []).filter(isPublicArticle).map((article, index) => cardFromArticle(article, index))
 
   return {
     titleLead: text(page?.titleLead, urbortBoardFallback.titleLead),
@@ -219,10 +172,9 @@ export function resolveUrbortBoard(
 export function resolveUrbortArticle(
   article: CmsUrbortArticle,
   page: CmsUrbortBlogPage,
-  images: UrbortImages,
 ): UrbortArticlePage | null {
   if (!isPublicArticle(article)) return null
-  const card = cardFromArticle(article, images, 0)
+  const card = cardFromArticle(article, 0)
   const title = card.title
   const excerpt = clean(article.excerpt)
   return {

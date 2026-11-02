@@ -19,8 +19,21 @@ function clean(value: string | null | undefined) {
   return trimmed || undefined
 }
 
+function approvedText(value: string | null | undefined) {
+  const trimmed = clean(value)
+  if (!trimmed || /^placeholder\b/i.test(trimmed)) return undefined
+  return trimmed
+}
+
 function text(value: string | null | undefined, fallback: string) {
-  return clean(value) ?? fallback
+  return approvedText(value) ?? fallback
+}
+
+function publishedLines(value: Array<string | null> | null | undefined) {
+  return (value ?? []).flatMap((item) => {
+    const line = approvedText(item)
+    return line ? [line] : []
+  })
 }
 
 function seoFor(seo: CmsSeo | undefined, fallback: PageSeoInput): PageSeoInput {
@@ -35,37 +48,12 @@ function seoFor(seo: CmsSeo | undefined, fallback: PageSeoInput): PageSeoInput {
   }
 }
 
-function list(value: Array<string | null> | null | undefined, fallback: readonly string[]) {
-  const next = (value ?? []).flatMap((item) => {
-    const line = clean(item)
-    return line ? [line] : []
-  })
-  return mergeNamed(fallback, next, (item) => item)
-}
-
-function mergeNamed<T>(fallback: readonly T[], incoming: readonly T[], key: (item: T) => string): T[] {
-  if (!incoming.length) return [...fallback]
-  if (incoming.length >= fallback.length) return [...incoming]
-  const byKey = new Map(incoming.map((item) => [key(item), item]))
-  const used = new Set<string>()
-  const merged = fallback.map((item) => {
-    const next = byKey.get(key(item))
-    if (!next) return item
-    used.add(key(item))
-    return next
-  })
-  for (const item of incoming) {
-    if (!used.has(key(item))) merged.push(item)
-  }
-  return merged
-}
-
 export type VisitImage = { src: string; alt: string }
 
 function photos(images: Array<SanityImage | null> | null | undefined): VisitImage[] | undefined {
   const next = (images ?? []).flatMap((image) => {
     const src = cmsImageUrl(image ?? undefined, 1400)
-    const alt = image?.alt?.trim()
+    const alt = approvedText(image?.alt)
     return src && alt ? [{ src, alt }] : []
   })
   return next.length ? next : undefined
@@ -79,10 +67,10 @@ export type IceFlavour = { name: string; story: string; ingredients: string }
 
 function flavours(value: Array<{ name?: string | null; story?: string | null; ingredients?: string | null } | null> | null | undefined): IceFlavour[] | undefined {
   const next = (value ?? []).flatMap((item) => {
-    const name = clean(item?.name)
-    const story = clean(item?.story)
+    const name = approvedText(item?.name)
+    const story = approvedText(item?.story)
     if (!name || !story) return []
-    return [{ name, story, ingredients: clean(item?.ingredients) ?? '' }]
+    return [{ name, story, ingredients: approvedText(item?.ingredients) ?? '' }]
   })
   return next.length ? next : undefined
 }
@@ -91,9 +79,9 @@ export type GiftAmount = { name: string; description?: string }
 
 function amounts(value: Array<{ name?: string | null; description?: string | null } | null> | null | undefined): GiftAmount[] {
   return (value ?? []).flatMap((item) => {
-    const name = clean(item?.name)
+    const name = approvedText(item?.name)
     if (!name) return []
-    return [{ name, description: clean(item?.description) }]
+    return [{ name, description: approvedText(item?.description) }]
   })
 }
 
@@ -116,11 +104,14 @@ export function resolveFarmMarket(page: {
   showStat?: boolean | null
   showIceCream?: boolean | null
   showGallery?: boolean | null
-  seo?: CmsSeo
+    seo?: CmsSeo
 } | null) {
+  const localParagraphs = publishedLines(page?.localParagraphs)
+  const statValue = approvedText(page?.statValue)
+  const statLabel = text(page?.statLabel, farmMarketFallback.statLabel)
   return {
     ...farmMarketFallback,
-    localParagraphs: list(page?.localParagraphs, farmMarketFallback.localParagraphs),
+    localParagraphs: localParagraphs.length ? localParagraphs : farmMarketFallback.localParagraphs,
     iceCta: text(page?.iceCta, farmMarketFallback.iceCta),
     closeHeading: text(page?.closeHeading, farmMarketFallback.closeHeading),
     closeCopy: text(page?.closeCopy, farmMarketFallback.closeCopy),
@@ -132,11 +123,11 @@ export function resolveFarmMarket(page: {
     introHeading: text(page?.introHeading, farmMarketFallback.introHeading),
     intro: text(page?.intro, farmMarketFallback.intro),
     localHeading: text(page?.localHeading, farmMarketFallback.localHeading),
-    statValue: text(page?.statValue, farmMarketFallback.statValue),
-    statLabel: text(page?.statLabel, farmMarketFallback.statLabel),
+    statValue: statValue ?? '',
+    statLabel,
     iceHeading: text(page?.iceHeading, farmMarketFallback.iceHeading),
     iceCopy: text(page?.iceCopy, farmMarketFallback.iceCopy),
-    showStat: page?.showStat !== false,
+    showStat: page?.showStat !== false && Boolean(statValue),
     showIceCream: page?.showIceCream !== false,
     seo: seoFor(page?.seo, {
       title: farmMarketFallback.seoTitle,
@@ -163,18 +154,19 @@ export function resolveIceCream(
 ) {
   const videoUrl = clean(page?.videoUrl)
   const safeVideo = videoUrl && /^https:\/\//.test(videoUrl) ? videoUrl : undefined
+  const flavourList = flavours(page?.flavours)
   return {
     ...iceCreamFallback,
-    flavours: flavours(page?.flavours),
+    flavours: flavourList,
     poster: photo(page?.poster),
-    showFlavours: page?.showFlavours !== false,
+    showFlavours: page?.showFlavours !== false && Boolean(flavourList?.length),
     heroLead: text(page?.heroLead, iceCreamFallback.heroLead),
     heroAccent: text(page?.heroAccent, iceCreamFallback.heroAccent),
     introHeading: text(page?.introHeading, iceCreamFallback.introHeading),
     videoHeading: text(page?.videoHeading, iceCreamFallback.videoHeading),
     videoUrl: safeVideo,
-    showVideo: page?.showVideo !== false,
-    showGift: page?.showGift !== false,
+    showVideo: page?.showVideo !== false && Boolean(safeVideo),
+    showGift: false,
     seo: seoFor(page?.seo, {
       title: iceCreamFallback.seoTitle,
       description: iceCreamFallback.seoDescription,
@@ -198,16 +190,18 @@ export function resolveGiftCard(
     seo?: CmsSeo
   } | null,
 ) {
+  const things = publishedLines(page?.things)
+  const gallery = photos(page?.gallery)
   return {
     ...giftCardFallback,
     amounts: amounts(page?.amounts),
-    gallery: photos(page?.gallery),
-    showThings: page?.showThings !== false,
-    showGallery: page?.showGallery !== false,
+    gallery,
+    things,
+    showThings: page?.showThings !== false && things.length > 0,
+    showGallery: page?.showGallery !== false && Boolean(gallery?.length),
     heroLead: text(page?.heroLead, giftCardFallback.heroLead),
     heroAccent: text(page?.heroAccent, giftCardFallback.heroAccent),
     intro: text(page?.intro, giftCardFallback.intro),
-    things: list(page?.things, giftCardFallback.things),
     showRainbow: page?.showRainbow !== false,
     showFeast: page?.showFeast !== false,
     seo: seoFor(page?.seo, {
@@ -265,29 +259,37 @@ export function resolveGlamping(
     const tier = clean(item?.text)
     return when && tier ? [{ when, text: tier }] : []
   })
+  const amenities = (page?.amenities ?? []).flatMap((item) => {
+    const line = clean(item)
+    return line ? [line] : []
+  })
+  const info = (page?.info ?? []).flatMap((item) => {
+    const line = clean(item)
+    return line ? [line] : []
+  })
   const cheeseHref = clean(page?.cheeseHref)
   return {
     ...glampingFallback,
     heroImage: photo(page?.heroImage),
-    gallery: photos(page?.gallery),
+    gallery: photos(page?.gallery) ?? [],
     addOnsHeading: text(page?.addOnsHeading, glampingFallback.addOnsHeading),
-    addOnsNote: text(page?.addOnsNote, glampingFallback.addOnsNote),
-    addOns: mergeNamed(glampingFallback.addOns, addOns, (item) => item.name),
-    cancellationNote: text(page?.cancellationNote, glampingFallback.cancellationNote),
-    cancellation: mergeNamed(glampingFallback.cancellation, cancellation, (item) => item.when),
+    addOnsNote: clean(page?.addOnsNote) ?? '',
+    addOns,
+    cancellationNote: clean(page?.cancellationNote) ?? '',
+    cancellation,
     infoHeading: text(page?.infoHeading, glampingFallback.infoHeading),
-    info: list(page?.info, glampingFallback.info),
+    info,
     cheeseHeading: text(page?.cheeseHeading, glampingFallback.cheeseHeading),
     cheeseCopy: text(page?.cheeseCopy, glampingFallback.cheeseCopy),
     cheeseHref: cheeseHref && /^https:\/\//.test(cheeseHref) ? cheeseHref : glampingFallback.cheeseHref,
-    showAmenities: page?.showAmenities !== false,
-    showInfo: page?.showInfo !== false,
+    showAmenities: page?.showAmenities !== false && amenities.length > 0,
+    showInfo: page?.showInfo !== false && info.length > 0,
     heroLead: text(page?.heroLead, glampingFallback.heroLead),
     heroAccent: text(page?.heroAccent, glampingFallback.heroAccent),
     intro: text(page?.intro, glampingFallback.intro),
-    amenities: list(page?.amenities, glampingFallback.amenities),
-    showAddOns: page?.showAddOns !== false,
-    showCancellation: page?.showCancellation !== false,
+    amenities,
+    showAddOns: page?.showAddOns !== false && addOns.length > 0,
+    showCancellation: page?.showCancellation !== false && cancellation.length > 0,
     showCheese: page?.showCheese !== false,
     seo: seoFor(page?.seo, {
       title: glampingFallback.seoTitle,

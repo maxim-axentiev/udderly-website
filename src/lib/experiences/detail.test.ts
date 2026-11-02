@@ -9,10 +9,11 @@ import {
   OPEN_HIGHLAND_BOOKING_LABEL,
   PRIVATE_CALF_BOOKING_LABEL,
   PRIVATE_HIGHLAND_BOOKING_LABEL,
+  FEAST_ON_CERTIFICATION,
   resolveExperienceDetail,
 } from '@/lib/experiences/detail'
 import { TOWER_OF_GOATS_TITLE } from '@/lib/experiences/tower-of-goats'
-import { experienceBySlugQuery, experienceHubQuery } from '@/lib/sanity/queries'
+import { experienceBySlugQuery, experienceHubQuery, experienceSitemapSlugsQuery } from '@/lib/sanity/queries'
 import type { ExperiencePageData } from '@/lib/sanity/types'
 import { experienceSlugAliases, publicExperienceSlug } from '@/lib/experiences/public-paths'
 import { routableExperienceSlug } from '@/lib/routes/paths'
@@ -67,8 +68,7 @@ function htmlFor(page: ExperiencePageData) {
 
 describe('experience detail resolution', () => {
   it('keeps the published query on published, active experiences', () => {
-    expect(experienceBySlugQuery).toContain('slug.current in $slugs')
-    expect(experienceBySlugQuery).toContain('active != false')
+    expect(experienceBySlugQuery).toMatch(/^\*\[_type == "experience" && slug\.current in \$slugs\]/)
     expect(experienceBySlugQuery).toContain('bookingVerified')
     expect(experienceBySlugQuery).toContain('reviewsApproved')
     expect(experienceBySlugQuery).not.toContain('relatedExperiences')
@@ -84,7 +84,9 @@ describe('experience detail resolution', () => {
     expect(TOWER_OF_GOATS_TITLE).toBe('General Admission')
     expect(routableExperienceSlug('tower-of-goats-discovery-trail')).toBeUndefined()
     expect(routableExperienceSlug('goat-cuddles')).toBe('goat-cuddles')
+    expect(routableExperienceSlug('goat-recess')).toBe('goat-recess')
     expect(routableExperienceSlug('not a slug')).toBeUndefined()
+    expect(experienceSitemapSlugsQuery).toContain('active != false')
   })
 
   it('renders Goat Yoga with an instructor and without unrelated sections', () => {
@@ -131,20 +133,24 @@ describe('experience detail resolution', () => {
     expect(cuddles.bookingUrl).toBeUndefined()
   })
 
-  it('shows FeastON for an alpaca picnic only when that experience enables it', () => {
+  it('shows the confirmed FeastON certification on food experiences without the producer count', () => {
     const plain = resolveExperienceDetail(experience({ title: 'Alpaca Lunch Picnic', slug: 'alpaca-lunch-picnic' }), images)
     const enabled = resolveExperienceDetail(experience({
       title: 'Alpaca Lunch Picnic',
       slug: 'alpaca-lunch-picnic',
-      feastOn: { enabled: true },
+      feastOn: { enabled: true, body: FEAST_ON.paragraphs.join('\n\n') },
     }), images)
+    const unrelated = resolveExperienceDetail(experience({ title: 'Goat Recess', slug: 'goat-recess' }), images)
 
-    expect(plain.feast).toBeUndefined()
+    expect(plain.feast?.paragraphs).toEqual([...FEAST_ON_CERTIFICATION])
+    expect(plain.feast?.paragraphs.join(' ')).not.toMatch(/\b140\b|local producers/)
+    expect(plain.feast?.href).toBe(FEAST_ON.href)
     expect(plain.gallery.map((image) => image.src)).toEqual(['/alpaca.jpg'])
-    expect(enabled.feast?.paragraphs).toEqual([...FEAST_ON.paragraphs])
+    expect(enabled.feast?.paragraphs).toEqual([...FEAST_ON_CERTIFICATION])
     expect(enabled.feast?.lead).toBe('We eat')
     expect(enabled.feast?.accent).toBe('and serve local.')
     expect(enabled.gallery.some((image) => image.src.includes('goat'))).toBe(false)
+    expect(unrelated.feast).toBeUndefined()
   })
 
   it('keeps Highland and donkey photos on their own experiences', () => {
@@ -162,7 +168,7 @@ describe('experience detail resolution', () => {
     expect(donkey.signature).toBeUndefined()
   })
 
-  it('shows FeastON and Signature sections only when Taste experiences enable them', () => {
+  it('shows the FeastON certification on Taste experiences and Signature only when enabled', () => {
     const bare = resolveExperienceDetail(experience({ title: 'Taste of Farm Life', slug: 'taste-of-farm-life' }), images)
     const configured = resolveExperienceDetail(experience({
       title: 'Taste of Farm Life Family Friendly',
@@ -171,7 +177,8 @@ describe('experience detail resolution', () => {
       signatureExperience: { enabled: true, body: 'This tasting is an official Signature Experience.' },
     }), images)
 
-    expect(bare.feast).toBeUndefined()
+    expect(bare.feast?.paragraphs).toEqual([...FEAST_ON_CERTIFICATION])
+    expect(bare.feast?.paragraphs.join(' ')).not.toMatch(/\b140\b|local producers/)
     expect(bare.signature).toBeUndefined()
     expect(bare.hero).toEqual({
       src: '/highland.jpg',
@@ -209,7 +216,23 @@ describe('experience detail resolution', () => {
     expect(html).not.toContain('#book')
     expect(html).not.toContain('$18')
     expect(html).toContain('Newsletter signup is not available yet.')
+    expect(html).not.toContain('Additional fees may apply at booking.')
     expect(html).toContain('disabled=""')
+  })
+
+  it('keeps a direct experience address bookable when the listing switch is off', () => {
+    const page = resolveExperienceDetail(experience({
+      title: 'Goat Recess',
+      slug: 'goat-recess',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      fareharborItemId: '308264',
+      fareharborFlowId: '573099',
+    }), images)
+
+    expect(routableExperienceSlug('goat-recess')).toBe('goat-recess')
+    expect(page.bookingUrl).toBe('https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308264/?full-items=yes&flow=573099')
+    expect(page.bookingOverlay).toBe(true)
   })
 
   it('renders a published booking URL and a published cancellation policy', () => {
@@ -523,7 +546,12 @@ describe('experience detail resolution', () => {
     expect(html).toContain('flex-col gap-3 md:flex-row')
     expect(html).toContain('disabled')
     expect(html).not.toContain('javascript:alert')
-    expect(html).toContain('Open visits and private sessions are booked separately.')
+    const detailsAt = html.indexOf('Experience Details')
+    const feesAt = html.indexOf('Additional fees may apply at booking.')
+    const bookingNoteAt = html.indexOf('Open visits and private sessions are booked separately.')
+    expect(detailsAt).toBeGreaterThan(-1)
+    expect(feesAt).toBeGreaterThan(detailsAt)
+    expect(bookingNoteAt).toBeGreaterThan(feesAt)
     expect(html).not.toContain('$250 for 4 people')
     expect(html).not.toContain('4–8 people')
     expect(experienceBySlugQuery).toContain('privateBookingUrl')

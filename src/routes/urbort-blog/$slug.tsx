@@ -1,7 +1,6 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { UrbortArticle } from '@/components/urbort/article'
-import { urbortImages } from '@/components/urbort/images'
 import { getUrbortArticleFn, getUrbortBlogPageFn } from '@/lib/sanity/server'
 import { createPageHead } from '@/lib/seo/page-head'
 import { resolveUrbortArticle } from '@/lib/urbort/resolve'
@@ -17,7 +16,7 @@ export const Route = createFileRoute('/urbort-blog/$slug')({
       getUrbortBlogPageFn(),
       getUrbortArticleFn({ data: params.slug }),
     ])
-    const resolved = resolveUrbortArticle(article, page, urbortImages)
+    const resolved = resolveUrbortArticle(article, page)
     if (!resolved || resolved.slug !== params.slug) {
       throw notFound({ headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' } })
     }

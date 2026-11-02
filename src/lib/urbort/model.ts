@@ -1,5 +1,12 @@
 export const URBORT_PATH = '/urbort-blog'
 
+export const URBORT_EXPLORE_LABEL = 'Explore the blog'
+
+export function urbortLinkLabel(href: string, label: string): string {
+  const path = href.trim().split(/[?#]/)[0].replace(/\/+$/, '') || '/'
+  return path === URBORT_PATH ? URBORT_EXPLORE_LABEL : label
+}
+
 export const urbortBoardFallback = {
   titleLead: 'URBORT:',
   titleAccent: 'Udderly Ridiculous Board of Ridiculous Things',

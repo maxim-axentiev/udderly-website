@@ -28,13 +28,17 @@ export function AnimalsForSalePage({
   sold: readonly SaleCard[]
   images: SaleImages
 }) {
-  const prep = copy.prep.map((item, index) => ({
-    ...item,
-    image:
-      item.image?.src ??
-      images[(item.imageKey ?? SALE_PREP[index]?.imageKey ?? 'highland-hero') as keyof SaleImages],
-    alt: item.image?.alt ?? item.title,
-  }))
+  const prep = copy.prep.flatMap((item, index) => {
+    if (/^placeholder\b/i.test(item.copy)) return []
+    return [{
+      ...item,
+      image:
+        item.image?.src ??
+        images[(item.imageKey ?? SALE_PREP[index]?.imageKey ?? 'highland-hero') as keyof SaleImages],
+      alt: item.image?.alt ?? item.title,
+    }]
+  })
+  const intro = /^placeholder\b/i.test(copy.intro) ? undefined : copy.intro
 
   return (
     <>
@@ -72,7 +76,7 @@ export function AnimalsForSalePage({
             <h2 className="font-display text-[clamp(2.2rem,5.2vw,4.4rem)] font-black uppercase leading-[0.85] text-headline">
               {copy.introLead} <span className="text-stroke">{copy.introAccent}</span>
             </h2>
-            <p className="mt-6 text-base leading-relaxed md:text-lg">{copy.intro}</p>
+            {intro ? <p className="mt-6 text-base leading-relaxed md:text-lg">{intro}</p> : null}
             <ButtonLink href={copy.introButtonHref} size="lg" className="mt-8">
               {copy.introButton}
             </ButtonLink>
@@ -80,6 +84,7 @@ export function AnimalsForSalePage({
         </Container>
       </section>
 
+      {available.length || sold.length === 0 ? (
       <section id="available" className="scroll-mt-20 bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
@@ -88,14 +93,18 @@ export function AnimalsForSalePage({
           {available.length === 0 && sold.length === 0 ? (
             <p className="mt-14 text-center text-lg">There are no animals in this list right now.</p>
           ) : null}
+          {available.length ? (
           <ul className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {available.map((animal, index) => (
               <SaleCardView key={animal.slug} animal={animal} index={index} images={images} learnMoreLabel={copy.learnMoreLabel} />
             ))}
           </ul>
+          ) : null}
         </Container>
       </section>
+      ) : null}
 
+      {sold.length ? (
       <section className="bg-background py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">
           <h2 className="text-center font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline">
@@ -109,7 +118,9 @@ export function AnimalsForSalePage({
           </ul>
         </Container>
       </section>
+      ) : null}
 
+      {prep.length ? (
       <section className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1400px]">
           <h2 className="max-w-4xl font-display text-[clamp(2.4rem,6.5vw,5.4rem)] font-black uppercase leading-[0.82] text-headline">
@@ -133,6 +144,7 @@ export function AnimalsForSalePage({
           </div>
         </Container>
       </section>
+      ) : null}
 
       <WaitlistSection title={copy.waitlistTitle} copy={copy.waitlistCopy} />
     </>
