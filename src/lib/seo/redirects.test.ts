@@ -47,6 +47,9 @@ describe('WordPress redirect infrastructure', () => {
 
   it('leaves uncertain legacy URLs unmatched', () => {
     for (const path of [
+      '/cheryl-haskett',
+      '/escape-to-the-countryside-farm-glamping',
+      '/goatscaping',
       '/cow-wedding',
       '/promotions',
       '/mini-cattle-for-sale',
