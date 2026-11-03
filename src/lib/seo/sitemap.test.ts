@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { experienceSitemapSlugsQuery } from '@/lib/sanity/queries'
 
 import {
   buildSitemapXml,
@@ -41,6 +42,10 @@ describe('sitemap foundation', () => {
     ])
     expect(isSitemapPathExcluded('/health')).toBe(true)
     expect(isSitemapPathExcluded('/')).toBe(false)
+  })
+
+  it('excludes experiences explicitly hidden from search from the CMS sitemap query', () => {
+    expect(experienceSitemapSlugsQuery).toContain('seo.noIndex != true')
   })
 
   it('builds loc URLs from the canonical origin', () => {

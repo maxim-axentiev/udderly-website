@@ -141,7 +141,7 @@ export const experienceHubQuery = `*[_type == "experience"] | order(sortOrder as
   animalSpecies[]->{ title }
 }`
 
-export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(slug.current)].slug.current`
+export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && seo.noIndex != true && defined(slug.current)].slug.current`
 
 export const experienceFoundationQuery = `*[_id == "siteSettings"][0]{
   experienceAwardsEnabled,
