@@ -50,6 +50,7 @@ export const redirects: RedirectRule[] = [
     to: `/${publicExperienceSlug(DONKEY_SUNSET_STORED.slice(1))}`,
     status: 301,
   },
+  { from: '/team-building-farm-experiences', to: corporateProgramPath('team-building-experiences'), status: 301 },
   { from: '/faqs', to: '/faq', status: 301 },
   { from: '/gift-certificate', to: GIFT_CARD_PATH, status: 301 },
   { from: '/subscribe-to-newsletter', to: NEWSLETTER_PATH, status: 301 },

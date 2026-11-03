@@ -16,6 +16,7 @@ const permanentRedirects = [
   ['/private-mini-highland-experience', MINI_HIGHLAND_COW_PATH],
   ['/private-miniature-donkey-lunch-picnic', '/miniature-donkey-lunch-picnic'],
   ['/private-miniature-donkey-sunset-picnic', '/miniature-donkey-sunset-picnic'],
+  ['/team-building-farm-experiences', '/corporate-training/team-building-experiences'],
   ['/faqs', '/faq'],
   ['/gift-certificate', '/gift-card'],
   ['/subscribe-to-newsletter', '/newsletter'],
