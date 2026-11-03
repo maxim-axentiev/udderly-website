@@ -21,18 +21,18 @@ export function Team({ page }: { page: TeamPage }) {
                 key={member.id}
                 className={`group flex flex-col border-2 border-headline bg-background p-3 shadow-[7px_7px_0_var(--color-headline)] transition-transform duration-200 hover:-translate-y-2 ${index % 2 === 0 ? '-rotate-1' : 'rotate-1'}`}
               >
-                <div className="overflow-hidden">
+                <div className="flex items-center justify-center px-3 pt-4 pb-2">
                   {member.image ? (
                     <img
                       src={member.image.src}
                       alt={member.image.alt}
-                      width={1000}
-                      height={750}
+                      width={800}
+                      height={800}
                       loading="lazy"
-                      className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="aspect-square w-full max-w-[320px] object-contain transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center bg-farm-beige px-4 text-center font-display text-sm font-black uppercase text-headline">
+                    <div className="flex aspect-square w-full max-w-[320px] items-center justify-center rounded-full bg-farm-beige px-4 text-center font-display text-sm font-black uppercase text-headline">
                       Photo not available yet
                     </div>
                   )}
