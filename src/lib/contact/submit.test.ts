@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CONTACT_RECIPIENT } from './model'
 import { deliverContactEmail, type ContactSmtpConfig, type ContactTransport } from './smtp'
 import {
+  CONTACT_RATE_HISTORY_CAP,
   CONTACT_RATE_LIMIT,
   CONTACT_RATE_WINDOW_MS,
   clientAddress,
@@ -26,12 +27,15 @@ const valid = {
 
 function acceptingTransport() {
   const sent: Array<{ from: string; to: string; replyTo: string; subject: string; text: string }> = []
-  const createTransport = vi.fn((_config: ContactSmtpConfig): ContactTransport => ({
-    async sendMail(mail) {
-      sent.push(mail)
-      return { accepted: [mail.to], rejected: [] }
-    },
-  }))
+  const createTransport = vi.fn((_config: ContactSmtpConfig): ContactTransport => {
+    void _config
+    return {
+      async sendMail(mail) {
+        sent.push(mail)
+        return { accepted: [mail.to], rejected: [] }
+      },
+    }
+  })
   return { createTransport, sent }
 }
 
@@ -144,6 +148,22 @@ describe('contact delivery', () => {
     expect(createTransport).toHaveBeenCalledTimes(CONTACT_RATE_LIMIT + 1)
   })
 
+  it('bounds in-memory attempts when spam rotates through many addresses', async () => {
+    const { createTransport } = acceptingTransport()
+    const bot = { ...valid, contactExtra: 'spam' }
+    for (let index = 0; index < CONTACT_RATE_HISTORY_CAP; index += 1) {
+      const result = await submitContactMessage(bot, { env, ip: `198.51.${Math.floor(index / 256)}.${index % 256}`, now: 1_000, createTransport })
+      expect(result).toEqual({ ok: true, delivery: 'accepted' })
+    }
+    expect(await submitContactMessage(bot, { env, ip: '203.0.113.200', now: 1_000, createTransport })).toEqual({
+      ok: false,
+      error: 'rate_limited',
+    })
+    expect(await submitContactMessage(bot, {
+      env, ip: '203.0.113.200', now: 1_000 + CONTACT_RATE_WINDOW_MS + 1, createTransport,
+    })).toEqual({ ok: true, delivery: 'accepted' })
+    expect(createTransport).not.toHaveBeenCalled()
+  })
   it('uses the proxy-appended address and ignores a spoofed forwarded list', () => {
     expect(clientAddress({ socketAddress: '203.0.113.8', forwardedFor: '198.51.100.9, 203.0.113.8' })).toBe('203.0.113.8')
     expect(clientAddress({ socketAddress: '172.18.0.2', forwardedFor: '198.51.100.9, 203.0.113.50' })).toBe('203.0.113.50')

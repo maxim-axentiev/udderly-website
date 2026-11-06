@@ -45,7 +45,7 @@ export function ConsentBanner({
           <Button type="button" variant="secondary" onClick={onReject}>
             Reject optional cookies
           </Button>
-          <Button type="button" variant="outline" aria-haspopup="dialog" onClick={onCustomize}>
+          <Button type="button" variant="outline" aria-haspopup="dialog" data-consent-customize onClick={onCustomize}>
             Customize
           </Button>
         </div>
@@ -78,7 +78,10 @@ export function ConsentPreferences({
   const dialogRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const onCloseRef = useRef(onClose)
-  onCloseRef.current = onClose
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -99,7 +102,7 @@ export function ConsentPreferences({
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
       if (!first || !last) return
-      if (event.shiftKey && document.activeElement === first) {
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === headingRef.current)) {
         event.preventDefault()
         last.focus()
       } else if (!event.shiftKey && document.activeElement === last) {

@@ -5,6 +5,7 @@ import {
   documentHref,
   mergeSiteChrome,
   resolveCmsLink,
+  safeExternalUrl,
   siteChromeFallback,
   sitePath,
 } from '@/lib/site-chrome'
@@ -345,6 +346,42 @@ describe('navigation publication safety', () => {
   })
 })
 
+describe('CMS external URL safety', () => {
+  it('accepts web URLs and rejects executable, non-web, and credentialed destinations', () => {
+    expect(safeExternalUrl(' https://example.com/visit?day=1 ')).toBe('https://example.com/visit?day=1')
+    expect(safeExternalUrl('http://example.com/visit')).toBe('http://example.com/visit')
+    for (const href of [
+      'javascript:alert(1)', 'data:text/html,hello', 'vbscript:msgbox(1)',
+      'file:///etc/passwd', '//example.com', '/contact', 'mailto:hello@example.com',
+      'https://user:pass@example.com/', 'https://example.com/\nlocation',
+      'https://example.com/\tlocation', 'https://', 'https://example.com/' + 'a'.repeat(2050),
+    ]) {
+      expect(safeExternalUrl(href)).toBeUndefined()
+      expect(resolveCmsLink({ label: 'Unsafe', linkType: 'external', href })).toBeUndefined()
+    }
+  })
+
+  it('does not expose unsafe social links or booking CTAs', () => {
+    const chrome = mergeSiteChrome({
+      siteSettings: {
+        bookingCta: { label: 'Bad booking', linkType: 'external', href: 'javascript:alert(1)' },
+        socialLinks: {
+          instagram: 'javascript:alert(1)',
+          tiktok: 'data:text/html,bad',
+          facebook: 'https://user:pass@example.com/',
+          youtube: 'https://www.youtube.com/@farm',
+        },
+      },
+    })
+    expect(chrome.bookCta).toEqual(siteChromeFallback.bookCta)
+    expect(chrome.social).toEqual({
+      instagram: siteChromeFallback.social.instagram,
+      tiktok: siteChromeFallback.social.tiktok,
+      youtube: 'https://www.youtube.com/@farm',
+    })
+  })
+})
+
 describe('CMS link resolution', () => {
   it('resolves experience slugs to root-level URLs', () => {
     expect(documentHref('experience', 'mini-highland-cow-experience')).toBe(
@@ -440,6 +477,14 @@ describe('CMS link resolution', () => {
     expect(sitePath('https://example.com/farm-glamping')).toBeUndefined()
     expect(sitePath('//example.com')).toBeUndefined()
     expect(sitePath('/../admin')).toBeUndefined()
+    for (const slug of [
+      'mini-cattle-for-sale', 'promotions', 'cow-wedding', 'cheryl-haskett',
+      'escape-to-the-countryside-farm-glamping', 'goatscaping',
+    ]) {
+      expect(sitePath(`/${slug}`)).toBeUndefined()
+      expect(sitePath(`/${slug}/`)).toBeUndefined()
+      expect(resolveCmsLink({ label: 'Retired', linkType: 'path', path: `/${slug}` })).toBeUndefined()
+    }
     expect(
       resolveCmsLink({ label: 'Glamping', linkType: 'path', path: '/farm-glamping' }),
     ).toEqual({ label: 'Glamping', href: '/farm-glamping' })

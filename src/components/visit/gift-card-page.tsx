@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import feastOn from '@/assets/experiences/feast-on-logo.webp'
 import { GIFT_CARD_UNAVAILABLE } from '@/lib/visit/model'
@@ -9,6 +9,36 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
   const photos = content.gallery ?? []
   const [open, setOpen] = useState<number | null>(null)
   const current = open === null ? null : photos[open]
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const openerRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (open === null) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    closeRef.current?.focus()
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setOpen(null)
+      } else if (event.key === 'Tab') {
+        event.preventDefault()
+        closeRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = previousOverflow
+      openerRef.current?.focus()
+    }
+  }, [open])
+
+  function openPhoto(index: number, opener: HTMLButtonElement) {
+    openerRef.current = opener
+    setOpen(index)
+  }
 
   return (
     <>
@@ -48,16 +78,16 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
         <ul className="mx-auto grid max-w-[1400px] grid-cols-2 gap-5 px-5 md:grid-cols-4 md:px-8">
           {photos.map((image, index) => (
             <li key={image.alt}>
-              <button type="button" onClick={() => setOpen(index)} aria-label={`Open photo: ${image.alt}`} className="block w-full overflow-hidden border-2 border-headline shadow-[8px_8px_0_var(--color-headline)]">
+              <button type="button" onClick={(event) => openPhoto(index, event.currentTarget)} aria-label={`Open photo: ${image.alt}`} className="block w-full overflow-hidden border-2 border-headline shadow-[8px_8px_0_var(--color-headline)]">
                 <img src={image.src} alt={image.alt} className="aspect-square w-full object-cover" />
               </button>
             </li>
           ))}
         </ul>
         {current ? (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-headline/85 p-5" role="dialog" aria-modal="true" aria-label={current.alt} onClick={() => setOpen(null)}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-headline/85 p-5" role="dialog" aria-modal="true" aria-label={current.alt} onClick={(event) => { if (event.target === event.currentTarget) setOpen(null) }}>
             <img src={current.src} alt={current.alt} className="max-h-[85vh] max-w-full border-4 border-background object-contain" />
-            <button type="button" className="absolute right-5 top-5 size-12 rounded-full border-2 border-headline bg-background" aria-label="Close photo" onClick={() => setOpen(null)}>Close</button>
+            <button ref={closeRef} type="button" className="absolute right-5 top-5 size-12 rounded-full border-2 border-headline bg-background" aria-label="Close photo" onClick={() => setOpen(null)}>Close</button>
           </div>
         ) : null}
       </section>
@@ -93,7 +123,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
               <h2 className="mt-3 font-display text-[clamp(2.6rem,6vw,5rem)] font-black uppercase leading-[0.82] text-headline">{content.feastHeading}</h2>
               <p className="mt-6 leading-relaxed">{content.feastCopy}</p>
             </div>
-            <a href={content.feastHref}><img src={feastOn} alt="FeastON Certified Local logo" className="mx-auto max-w-sm" /></a>
+            <a href={content.feastHref} className="block min-w-0"><img src={feastOn} alt="FeastON Certified Local logo" className="mx-auto h-auto w-full max-w-sm" /></a>
           </div>
         </section>
       ) : null}

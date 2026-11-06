@@ -32,6 +32,9 @@ describe('cookie consent', () => {
   it('starts with no optional consent and does not plan tracking before a choice', () => {
     expect(parseStoredConsent(null)).toBeNull()
     expect(parseStoredConsent({ version: 0, analytics: true, advertising: true })).toBeNull()
+    expect(parseStoredConsent({ version: 1, analytics: true, advertising: true })).toBeNull()
+    expect(parseStoredConsent({ version: 1, analytics: true, advertising: true, decidedAt: '' })).toBeNull()
+    expect(parseStoredConsent({ version: 1, analytics: true, advertising: true, decidedAt: 42 })).toBeNull()
     expect(planOptionalTracking(null, CONFIGURED)).toEqual({})
     expect(currentTrackingConfig()).toEqual({})
     expect(readTrackingConfig({})).toEqual({})

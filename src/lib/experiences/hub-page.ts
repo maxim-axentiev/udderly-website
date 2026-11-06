@@ -1,3 +1,4 @@
+import { isRetiredExperiencePath } from '@/lib/routes/paths'
 import { cmsImageUrl } from '@/lib/sanity/image'
 import type { ExperienceCardData, SanityImage } from '@/lib/sanity/types'
 
@@ -386,7 +387,13 @@ const PRIVATE_BOOKING_SLUGS = new Set([
 function publishedMatch(slug: string | undefined, published: readonly ExperienceCardData[]) {
   if (!slug) return undefined
   const keys = new Set(experienceSlugAliases(slug))
-  return published.find((item) => keys.has(item.slug))
+  const matches = published.filter((item) => keys.has(item.slug))
+  const publicSlug = publicExperienceSlug(slug)
+  return matches.find((item) => item.slug === publicSlug && item.active !== false)
+    ?? matches.find((item) => item.slug === slug && item.active !== false)
+    ?? matches.find((item) => item.active !== false)
+    ?? matches.find((item) => item.slug === slug)
+    ?? matches[0]
 }
 
 function bookingAction(
@@ -476,12 +483,17 @@ function cardsFromCms(
   publishedSlugs: ReadonlySet<string>,
 ): ListedCard[] {
   const rows = records(value) ?? []
+  const publicSlugs = new Set(rows.flatMap((row) => {
+    const slug = text(row.slug, 80)
+    return slug && slug === publicExperienceSlug(slug) ? [slug] : []
+  }))
   const seen = new Set<string>()
   return byOrder(rows).flatMap((row) => {
     const title = text(row.title, 120)
     const slug = text(row.slug, 80)
-    if (!title || isFarmHoppingListing({ title, slug }) || hiddenFromListing(slug, published)) return []
-    const key = slug || title
+    if (!title || (slug && isRetiredExperiencePath(slug)) || isFarmHoppingListing({ title, slug }) || hiddenFromListing(slug, published)) return []
+    const key = slug ? publicExperienceSlug(slug) : title
+    if (slug && slug !== key && publicSlugs.has(key)) return []
     if (seen.has(key)) return []
     seen.add(key)
     const badge: HubExperienceCard['badge'] =
@@ -608,19 +620,22 @@ export function resolveExperiencesHubPage(
   document: RawDocument,
   published: readonly ExperienceCardData[] = [],
 ): ExperiencesHubPageModel {
-  const visible = published.filter((item) => item.title?.trim() && item.slug?.trim() && !isFarmHoppingListing(item) && item.active !== false)
+  const visible = published.filter((item) => item.title?.trim() && item.slug?.trim() && !isRetiredExperiencePath(item.slug) && !isFarmHoppingListing(item) && item.active !== false)
   const publishedSlugs = new Set(visible.map((item) => item.slug))
   const cmsCards = document && Array.isArray(document.experienceCards) ? document.experienceCards : null
   const baseCards = cmsCards
     ? cardsFromCms(cmsCards, published, publishedSlugs)
     : lovableCards
-        .filter((entry) => !hiddenFromListing(entry.slug, published))
+        .filter((entry) => !hiddenFromListing(entry.slug, published) && !(entry.slug && isRetiredExperiencePath(entry.slug)))
         .map((entry) => overlayPublished(entry, visible))
   const used = new Set(baseCards.flatMap((entry) => (entry.slug ? experienceSlugAliases(entry.slug) : [])))
   const extras = cmsCards
     ? []
     : visible
-        .filter((item) => !experienceSlugAliases(item.slug).some((slug) => used.has(slug)))
+        .filter((item) =>
+          publishedMatch(publicExperienceSlug(item.slug), visible) === item &&
+          !experienceSlugAliases(item.slug).some((slug) => used.has(slug)),
+        )
         .map((item) => {
           const slug = publicExperienceSlug(item.slug)
           return applyBooking({

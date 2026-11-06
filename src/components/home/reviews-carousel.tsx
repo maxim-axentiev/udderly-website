@@ -1,5 +1,6 @@
 import {
   useId,
+  useRef,
   useState,
   useSyncExternalStore,
   type KeyboardEvent,
@@ -17,6 +18,7 @@ import {
   clampCarouselIndex,
   maxCarouselIndex,
   reviewCarouselColumns,
+  reviewSwipeDirection,
 } from '@/lib/reviews/carousel'
 import type { NormalizedReview } from '@/lib/reviews/model'
 
@@ -134,7 +136,7 @@ export function ReviewsCarousel({
     () => 1,
   )
   const [index, setIndex] = useState(0)
-  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
   const movable = canMoveCarousel(reviews.length, columns)
   const current = clampCarouselIndex(index, reviews.length, columns)
   const lastIndex = maxCarouselIndex(reviews.length, columns)
@@ -144,7 +146,7 @@ export function ReviewsCarousel({
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!movable) return
+    if (!movable || event.target !== event.currentTarget) return
     if (event.key === 'ArrowLeft') {
       event.preventDefault()
       go(current - 1)
@@ -164,15 +166,17 @@ export function ReviewsCarousel({
   }
 
   const onTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    setTouchStart(event.touches[0]?.clientX ?? null)
+    const start = event.touches[0]
+    touchStart.current = start ? { x: start.clientX, y: start.clientY } : null
   }
 
   const onTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
-    const start = touchStart
-    const end = event.changedTouches[0]?.clientX ?? null
-    setTouchStart(null)
-    if (start === null || end === null || !movable) return
-    if (Math.abs(end - start) > 50) go(end < start ? current + 1 : current - 1)
+    const start = touchStart.current
+    touchStart.current = null
+    const end = event.changedTouches[0]
+    if (!start || !end || !movable) return
+    const direction = reviewSwipeDirection(end.clientX - start.x, end.clientY - start.y)
+    if (direction) go(current + direction)
   }
 
   return (
@@ -193,6 +197,7 @@ export function ReviewsCarousel({
           className="reviews-viewport overflow-hidden"
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
+          onTouchCancel={() => { touchStart.current = null }}
         >
           <div
             className="reviews-track motion-safe:transition-transform motion-safe:duration-300"

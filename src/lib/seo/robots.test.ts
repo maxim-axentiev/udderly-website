@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { buildRobotsTxt } from './robots'
 
 describe('buildRobotsTxt', () => {
+  it('locks the staging container canonical origin off at deployment configuration level', () => {
+    const compose = readFileSync(resolve(process.cwd(), 'docker-compose.staging.yml'), 'utf8')
+    expect(compose).toMatch(/^\s+PUBLIC_CANONICAL_ORIGIN: ""\s*$/m)
+    expect(compose).toContain('X-Robots-Tag=noindex, nofollow, noarchive')
+  })
+
   it('disallows crawling when no canonical origin is configured', () => {
     expect(buildRobotsTxt()).toBe('User-agent: *\nDisallow: /\n')
     expect(buildRobotsTxt(undefined)).not.toContain('Sitemap:')

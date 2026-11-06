@@ -221,6 +221,7 @@ const FACILITIES: CorporateClose['facility'] = {
 }
 
 export function corporateFacility(_images: CorporateImages): NonNullable<CorporateClose['facility']> {
+  void _images
   return {
     lead: FACILITIES?.lead ?? "What's in the",
     accent: FACILITIES?.accent ?? 'facility',
@@ -230,6 +231,7 @@ export function corporateFacility(_images: CorporateImages): NonNullable<Corpora
 }
 
 export function corporateFacilitator(_images: CorporateImages) {
+  void _images
   return {
     eyebrow: 'Meet your facilitator',
     title: '',
@@ -241,6 +243,7 @@ export function corporateFacilitator(_images: CorporateImages) {
 }
 
 export function corporateEnvironment(_images: CorporateImages) {
+  void _images
   return {
     lead: 'A learning space with',
     accent: 'hooves outside',

@@ -26,11 +26,12 @@ export function parseStoredConsent(value: unknown): ConsentChoice | null {
   const record = value as Record<string, unknown>
   if (record.version !== CONSENT_VERSION) return null
   if (typeof record.analytics !== 'boolean' || typeof record.advertising !== 'boolean') return null
+  if (typeof record.decidedAt !== 'string' || !record.decidedAt.trim()) return null
   return {
     version: CONSENT_VERSION,
     analytics: record.analytics,
     advertising: record.advertising,
-    decidedAt: typeof record.decidedAt === 'string' ? record.decidedAt : '',
+    decidedAt: record.decidedAt,
   }
 }
 

@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode, type TouchEvent } from 'react'
 
 import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
@@ -38,7 +38,7 @@ function Lines({
 function BookLink({ href, label, overlay }: { href?: string; label: string; overlay?: boolean }) {
   if (!href) return null
   return (
-    <ButtonLink href={href} external={!overlay} openInNewTab={overlay ? false : undefined} size="lg" className="mt-8">
+    <ButtonLink href={href} external={!overlay} openInNewTab={overlay ? false : undefined} size="lg" className="mt-8 w-full min-w-0 px-5 text-center whitespace-normal break-words sm:w-auto sm:px-8">
       {label}
     </ButtonLink>
   )
@@ -59,14 +59,17 @@ function BookingActions({ page }: { page: ExperienceDetailModel }) {
             external={!choice.overlay}
             openInNewTab={choice.overlay ? false : undefined}
             size="lg"
-            className="w-full md:w-auto"
+            className="w-full min-w-0 px-5 text-center whitespace-normal break-words sm:px-8 md:w-auto"
           >
             {choice.label}
           </ButtonLink>
         ) : (
-          <Button key={choice.label} type="button" disabled size="lg" className="w-full cursor-not-allowed opacity-60 md:w-auto">
-            {choice.label}
-          </Button>
+          <div key={choice.label} className="flex w-full flex-col items-center gap-2 md:w-auto">
+            <Button type="button" disabled size="lg" className="w-full min-w-0 cursor-not-allowed px-5 text-center whitespace-normal break-words opacity-60 sm:px-8 md:w-auto">
+              {choice.label}
+            </Button>
+            <p className="text-center text-sm font-semibold text-body-copy">Online booking for this option is currently unavailable.</p>
+          </div>
         ),
       )}
     </div>
@@ -124,20 +127,32 @@ function ScrollCarousel({
           </div>
         ))}
       </div>
-      <div className="mt-2 flex justify-center gap-3 md:justify-end">
-        <CarouselButton label={`Previous — ${label}`} onClick={() => scrollByCard(-1)} />
-        <CarouselButton label={`Next — ${label}`} onClick={() => scrollByCard(1)} />
-      </div>
+      {children.length > 1 ? (
+        <div className="mt-2 flex justify-center gap-3 md:justify-end">
+          <CarouselButton label={`Previous — ${label}`} onClick={() => scrollByCard(-1)} />
+          <CarouselButton label={`Next — ${label}`} onClick={() => scrollByCard(1)} />
+        </div>
+      ) : null}
     </div>
   )
 }
 
 function Gallery({ images }: { images: DetailPicture[] }) {
   const [index, setIndex] = useState(0)
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
   const total = images.length
   if (!total) return null
   const current = images[index] ?? images[0]
   const go = (next: number) => setIndex((next + total) % total)
+  const onTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const start = touchStart.current
+    touchStart.current = null
+    const end = event.changedTouches[0]
+    if (!start || !end || total < 2) return
+    const deltaX = end.clientX - start.x
+    const deltaY = end.clientY - start.y
+    if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) go(index + (deltaX < 0 ? 1 : -1))
+  }
 
   return (
     <div className="relative">
@@ -147,6 +162,18 @@ function Gallery({ images }: { images: DetailPicture[] }) {
         role="group"
         aria-roledescription="carousel"
         aria-label="Experience photo gallery"
+        tabIndex={total > 1 ? 0 : undefined}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return
+          if (event.key === 'ArrowLeft') { event.preventDefault(); go(index - 1) }
+          if (event.key === 'ArrowRight') { event.preventDefault(); go(index + 1) }
+        }}
+        onTouchStart={(event) => {
+          const start = event.touches[0]
+          touchStart.current = start ? { x: start.clientX, y: start.clientY } : null
+        }}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={() => { touchStart.current = null }}
       >
         <img src={current.src} alt={current.alt} width={1280} height={960} className="aspect-[4/3] w-full object-cover" />
         {total > 1 ? (
@@ -229,6 +256,7 @@ export function ExperienceDetail({
   const showPractical = Boolean(
     page.tips.length || page.visitorInfo || page.accessibilityInfo || page.cancellation,
   )
+  const hasBookingOptions = Boolean(page.bookingUrl || page.bookingChoices?.some((choice) => choice.href))
   const awardsToShow = page.awardImages.length
     ? page.awardImages.map((image) => ({ key: image.src, src: image.src, alt: image.alt }))
     : awards.map((award) => ({
@@ -260,6 +288,11 @@ export function ExperienceDetail({
             <span className="text-secondary-accent">{page.titleAccent}</span>
           </h1>
           {page.intro ? <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">{page.intro}</p> : null}
+          {hasBookingOptions && showIntroduction ? (
+            <a href="#booking-options" className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full border-2 border-headline bg-cta px-8 py-3 font-display text-lg font-extrabold uppercase text-cta-foreground shadow-[4px_4px_0_var(--color-headline)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-background">
+              View booking options
+            </a>
+          ) : null}
         </Container>
       </section>
 
@@ -280,7 +313,17 @@ export function ExperienceDetail({
         </Container>
       </section>
       ) : null}
-      {page.bookingOverlay ? <script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async /> : null}
+      {(page.bookingUrl && page.bookingOverlay) || page.bookingChoices?.some((choice) => choice.href && choice.overlay)
+        ? <script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async />
+        : null}
+
+      {!showIntroduction && hasBookingOptions ? (
+        <section id="booking-options" aria-label="Booking options" className="bg-background py-12 md:py-16">
+          <Container width="brand" className="flex max-w-[1400px] justify-center">
+            <BookingActions page={page} />
+          </Container>
+        </section>
+      ) : null}
 
       {showIntroduction ? (
         <section id="experience-introduction" className="scroll-mt-20 overflow-hidden bg-background py-20 md:py-28">
@@ -296,7 +339,9 @@ export function ExperienceDetail({
                     <PortableTextRenderer value={page.description} />
                   </div>
                 ) : null}
-                <BookingActions page={page} />
+                <div id={hasBookingOptions ? 'booking-options' : undefined} tabIndex={hasBookingOptions ? -1 : undefined} className="scroll-mt-24 outline-none">
+                  <BookingActions page={page} />
+                </div>
               </div>
             </div>
             {page.details.length ? (
@@ -507,7 +552,7 @@ export function ExperienceDetail({
           <div className="border-2 border-headline bg-background p-7 text-center shadow-[10px_10px_0_var(--color-secondary-accent)] md:p-12">
             <h2 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">{page.newsletter.title}</h2>
             <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">{page.newsletter.copy}</p>
-            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" onSubmit={(event) => event.preventDefault()}>
+            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" aria-describedby="experience-newsletter-unavailable" onSubmit={(event) => event.preventDefault()}>
               <label className="font-display text-sm font-bold uppercase text-headline">
                 First name
                 <input disabled name="firstName" className="mt-1 min-h-12 w-full rounded-full border-2 border-headline bg-background px-5" />
@@ -518,7 +563,7 @@ export function ExperienceDetail({
               </label>
               <button type="button" disabled className="mt-2 justify-self-center rounded-full bg-cta px-8 py-3 font-display font-extrabold uppercase">Sign me up</button>
             </form>
-            <p className="mt-4 font-accent text-lg italic text-primary-accent">{page.newsletter.unavailable}</p>
+            <p id="experience-newsletter-unavailable" role="status" className="mt-4 font-accent text-lg italic text-primary-accent">{page.newsletter.unavailable}</p>
           </div>
         </Container>
       </section>

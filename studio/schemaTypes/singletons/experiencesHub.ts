@@ -209,7 +209,8 @@ export const experiencesHub = defineType({
       title: 'Farm experience cards',
       type: 'array',
       group: 'content',
-      description: 'Leave this unset to keep the current experience cards. Publish an empty list to remove them. Farm Hopping is never shown.',
+      description:
+        'Leave this unset to keep the current experience cards. Publish an empty list to remove them. Farm Hopping is never shown. An experience document’s Show on the website switch removes its card. Its Display order replaces the card order below when that number is set.',
       of: [
         defineArrayMember({
           type: 'object',
@@ -223,7 +224,12 @@ export const experiencesHub = defineType({
             defineField({name: 'image', title: 'Image', type: 'altImage'}),
             defineField({name: 'learnMoreHref', title: 'Learn more link', type: 'string'}),
             defineField({name: 'bookingUrl', title: 'Booking link', type: 'url', description: 'Only an absolute https booking page. Leave empty until the destination is verified.'}),
-            defineField({name: 'sortOrder', title: 'Display order', type: 'number'}),
+            defineField({
+              name: 'sortOrder',
+              title: 'Display order',
+              type: 'number',
+              description: 'Used only when the matching experience has no Display order of its own.',
+            }),
           ],
           preview: {select: {title: 'title', subtitle: 'season'}},
         }),

@@ -68,7 +68,8 @@ function htmlFor(page: ExperiencePageData) {
 
 describe('experience detail resolution', () => {
   it('keeps the published query on published, active experiences', () => {
-    expect(experienceBySlugQuery).toMatch(/^\*\[_type == "experience" && slug\.current in \$slugs\]/)
+    expect(experienceBySlugQuery).toMatch(/^\*\[_type == "experience" && active != false && defined\(title\) && title != "" && slug\.current in \$slugs\]/)
+    expect(experienceBySlugQuery).toContain('order(select(slug.current == $slug => 0, 1))')
     expect(experienceBySlugQuery).toContain('bookingVerified')
     expect(experienceBySlugQuery).toContain('reviewsApproved')
     expect(experienceBySlugQuery).not.toContain('relatedExperiences')
@@ -216,6 +217,9 @@ describe('experience detail resolution', () => {
     expect(html).not.toContain('#book')
     expect(html).not.toContain('$18')
     expect(html).toContain('Newsletter signup is not available yet.')
+    expect(html).toContain('aria-describedby="experience-newsletter-unavailable"')
+    expect(html).toContain('id="experience-newsletter-unavailable" role="status"')
+    expect(html).not.toContain('type="submit"')
     expect(html).not.toContain('Additional fees may apply at booking.')
     expect(html).toContain('disabled=""')
   })
@@ -278,6 +282,22 @@ describe('experience detail resolution', () => {
     expect(missing.cancellation).toBeUndefined()
   })
 
+  it('hides Tripadvisor claims until the shared awards section is explicitly approved', () => {
+    const source = experience({ title: 'Goat Yoga', slug: 'goat-yoga' })
+    const absent = resolveExperienceDetail(source, images)
+    const disabled = resolveExperienceDetail(source, images, { experienceAwardsEnabled: false })
+    const enabled = resolveExperienceDetail(source, images, { experienceAwardsEnabled: true })
+    const render = (page: ReturnType<typeof resolveExperienceDetail>) =>
+      renderToStaticMarkup(createElement(ExperienceDetail, { page, awards }))
+    expect(absent.showAwards).toBe(false)
+    expect(disabled.showAwards).toBe(false)
+    expect(render(absent)).not.toContain('TripAdvisor awards')
+    expect(render(absent)).not.toContain('Top 10% of attractions worldwide')
+    expect(render(disabled)).not.toContain('TripAdvisor awards')
+    expect(enabled.showAwards).toBe(true)
+    expect(render(enabled)).toContain('TripAdvisor awards')
+  })
+
   it('keeps the shared section order', () => {
     const html = htmlFor(experience({
       title: 'Goat Yoga',
@@ -295,7 +315,6 @@ describe('experience detail resolution', () => {
     }))
     const order = [
       'experience-hero',
-      'TripAdvisor awards',
       'experience-introduction',
       'important-information',
       'id="reviews"',
@@ -318,10 +337,29 @@ describe('experience detail resolution', () => {
     expect(html).toContain('>✓</span>')
     expect(html).toContain('-rotate-1')
     expect(html).toContain('aria-roledescription="carousel"')
+    expect(html).not.toContain('aria-label="Previous — Guest reviews"')
+    expect(html).not.toContain('aria-label="Next — Meet the animals"')
+    expect(html).toContain('aria-label="Previous photo"')
+    expect(html).toContain('aria-label="Experience photo gallery" tabindex="0"')
+    expect(html).toContain('w-[85%]')
+  })
+
+  it('shows carousel navigation when more than one review or animal is available', () => {
+    const html = htmlFor(experience({
+      title: 'Goat Yoga',
+      slug: 'goat-yoga',
+      reviewsApproved: true,
+      testimonials: [
+        { _id: '1', quote: 'First guest note.', guestName: 'Sam', source: null, sourceUrl: null, image: null },
+        { _id: '2', quote: 'Second guest note.', guestName: 'Lee', source: null, sourceUrl: null, image: null },
+      ],
+      animals: [
+        { _id: 'a', name: 'Pekoe', slug: 'pekoe', shortIntro: 'First goat.', funFact: null, status: 'active', speciesTitle: 'Goat', profileImage: null },
+        { _id: 'b', name: 'Mochi', slug: 'mochi', shortIntro: 'Second goat.', funFact: null, status: 'active', speciesTitle: 'Goat', profileImage: null },
+      ],
+    }))
     expect(html).toContain('aria-label="Previous — Guest reviews"')
     expect(html).toContain('aria-label="Next — Meet the animals"')
-    expect(html).toContain('aria-label="Previous photo"')
-    expect(html).toContain('w-[85%]')
   })
 
   it('keeps the goat welfare photo off other species', () => {
@@ -373,6 +411,30 @@ describe('experience detail resolution', () => {
     expect(page.reviews).toEqual([])
   })
 
+  it('links from the hero to verified booking actions and omits the shortcut for closed experiences', () => {
+    const verified = htmlFor(experience({
+      title: 'Goat Cuddles', slug: 'goat-cuddles', bookingVerified: true,
+      bookingProvider: 'fareharbor', fareharborItemId: '336824',
+    }))
+    const closed = htmlFor(experience({ title: 'Goat Yoga', slug: 'goat-yoga' }))
+    expect(verified).toContain('href="#booking-options"')
+    expect(verified).toContain('id="booking-options" tabindex="-1"')
+    expect(verified).toContain('View booking options')
+    expect(closed).not.toContain('href="#booking-options"')
+    expect(closed).not.toContain('id="booking-options"')
+  })
+
+  it('shows a booking button for a verified experience with no introduction content', () => {
+    const html = htmlFor(experience({
+      title: 'Farm Visit', slug: 'farm-visit', bookingVerified: true,
+      bookingProvider: 'fareharbor', fareharborItemId: '336824',
+    }))
+    expect(html).toContain('id="booking-options" aria-label="Booking options"')
+    expect(html).toContain('Book Farm Visit')
+    expect(html).toContain('items/336824/')
+    expect(html).not.toContain('href="#booking-options"')
+  })
+
   it('keeps an unverified booking URL off the page and builds a verified FareHarbor overlay', () => {
     const stored = resolveExperienceDetail(experience({
       title: 'Goat Cuddles',
@@ -408,6 +470,29 @@ describe('experience detail resolution', () => {
     expect(overlay.bookingOverlay).toBe(true)
     expect(html).toContain('fareharbor.com/embeds/api/v1/?autolightframe=yes')
     expect(html).toContain('href="https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/?full-items=yes"')
+  })
+
+  it('loads FareHarbor for a verified private Highland booking when open booking is absent', () => {
+    const html = htmlFor(experience({
+      title: 'Mini Highland Cow Experience',
+      slug: 'mini-highland-cow-experience',
+      privateBookingVerified: true,
+      privateBookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/123456/?full-items=yes',
+    }))
+    expect(html).toContain('Book Private Mini Highland Cow Experience')
+    expect(html).toContain('href="https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/123456/?full-items=yes"')
+    expect(html).toContain('fareharbor.com/embeds/api/v1/?autolightframe=yes')
+    expect(html).not.toContain('href="undefined"')
+  })
+
+  it('does not load FareHarbor when both booking destinations are unverified', () => {
+    const html = htmlFor(experience({
+      title: 'Mini Highland Cow Experience',
+      slug: 'mini-highland-cow-experience',
+      privateBookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/123456/?full-items=yes',
+    }))
+    expect(html).not.toContain('fareharbor.com/embeds/api/v1/')
+    expect(html).not.toContain('href="https://fareharbor.com/embeds/book/')
   })
 
   it('shows several ticket lines, an editable accent, and hides empty optional sections', () => {
@@ -544,7 +629,10 @@ describe('experience detail resolution', () => {
     expect(html).toContain('Book Open Mini Highland Cow Experience')
     expect(html).toContain('Book Private Mini Highland Cow Experience')
     expect(html).toContain('flex-col gap-3 md:flex-row')
+    expect(html).toContain('w-full min-w-0 px-5 text-center whitespace-normal break-words sm:px-8 md:w-auto')
+    expect(html).toContain('w-full min-w-0 cursor-not-allowed px-5 text-center whitespace-normal break-words opacity-60')
     expect(html).toContain('disabled')
+    expect(html).toContain('Online booking for this option is currently unavailable.')
     expect(html).not.toContain('javascript:alert')
     const detailsAt = html.indexOf('Experience Details')
     const feesAt = html.indexOf('Additional fees may apply at booking.')

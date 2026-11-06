@@ -12,7 +12,7 @@ const altImage = `{
   }
 }`
 
-export const experienceBySlugQuery = `*[_type == "experience" && slug.current in $slugs] | order(select(slug.current == $slug => 0, 1))[0]{
+export const experienceBySlugQuery = `*[_type == "experience" && active != false && defined(title) && title != "" && slug.current in $slugs] | order(select(slug.current == $slug => 0, 1))[0]{
   _id,
   title,
   titleAccent,
@@ -141,7 +141,7 @@ export const experienceHubQuery = `*[_type == "experience"] | order(sortOrder as
   animalSpecies[]->{ title }
 }`
 
-export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && seo.noIndex != true && defined(slug.current)].slug.current`
+export const experienceSitemapSlugsQuery = `*[_type == "experience" && active != false && defined(title) && title != "" && defined(slug.current)]{ "slug": slug.current, "noIndex": seo.noIndex }`
 
 export const experienceFoundationQuery = `*[_id == "siteSettings"][0]{
   experienceAwardsEnabled,
@@ -771,7 +771,7 @@ export const urbortArticleBySlugQuery = `*[_type == "urbortArticle" && slug.curr
   seo { title, description, noIndex, image ${altImage} }
 }`
 
-export const urbortSitemapSlugsQuery = `*[_type == "urbortArticle" && active != false && defined(slug.current) && count(body) > 0].slug.current`
+export const urbortSitemapSlugsQuery = `*[_type == "urbortArticle" && active != false && seo.noIndex != true && defined(slug.current) && count(body) > 0].slug.current`
 
 export const contactPageQuery = `*[_id == "contactPage"][0]{
   heroLead,

@@ -8,7 +8,7 @@ import { HomeImage } from './homepage-content'
 export function MediaCarousel() {
   const videos = useHomepageContent().media.videos
   const [index, setIndex] = useState(0)
-  const touchStart = useRef<number | null>(null)
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
   const current = videos[index]
 
   if (!current) {
@@ -23,15 +23,19 @@ export function MediaCarousel() {
     <div
       className="mt-14"
       onTouchStart={(event) => {
-        touchStart.current = event.touches[0]?.clientX ?? null
+        const start = event.touches[0]
+        touchStart.current = start ? { x: start.clientX, y: start.clientY } : null
       }}
       onTouchEnd={(event) => {
         const start = touchStart.current
-        const end = event.changedTouches[0]?.clientX ?? null
-        if (start === null || end === null) return
-        if (Math.abs(end - start) > 50) go(end < start ? index + 1 : index - 1)
+        const end = event.changedTouches[0]
         touchStart.current = null
+        if (!start || !end || videos.length < 2) return
+        const deltaX = end.clientX - start.x
+        const deltaY = end.clientY - start.y
+        if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) go(index + (deltaX < 0 ? 1 : -1))
       }}
+      onTouchCancel={() => { touchStart.current = null }}
     >
       <div className="relative mx-auto max-w-4xl">
         <div className="relative border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)]">
@@ -54,22 +58,22 @@ export function MediaCarousel() {
           </div>
         </div>
 
-        <button
+        {videos.length > 1 ? <button
           type="button"
           onClick={() => go(index - 1)}
           aria-label="Previous video"
           className="absolute -left-3 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-headline bg-background text-headline shadow-[3px_3px_0_var(--color-headline)] transition-transform hover:-translate-y-[calc(50%+2px)] md:-left-7"
         >
           <ChevronLeftIcon />
-        </button>
-        <button
+        </button> : null}
+        {videos.length > 1 ? <button
           type="button"
           onClick={() => go(index + 1)}
           aria-label="Next video"
           className="absolute -right-3 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-headline bg-background text-headline shadow-[3px_3px_0_var(--color-headline)] transition-transform hover:-translate-y-[calc(50%+2px)] md:-right-7"
         >
           <ChevronRightIcon />
-        </button>
+        </button> : null}
       </div>
 
       <ul className="mx-auto mt-9 grid max-w-4xl grid-cols-4 place-items-center gap-3 lg:grid-cols-8">

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { redirects } from '@/lib/seo/redirects'
 
 import {
   INTERNAL_DOCUMENT_TYPES,
@@ -41,6 +42,40 @@ describe('reserved route collisions', () => {
         reason: 'reserved-slug',
       })
     }
+  })
+})
+
+describe('migration redirect source protection', () => {
+  it('never treats a redirected root URL as a public experience detail', () => {
+    const approvedStoredAliases = new Set([
+      'private-miniature-donkey-lunch-picnic',
+      'private-miniature-donkey-sunset-picnic',
+    ])
+    for (const redirect of redirects) {
+      const slug = redirect.from.slice(1)
+      if (slug.includes('/')) continue
+      if (approvedStoredAliases.has(slug)) {
+        expect(routableExperienceSlug(slug), redirect.from).toBe(slug)
+        expect(documentPath('experience', slug), redirect.from).toBe('/' + slug)
+      } else {
+        expect(routableExperienceSlug(slug), redirect.from).toBeUndefined()
+        expect(documentPath('experience', slug), redirect.from).toBeUndefined()
+      }
+    }
+  })
+})
+
+describe('retired URL protection', () => {
+  it('keeps owner-retired experience URLs unavailable even if Sanity later contains matching slugs', () => {
+    for (const slug of [
+      'mini-cattle-for-sale', 'promotions', 'cow-wedding', 'cheryl-haskett',
+      'escape-to-the-countryside-farm-glamping', 'goatscaping',
+    ]) {
+      expect(routableExperienceSlug(slug)).toBeUndefined()
+      expect(documentPath('experience', slug)).toBeUndefined()
+    }
+    expect(routableExperienceSlug('goat-yoga')).toBe('goat-yoga')
+    expect(documentPath('corporateProgram', 'team-building-experiences')).toBe('/corporate-training/team-building-experiences')
   })
 })
 

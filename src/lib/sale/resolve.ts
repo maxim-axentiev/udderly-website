@@ -129,7 +129,7 @@ function listingSpecies(entry: PublishedListing, known: SaleAnimal | undefined):
 function visibleListings(published: readonly PublishedListing[]): PublishedListing[] {
   const seen = new Set<string>()
   return [...published].sort(byOrder).flatMap((entry) => {
-    if (entry.active === false) return []
+    if (entry.active === false || (entry.status !== 'available' && entry.status !== 'sold')) return []
     const slug = entry.slug?.trim() ?? ''
     const known = knownSale(slug)
     const title = entry.title?.trim() || known?.name || ''
@@ -258,14 +258,14 @@ export type SalePageCopy = {
   seoDescription: string
 }
 
-function publicHref(value: unknown, fallback: string): string {
+export function safeSalePageHref(value: unknown, fallback: string): string {
   if (typeof value !== 'string' || !value.trim()) return fallback
   const href = value.trim()
   if (href.startsWith('#') && href.length > 1 && !/\s/.test(href)) return href
   if (href.startsWith('/') && !href.startsWith('//') && !/\s/.test(href)) return href
   try {
     const parsed = new URL(href)
-    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return href
+    if ((parsed.protocol === 'http:' || parsed.protocol === 'https:') && !parsed.username && !parsed.password) return href
   } catch {
     return fallback
   }
@@ -373,7 +373,7 @@ export function resolveSalePageCopy(document: Record<string, unknown> | null): S
     intro,
     introImage: presentationImage(document.introImage as SanityImage, 1280),
     introButton,
-    introButtonHref: publicHref(document.introButtonHref, SALE_PAGE.introButtonHref),
+    introButtonHref: safeSalePageHref(document.introButtonHref, SALE_PAGE.introButtonHref),
     availableHeading,
     soldLead,
     soldAccent,

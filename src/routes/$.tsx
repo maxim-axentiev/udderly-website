@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { ExperienceTemplate } from '@/components/experience/experience-template'
+import { ExperienceUnavailable } from '@/components/experience/experience-unavailable'
 import feastOnLogo from '@/assets/experiences/feast-on-logo.webp'
 import goatCuddles from '@/assets/experiences/goat-cuddles.jpg'
 import goatIcon1 from '@/assets/experiences/goat-icon-1.jpg'
@@ -75,6 +76,7 @@ export const Route = createFileRoute('/$')({
     return createExperienceHead(loaderData.experience)
   },
   component: ExperienceCatchAllPage,
+  errorComponent: ExperienceUnavailable,
 })
 
 function ExperienceCatchAllPage() {

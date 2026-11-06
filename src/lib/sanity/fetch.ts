@@ -3,7 +3,7 @@ import {
   type CmsExperiencesHubDocument,
   type ExperiencesHubContent,
 } from '@/lib/experiences/hub'
-import { experienceSlugAliases, publicExperienceSlug } from '@/lib/experiences/public-paths'
+import { experienceSlugAliases, selectIndexableExperienceSlugs } from '@/lib/experiences/public-paths'
 import type { CmsHomepageDocument } from '@/lib/homepage/cms'
 import { homepageContentOrFixture } from '@/lib/homepage/cms'
 import type { HomepageContent } from '@/lib/homepage/model'
@@ -80,9 +80,12 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export async function fetchExperienceBySlug(
   slug: string,
 ): Promise<ExperiencePageData | null> {
-  const experience = await sanityClient.fetch<ExperiencePageData | null>(
-    experienceBySlugQuery,
-    { slug, slugs: experienceSlugAliases(slug) },
+  const experience = await withTimeout(
+    sanityClient.fetch<ExperiencePageData | null>(
+      experienceBySlugQuery,
+      { slug, slugs: experienceSlugAliases(slug) },
+    ),
+    CHROME_FETCH_TIMEOUT_MS,
   )
 
   if (!experience?.slug || !experience.title) {
@@ -99,13 +102,18 @@ export async function fetchExperienceBySlug(
 }
 
 export async function fetchExperienceHub(): Promise<ExperienceCardData[]> {
-  const experiences = await sanityClient.fetch<ExperienceCardData[] | null>(
-    experienceHubQuery,
-  )
-
-  return (experiences ?? []).filter(
-    (experience) => experience.slug && experience.title,
-  )
+  try {
+    const experiences = await withTimeout(
+      sanityClient.fetch<ExperienceCardData[] | null>(experienceHubQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
+    return (experiences ?? []).filter(
+      (experience) => experience.slug && experience.title,
+    )
+  } catch {
+    // Preserve the static listing without inventing verified booking links.
+    return []
+  }
 }
 
 export async function fetchPublishedExperiencesHub(): Promise<CmsExperiencesHubDocument> {
@@ -125,16 +133,19 @@ export async function loadExperiencesHubContent(): Promise<ExperiencesHubContent
 }
 
 export async function fetchExperienceSitemapSlugs(): Promise<string[]> {
-  const slugs = await sanityClient.fetch<string[] | null>(
-    experienceSitemapSlugsQuery,
+  const records = await withTimeout(
+    sanityClient.fetch<Array<{ slug: string; noIndex?: boolean | null }> | null>(experienceSitemapSlugsQuery),
+    CHROME_FETCH_TIMEOUT_MS,
   )
-
-  return [...new Set((slugs ?? []).filter(Boolean).map(publicExperienceSlug))]
+  return selectIndexableExperienceSlugs(records ?? [])
 }
 
 export async function fetchExperienceFoundation(): Promise<ExperienceFoundation> {
   try {
-    return await sanityClient.fetch<ExperienceFoundation>(experienceFoundationQuery)
+    return await withTimeout(
+      sanityClient.fetch<ExperienceFoundation>(experienceFoundationQuery),
+      CHROME_FETCH_TIMEOUT_MS,
+    )
   } catch {
     return null
   }

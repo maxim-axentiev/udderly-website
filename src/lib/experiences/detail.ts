@@ -477,7 +477,7 @@ export function resolveExperienceDetail(
     location: SHARED_LOCATION,
     awardsTitle: clean(foundation?.experienceAwardsTitle, 80) ?? "TripAdvisor Travellers' Choice",
     awardsTagline: clean(foundation?.experienceAwardsTagline, 160) ?? 'Top 10% of attractions worldwide by Tripadvisor.',
-    showAwards: foundation?.experienceAwardsEnabled !== false,
+    showAwards: foundation?.experienceAwardsEnabled === true,
     awardImages,
   }
 }

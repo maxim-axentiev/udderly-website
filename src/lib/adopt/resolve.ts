@@ -49,7 +49,7 @@ export function checkoutHref(url: string | null | undefined): string | undefined
   if (!trimmed) return undefined
   try {
     const parsed = new URL(trimmed)
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return undefined
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return undefined
     return trimmed
   } catch {
     return undefined
@@ -165,6 +165,7 @@ export type AdoptionPageCopy = {
   heroImage?: PresentationImage
   awardsTitle: string
   awardsTagline: string
+  showAwards: boolean
   awardImages: PresentationImage[]
   sponsorLead: string
   sponsorAccent: string
@@ -205,6 +206,7 @@ function fallbackAdoptionCopy(): AdoptionPageCopy {
     intro: ADOPT_PAGE.intro,
     awardsTitle: ADOPT_PAGE.awardsTitle,
     awardsTagline: ADOPT_PAGE.awardsTagline,
+    showAwards: false,
     awardImages: [],
     sponsorLead: ADOPT_PAGE.sponsorLead,
     sponsorAccent: ADOPT_PAGE.sponsorAccent,
@@ -310,6 +312,7 @@ export function resolveAdoptionPageCopy(document: Record<string, unknown> | null
     awardsTitle,
     awardsTagline,
     awardImages: imageList(document.awardImages, 400, 8),
+    showAwards: imageList(document.awardImages, 400, 8).length > 0,
     sponsorLead,
     sponsorAccent,
     sponsorParagraphs,

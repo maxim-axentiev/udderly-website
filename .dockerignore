@@ -10,14 +10,15 @@ dist
 .tanstack
 coverage
 
+# Never send server credentials or local migration/audit data to Docker.
 .env
 .env.*
-!.env.example
-!.env.production.example
+.local
+reports
+studio
 
 docs
 *.md
-!README.md
 
 logs
 *.log

@@ -11,12 +11,19 @@ export default tseslint.config(
       '.output/**',
       'node_modules/**',
       'coverage/**',
+      'reports/**', // Generated migration research and one-off audit artifacts.
       'src/routeTree.gen.ts',
       'studio/**',
     ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {

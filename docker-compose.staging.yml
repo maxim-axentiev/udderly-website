@@ -6,19 +6,25 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     environment:
       NODE_ENV: production
       HOST: "0.0.0.0"
       PORT: "3000"
       APP_HOST: ${APP_HOST}
-      PUBLIC_CANONICAL_ORIGIN: ${PUBLIC_CANONICAL_ORIGIN:-}
+      # Always keep staging non-indexable, regardless of the host environment.
+      PUBLIC_CANONICAL_ORIGIN: ""
       GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:-}
       GOOGLE_PLACE_ID: ${GOOGLE_PLACE_ID:-}
-      RESEND_API_KEY: ${RESEND_API_KEY:-}
-      CONTACT_SMTP_HOST: ${CONTACT_SMTP_HOST:-}
-      CONTACT_SMTP_PORT: ${CONTACT_SMTP_PORT:-}
-      CONTACT_SMTP_USER: ${CONTACT_SMTP_USER:-}
-      CONTACT_SMTP_PASSWORD: ${CONTACT_SMTP_PASSWORD:-}
+      RESEND_API_KEY: ""
+      CONTACT_SMTP_HOST: ""
+      CONTACT_SMTP_PORT: ""
+      CONTACT_SMTP_USER: ""
+      CONTACT_SMTP_PASSWORD: ""
     networks:
       - web
     labels:
@@ -31,6 +37,8 @@ services:
       - traefik.http.routers.udderly-website-staging.service=udderly-website-staging
       - traefik.http.services.udderly-website-staging.loadbalancer.server.port=3000
       - traefik.http.middlewares.udderly-website-staging-noindex.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow, noarchive
+      - traefik.http.middlewares.udderly-website-staging-noindex.headers.contenttypenosniff=true
+      - traefik.http.middlewares.udderly-website-staging-noindex.headers.referrerpolicy=strict-origin-when-cross-origin
       - traefik.http.routers.udderly-website-staging.middlewares=udderly-website-staging-noindex
 
 networks:

@@ -136,7 +136,8 @@ export const experience = defineType({
       title: 'Season',
       type: 'string',
       group: 'visit',
-      options: {list: [...experienceSeasons]},
+      description: 'Summer covers spring, summer, and fall. Winter covers winter. The public date range stays in Season label.',
+      options: {list: [...experienceSeasons], layout: 'dropdown'},
       initialValue: 'yearRound',
     }),
     defineField({
@@ -314,7 +315,7 @@ export const experience = defineType({
       title: 'Private price shown on the website',
       type: 'string',
       group: 'visit',
-      description: 'Optional display text for a private session, such as “$250 for 4 people”. Leave empty to keep the approved Mini Highland Cow line on that page. This does not set extra-person pricing.',
+      description: 'Optional display text for a private session. The page shows a private price only when this field is filled. This does not set extra-person pricing.',
       validation: (rule) => rule.max(80),
     }),
     defineField({
@@ -322,7 +323,7 @@ export const experience = defineType({
       title: 'Private capacity',
       type: 'string',
       group: 'visit',
-      description: 'Optional display text, such as “4–8 people”. Leave empty to keep the approved Mini Highland Cow line on that page. Do not state that the private price covers the top of the range unless the farm confirms it.',
+      description: 'Optional display text for a private session. The page shows a private capacity only when this field is filled. Do not state that the private price covers the top of the range unless the farm confirms it.',
       validation: (rule) => rule.max(80),
     }),
     defineField({
@@ -563,11 +564,15 @@ export const experience = defineType({
       title: 'Show on the website',
       type: 'boolean',
       group: 'settings',
-      description: 'Turn off to hide this experience without deleting it.',
+      description:
+        'Turn off to remove this experience from the Experiences listing. The document stays here, and its page address still opens. This does not change booking verification.',
       initialValue: true,
     }),
     featuredField('settings'),
-    orderRankField('Lower numbers appear first on the Experiences hub.', 'settings'),
+    orderRankField(
+      'Lower numbers appear first on the Experiences listing. Leave empty to keep this experience where it is now.',
+      'settings',
+    ),
   ],
   preview: {
     select: {

@@ -27,19 +27,20 @@ export function ConsentManager() {
   const [advertising, setAdvertising] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const choiceRef = useRef<ConsentChoice | null>(null)
-  const sessionRef = useRef<ReturnType<typeof createTrackingSession> | null>(null)
-  if (!sessionRef.current) sessionRef.current = createTrackingSession()
+  const [session] = useState(createTrackingSession)
 
   useEffect(() => {
-    const session = sessionRef.current
-    if (!session) return
     const stored = readStoredConsent(browserConsentStorage())
     choiceRef.current = stored
-    setChoice(stored)
-    setAnalytics(stored?.analytics ?? false)
-    setAdvertising(stored?.advertising ?? false)
-    setBannerOpen(stored === null)
-    setReady(true)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) return
+      setChoice(stored)
+      setAnalytics(stored?.analytics ?? false)
+      setAdvertising(stored?.advertising ?? false)
+      setBannerOpen(stored === null)
+      setReady(true)
+    })
     session.watchNavigations({
       history: window.history as unknown as {
         pushState: (...args: unknown[]) => unknown
@@ -59,10 +60,11 @@ export function ConsentManager() {
 
     window.addEventListener(OPEN_CONSENT_EVENT, openPreferences)
     return () => {
+      cancelled = true
       window.removeEventListener(OPEN_CONSENT_EVENT, openPreferences)
       session.stopWatching()
     }
-  }, [])
+  }, [session])
 
   function apply(next: ConsentChoice) {
     const saved = writeStoredConsent(browserConsentStorage(), next)
@@ -73,13 +75,20 @@ export function ConsentManager() {
     setBannerOpen(false)
     setPreferencesOpen(false)
     setNotice(saved ? null : UNSAVED)
-    sessionRef.current?.sync(next, currentTrackingConfig(), document, browserTrackingHost(), browserCookieAccess())
+    session.sync(next, currentTrackingConfig(), document, browserTrackingHost(), browserCookieAccess())
   }
 
   function openFromBanner() {
     setAnalytics(choice?.analytics ?? false)
     setAdvertising(choice?.advertising ?? false)
     setPreferencesOpen(true)
+  }
+
+  function closePreferences() {
+    setPreferencesOpen(false)
+    if (bannerOpen) {
+      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('[data-consent-customize]')?.focus())
+    }
   }
 
   if (!ready) return null
@@ -98,7 +107,7 @@ export function ConsentManager() {
           onAccept={() => apply(acceptAll(now()))}
           onReject={() => apply(rejectOptional(now()))}
           onSave={() => apply(savePreferences(analytics, advertising, now()))}
-          onClose={() => setPreferencesOpen(false)}
+          onClose={closePreferences}
         />
       ) : null}
       {notice ? (

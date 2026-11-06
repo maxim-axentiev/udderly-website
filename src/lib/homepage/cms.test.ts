@@ -96,6 +96,22 @@ describe('homepage CMS content', () => {
     expect(JSON.stringify(content)).not.toContain('drafts.homepage')
   })
 
+  it('rejects retired and credentialed homepage CTA URLs without publishing partial CMS content', () => {
+    for (const destination of [
+      '/mini-cattle-for-sale', '/promotions', '/cow-wedding', '/cheryl-haskett',
+      '/escape-to-the-countryside-farm-glamping', '/goatscaping',
+      'https://user:password@example.com/visit',
+    ]) {
+      const unsafe = { ...publishedDocument, heroCta: { label: 'Visit', href: destination } }
+      expect(resolveHomepageContent(unsafe)).toBeNull()
+      expect(homepageContentOrFixture(unsafe).source).toBe('fixture')
+    }
+    expect(resolveHomepageContent({
+      ...publishedDocument,
+      heroCta: { label: 'Visit', href: 'https://example.com/visit' },
+    })?.hero.cta.href).toBe('https://example.com/visit')
+  })
+
   it('rejects incomplete CMS content instead of mixing it with the fixture', () => {
     const broken = {
       ...publishedDocument,

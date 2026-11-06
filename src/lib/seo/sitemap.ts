@@ -1,3 +1,6 @@
+import { publicExperienceSlug } from '@/lib/experiences/public-paths'
+import { routableExperienceSlug, resolveDocumentPath } from '@/lib/routes/paths'
+
 import { normalizePath } from './page-head'
 
 export type SitemapChangeFrequency =
@@ -161,29 +164,40 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
   ]
 }
 
+/** Canonical public experience paths, never stored slugs that only redirect. */
+export function publicExperienceSitemapEntries(slugs: readonly string[]): SitemapEntry[] {
+  const seen = new Set<string>()
+  return slugs.flatMap((storedSlug) => {
+    const slug = publicExperienceSlug(storedSlug)
+    if (!routableExperienceSlug(slug) || seen.has(slug)) return []
+    seen.add(slug)
+    return [{ path: `/${slug}`, changeFrequency: 'weekly' as const, priority: 0.8 }]
+  })
+}
+
+/** Only published articles with an implemented public route belong in the sitemap. */
+export function publicUrbortSitemapEntries(slugs: readonly string[]): SitemapEntry[] {
+  const seen = new Set<string>()
+  return slugs.flatMap((slug) => {
+    const resolved = resolveDocumentPath('urbortArticle', slug)
+    if (!resolved.ok || seen.has(resolved.href)) return []
+    seen.add(resolved.href)
+    return [{ path: resolved.href, changeFrequency: 'monthly' as const, priority: 0.5 }]
+  })
+}
+
 export async function getSitemapEntries(): Promise<SitemapEntry[]> {
   const { fetchExperienceSitemapSlugs, fetchUrbortSitemapSlugs } = await import('@/lib/sanity/fetch')
 
-  try {
-    const [slugs, articleSlugs] = await Promise.all([
-      fetchExperienceSitemapSlugs(),
-      fetchUrbortSitemapSlugs().catch(() => [] as string[]),
-    ])
-    const experienceEntries: SitemapEntry[] = slugs.map((slug) => ({
-      path: `/${slug}`,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    }))
-    const articleEntries: SitemapEntry[] = articleSlugs.map((slug) => ({
-      path: `/urbort-blog/${slug}`,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    }))
-
-    return [...getStaticSitemapEntries(), ...experienceEntries, ...articleEntries]
-  } catch {
-    return getStaticSitemapEntries()
-  }
+  const [slugs, articleSlugs] = await Promise.all([
+    fetchExperienceSitemapSlugs().catch(() => [] as string[]),
+    fetchUrbortSitemapSlugs().catch(() => [] as string[]),
+  ])
+  return [
+    ...getStaticSitemapEntries(),
+    ...publicExperienceSitemapEntries(slugs),
+    ...publicUrbortSitemapEntries(articleSlugs),
+  ]
 }
 
 export function isSitemapPathExcluded(path: string): boolean {

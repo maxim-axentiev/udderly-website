@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import { CorporateLanding } from '@/components/corporate/landing-page'
+import { PhotoCarousel } from '@/components/corporate/sections'
 import { DiscProgram } from '@/components/corporate/disc-page'
 import { SharedCorporateProgram } from '@/components/corporate/shared-program-page'
 import { TeamBuildingProgram } from '@/components/corporate/team-building-page'
@@ -45,6 +46,28 @@ const routes = [
   '/corporate-training',
   ...CORPORATE_PROGRAM_SLUGS.map((slug) => `/corporate-training/${slug}`),
 ]
+
+describe('corporate photo carousel', () => {
+  const photos = [
+    { src: '/goats.jpg', alt: 'Goats at the farm' },
+    { src: '/alpaca.jpg', alt: 'Alpaca at the farm' },
+  ]
+
+  it('makes multi-photo galleries keyboard focusable with carousel controls', () => {
+    const html = renderToStaticMarkup(<PhotoCarousel images={photos} label="Training photos" />)
+    expect(html).toContain('aria-roledescription="carousel"')
+    expect(html).toContain('aria-label="Training photos"')
+    expect(html).toContain('tabindex="0"')
+    expect(html).toContain('aria-label="Previous photo"')
+    expect(html).toContain('aria-label="Next photo"')
+  })
+
+  it('does not add unnecessary keyboard stops to a single photo', () => {
+    const html = renderToStaticMarkup(<PhotoCarousel images={photos.slice(0, 1)} label="Training photos" />)
+    expect(html).not.toContain('tabindex="0"')
+    expect(html).not.toContain('aria-label="Next photo"')
+  })
+})
 
 describe('corporate training pages', () => {
   it('renders all eight approved routes from Lovable fallbacks', () => {
@@ -270,6 +293,12 @@ describe('corporate training pages', () => {
     expect(publishedHtml).not.toContain('$125/hour')
     expect(publishedHtml).not.toContain('14-time')
     expect(publishedHtml).not.toContain('Placeholder')
+  })
+
+  it('rejects credentialed corporate card links while preserving approved destinations', () => {
+    const fallback = resolveCorporateLanding(null, [], null, images).featured?.href
+    expect(resolveCorporateLanding({ featuredProgram: { href: 'https://user:secret@example.com/visit' } }, [], null, images).featured?.href).toBe(fallback)
+    expect(resolveCorporateLanding({ featuredProgram: { href: 'https://example.com/visit' } }, [], null, images).featured?.href).toBe('https://example.com/visit')
   })
 
   it('keeps approved sections when a published corporate document is only partial', () => {

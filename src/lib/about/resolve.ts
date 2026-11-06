@@ -67,7 +67,7 @@ function href(value: string | null | undefined, fallback: string): string {
   if (raw.startsWith('/') && !raw.startsWith('//') && !/\s/.test(raw)) return raw
   try {
     const url = new URL(raw)
-    if (url.protocol === 'http:' || url.protocol === 'https:') return raw
+    if ((url.protocol === 'http:' || url.protocol === 'https:') && !url.username && !url.password) return raw
   } catch {
     return fallback
   }

@@ -4,6 +4,8 @@ import { contactSmtpConfigured, deliverContactEmail, type ContactMail } from './
 
 export const CONTACT_RATE_LIMIT = 5
 export const CONTACT_RATE_WINDOW_MS = 60 * 60 * 1000
+/** Bound process memory even when bots rotate through many source addresses. */
+export const CONTACT_RATE_HISTORY_CAP = 10_000
 
 const NAME_MAX = 100
 const EMAIL_MAX = 254
@@ -70,7 +72,7 @@ function allowAttempt(ip: string, now: number): boolean {
     if (!attempt || attempt.at <= cutoff) attempts.splice(index, 1)
   }
   const recent = attempts.filter((attempt) => attempt.ip === ip).length
-  if (recent >= CONTACT_RATE_LIMIT) return false
+  if (recent >= CONTACT_RATE_LIMIT || attempts.length >= CONTACT_RATE_HISTORY_CAP) return false
   attempts.push({ ip, at: now })
   return true
 }
@@ -102,7 +104,10 @@ function honeypotFilled(value: unknown): boolean {
 function singleLine(value: unknown, max: number): string | undefined {
   if (typeof value !== 'string') return undefined
   const trimmed = value.trim()
-  if (!trimmed || trimmed.length > max || /[\u0000-\u001F\u007F]/.test(trimmed)) return undefined
+  if (!trimmed || trimmed.length > max || [...trimmed].some((char) => {
+    const code = char.charCodeAt(0)
+    return code <= 31 || code === 127
+  })) return undefined
   return trimmed
 }
 

@@ -159,7 +159,7 @@ export function resolveVerifiedExternalBooking(
   }
 }
 
-/** A booking action is allowed only for an absolute http(s) URL from Sanity. */
+/** Booking actions require a secure, absolute HTTPS URL from Sanity. */
 export function publicBookingUrl(url: string | null | undefined): string | undefined {
   const trimmed = url?.trim() ?? ''
   if (!trimmed || trimmed.startsWith('#')) {
@@ -168,7 +168,7 @@ export function publicBookingUrl(url: string | null | undefined): string | undef
 
   try {
     const parsed = new URL(trimmed)
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) {
       return undefined
     }
     return trimmed

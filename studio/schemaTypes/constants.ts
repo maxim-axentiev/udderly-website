@@ -8,11 +8,9 @@ export const experienceCategories = [
 ] as const
 
 export const experienceSeasons = [
-  {title: 'Year-round', value: 'yearRound'},
-  {title: 'Spring', value: 'spring'},
   {title: 'Summer', value: 'summer'},
-  {title: 'Fall', value: 'fall'},
   {title: 'Winter', value: 'winter'},
+  {title: 'Year-round', value: 'yearRound'},
 ] as const
 
 export const experienceFormats = [

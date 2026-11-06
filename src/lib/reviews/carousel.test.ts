@@ -10,6 +10,7 @@ import {
   clampCarouselIndex,
   maxCarouselIndex,
   reviewCarouselColumns,
+  reviewSwipeDirection,
 } from './carousel'
 
 describe('review text collapse', () => {
@@ -27,6 +28,17 @@ describe('review text collapse', () => {
     expect(collapsed.endsWith('…')).toBe(true)
     expect(collapsed.length).toBeLessThan(text.length)
     expect(text.endsWith('The end.')).toBe(true)
+  })
+})
+
+describe('review swipe handling', () => {
+  it('moves only for intentional horizontal swipes', () => {
+    expect(reviewSwipeDirection(-80, 10)).toBe(1)
+    expect(reviewSwipeDirection(80, -10)).toBe(-1)
+    expect(reviewSwipeDirection(20, 0)).toBe(0)
+    expect(reviewSwipeDirection(-70, 100)).toBe(0)
+    expect(reviewSwipeDirection(70, 70)).toBe(0)
+    expect(reviewSwipeDirection(-50, 0)).toBe(0)
   })
 })
 

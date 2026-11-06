@@ -109,6 +109,9 @@ export function ExperiencesPresentation({
           <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">
             {page.hero.supporting}
           </p>
+          <a href="#farm-experiences" className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full border-2 border-headline bg-cta px-8 py-3 font-display text-lg font-extrabold uppercase text-cta-foreground shadow-[4px_4px_0_var(--color-headline)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-background">
+            Browse farm experiences
+          </a>
         </Container>
       </section>
 
@@ -149,7 +152,7 @@ export function ExperiencesPresentation({
         </section>
       ) : null}
 
-      <section id="farm-experiences" className="scroll-mt-20 bg-background py-20 md:py-28">
+      <section id="farm-experiences" tabIndex={-1} className="scroll-mt-20 bg-background py-20 outline-none md:py-28">
         <Container width="brand" className="max-w-[1500px]">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <h2 className="max-w-3xl font-display text-[clamp(2.8rem,7vw,7rem)] font-black uppercase leading-[0.8] text-headline">
@@ -210,7 +213,7 @@ export function ExperiencesPresentation({
                         <ExperienceFacts season={experience.season} age={experience.age} />
                         <div className="mt-5 flex flex-col gap-3">
                           {experience.href ? (
-                            <ButtonLink href={experience.href} variant="outline" className="w-full">
+                            <ButtonLink href={experience.href} variant="outline" aria-label={`Learn more about ${experience.title}`} className="w-full">
                               Learn More
                             </ButtonLink>
                           ) : null}
@@ -218,9 +221,10 @@ export function ExperiencesPresentation({
                             <ButtonLink
                               key={action.label}
                               href={action.href}
+                              aria-label={`${action.label} for ${experience.title}`}
                               external={!action.overlay}
                               openInNewTab={action.overlay ? false : undefined}
-                              className="w-full"
+                              className="w-full min-w-0 px-5 text-center whitespace-normal break-words sm:px-6"
                             >
                               {action.label}
                             </ButtonLink>
@@ -407,7 +411,7 @@ export function ExperiencesPresentation({
           <div className="border-2 border-headline bg-background p-7 text-center shadow-[10px_10px_0_var(--color-secondary-accent)] md:p-12">
             <h2 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">{page.newsletter.title}</h2>
             <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">{page.newsletter.copy}</p>
-            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" onSubmit={(event) => event.preventDefault()}>
+            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" aria-describedby="experience-newsletter-unavailable" onSubmit={(event) => event.preventDefault()}>
               <label className="font-display text-sm font-bold uppercase text-headline">
                 First name
                 <input disabled name="firstName" className="mt-1 min-h-12 w-full rounded-full border-2 border-headline bg-background px-5" />
@@ -420,7 +424,7 @@ export function ExperiencesPresentation({
                 Sign me up
               </Button>
             </form>
-            <p className="mt-4 font-accent text-lg italic text-primary-accent">{page.newsletter.unavailable}</p>
+            <p id="experience-newsletter-unavailable" role="status" className="mt-4 font-accent text-lg italic text-primary-accent">{page.newsletter.unavailable}</p>
           </div>
         </Container>
       </section>

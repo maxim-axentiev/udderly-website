@@ -48,7 +48,7 @@ export function AdoptPage({
         </Container>
       </section>
 
-      <section aria-label="TripAdvisor awards" className="border-y-2 border-headline bg-farm-beige py-6">
+      {copy.showAwards ? <section aria-label="TripAdvisor awards" className="border-y-2 border-headline bg-farm-beige py-6">
         <Container width="brand" className="flex flex-col items-center gap-5 md:flex-row md:justify-between">
           <div className="text-center md:max-w-[24rem] md:text-left">
             <p className="font-display text-lg font-black uppercase leading-tight text-headline">
@@ -78,7 +78,7 @@ export function AdoptPage({
             ))}
           </ul>
         </Container>
-      </section>
+      </section> : null}
 
       <section className="overflow-hidden bg-background py-20 md:py-28">
         <Container width="brand" className="grid max-w-[1400px] items-start gap-14 lg:grid-cols-[1.05fr_1fr]">

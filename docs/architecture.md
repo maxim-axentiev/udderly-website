@@ -49,7 +49,16 @@ No photography is bundled in the website scaffold. Prefer Sanity’s image CDN f
 
 Studio lives in `/studio` and is connected to project `umbuxpyp` / dataset `production`.
 
-Content types and page-builder sections are defined there. The public website does not query Sanity yet. Sales listings are public website content only; applicant and CRM data stays out of this repository.
+Content types and page-builder sections are defined there. The public website reads published documents. Sales listings are public website content only; applicant and CRM data stays out of this repository.
+
+### Experience listing
+
+Each experience has two settings that do not change `bookingVerified` or `privateBookingVerified`.
+
+- **Show on the website** (`active`). On, or empty, the experience stays on `/experiences`. Off removes that card from the listing and from the sitemap. The document stays in Sanity, and `/{slug}` still opens the page. A missing value stays visible, so the 15 published experiences remain listed without a content edit.
+- **Display order** (`sortOrder`). A number places the card on the listing. Lower numbers come first. Empty keeps the card where the Experiences hub card list already puts it.
+
+Tower of Goats is a hub card, not an experience document, so these two settings do not move or hide it. The homepage’s own experience cards are a separate list.
 
 Editorial types include Experiences, Corporate Programs, Animals, Adoption Offerings, Animals for Sale, URBORT articles, FAQs, Policies, and flexible Pages for unique marketing pages such as Glamping and Corporate Experiences.
 
@@ -61,15 +70,15 @@ Do not add GA4, GTM, Meta Pixel, or TikTok Pixel until a later task. Analytics s
 
 ## Forms
 
-Public forms are not implemented. When they are added they should use:
+The contact page is the only form that can send. Newsletter signup, gift-card checkout, glamping booking, and experience booking stay disabled.
 
-- server-side validation
-- Zod or an equivalent schema
-- server-only secrets
-- spam protection such as Cloudflare Turnstile
-- clear success and error states
+`POST` `submitContactFn` validates the name, email, and message on the server, then sends one message with Nodemailer. The recipient is fixed as `info@udderlyridiculousfarmlife.com`. `Reply-To` is the visitor’s email. SMTP host, port, username, and password come from `CONTACT_SMTP_*`. Those variables are server-only: they are not `PUBLIC_` or `VITE_` values, and an empty set leaves the form disabled with the existing unavailable notice and `mailto:` link.
 
-Do not put mail-provider keys in client code.
+The mail server’s acceptance is the success condition. The page says that acceptance is not the same as the message already being in the inbox. A connection, authentication, or rejection error keeps the entered fields and says the message was not sent. Message bodies and credentials are not logged.
+
+A hidden honeypot field is discarded without sending. Repeated submissions are limited to five per hour for one client address, in memory, for this single website process. Behind Traefik, the address is the rightmost `X-Forwarded-For` value only when the socket peer is a private or loopback address. A public socket peer ignores that header. Restarting the container clears the limit.
+
+Cloudflare Turnstile is not configured. Add it only if this honeypot and limit are not enough.
 
 ## Docker / Traefik
 

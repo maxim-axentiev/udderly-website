@@ -7,6 +7,20 @@
  * either hit the experience catch-all or a reserved path that is still a 404.
  */
 
+export const RETIRED_EXPERIENCE_SLUGS = [
+  'mini-cattle-for-sale',
+  'promotions',
+  'cow-wedding',
+  'cheryl-haskett',
+  'escape-to-the-countryside-farm-glamping',
+  'goatscaping',
+] as const
+
+export function isRetiredExperiencePath(path: string): boolean {
+  const slug = path.replace(/^\/+|\/+$/g, '')
+  return !slug.includes('/') && (RETIRED_EXPERIENCE_SLUGS as readonly string[]).includes(slug)
+}
+
 export const RESERVED_SLUGS = [
   'experiences',
   'tower-of-goats',
@@ -37,6 +51,17 @@ export const RESERVED_SLUGS = [
   'gift-card',
   'farm-glamping',
   'private-mini-highland-experience',
+  // These two stored CMS slugs remain resolvable for the approved donkey aliases.
+  // Their legacy HTTP paths are redirected before the catch-all route.
+  'team-building-farm-experiences',
+  'faqs',
+  'gift-certificate',
+  'subscribe-to-newsletter',
+  'our-vision',
+  'privacy-policy-2',
+  'experiential-tourism-development',
+  // Owner-confirmed retired URLs must never become experience catch-all pages.
+  ...RETIRED_EXPERIENCE_SLUGS,
   'health',
   'studio',
   'robots.txt',

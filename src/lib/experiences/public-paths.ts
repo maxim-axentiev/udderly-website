@@ -21,6 +21,22 @@ export function publicExperienceSlug(slug: string): string {
   return STORED_TO_PUBLIC_SLUG[slug] ?? slug
 }
 
+/** Match detail-page alias preference before applying SEO exclusion. */
+export function selectIndexableExperienceSlugs(
+  records: readonly { slug: string; noIndex?: boolean | null }[],
+): string[] {
+  const selected = new Map<string, { slug: string; noIndex?: boolean | null }>()
+  for (const record of records) {
+    if (!record || typeof record.slug !== 'string' || !record.slug.trim()) continue
+    const publicSlug = publicExperienceSlug(record.slug)
+    const previous = selected.get(publicSlug)
+    if (!previous || (record.slug === publicSlug && previous.slug !== publicSlug)) {
+      selected.set(publicSlug, record)
+    }
+  }
+  return [...selected].filter(([, record]) => record.noIndex !== true).map(([slug]) => slug)
+}
+
 export function experienceSlugAliases(slug: string): string[] {
   const stored = PUBLIC_TO_STORED_SLUG[slug]
   const published = STORED_TO_PUBLIC_SLUG[slug]

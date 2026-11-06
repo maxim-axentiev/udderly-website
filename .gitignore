@@ -26,6 +26,15 @@ coverage/
 # Local audit inputs. Do not commit Search Console exports or WordPress extracts.
 .local/
 
+# Raw CMS/WordPress snapshots and generated migration datasets are review-only.
+# Preserve curated reports and migration scripts for deliberate source review.
+reports/about-wordpress-migration/source/
+reports/website-content-migration/export/
+reports/website-content-migration/urbort-source/
+reports/website-content-migration/_sanity-*.json
+reports/website-content-migration/_field-report.json
+reports/website-content-migration/content-source-export.json
+
 # Editor / OS
 .DS_Store
 Thumbs.db

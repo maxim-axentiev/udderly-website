@@ -118,6 +118,13 @@ describe('about pages', () => {
     expect(html).not.toContain('Growing together')
   })
 
+  it('rejects credentialed About page CTA destinations while keeping approved links', () => {
+    const baseline = resolveVisionValues(null, images).cta?.href
+    expect(resolveVisionValues({ ctaHref: 'https://user:secret@example.com/visit' }, images).cta?.href).toBe(baseline)
+    expect(resolveVisionValues({ ctaHref: 'https://example.com/visit' }, images).cta?.href).toBe('https://example.com/visit')
+    expect(resolveVisionValues({ ctaHref: '/experiences' }, images).cta?.href).toBe('/experiences')
+  })
+
   it('renders vision and values only from complete published content', () => {
     const incomplete = resolveVisionValues(
       {

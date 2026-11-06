@@ -3,6 +3,7 @@ import {
   homepageNewsletter,
   homepageUrbort,
 } from '@/content/homepage'
+import { isRetiredExperiencePath } from '@/lib/routes/paths'
 import { cmsImageSrcSet, cmsImageUrl, isSanityImage } from '@/lib/sanity/image'
 import type { SanityImage } from '@/lib/sanity/types'
 import { getHomepageVideoEmbedUrl } from '@/lib/youtube'
@@ -146,10 +147,10 @@ function optionalText(value: unknown, max: number): string {
 
 function href(value: unknown): string {
   if (typeof value !== 'string' || /\s/.test(value)) throw new InvalidHomepage('href')
-  if (value.startsWith('/') && !value.startsWith('//')) return value
+  if (value.startsWith('/') && !value.startsWith('//') && !isRetiredExperiencePath(value)) return value
   try {
     const url = new URL(value)
-    if (url.protocol === 'http:' || url.protocol === 'https:') return value
+    if ((url.protocol === 'http:' || url.protocol === 'https:') && !url.username && !url.password) return value
   } catch {
     throw new InvalidHomepage('href')
   }

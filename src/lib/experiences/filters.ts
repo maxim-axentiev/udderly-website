@@ -1,3 +1,4 @@
+import { routableExperienceSlug } from '@/lib/routes/paths'
 import type { ExperienceCardData } from '@/lib/sanity/types'
 
 /**
@@ -16,6 +17,8 @@ export function filterExperienceCards(
   filters: ExperienceHubFilters = {},
 ): ExperienceCardData[] {
   return experiences.filter((experience) => {
+    if (!experience.title || !routableExperienceSlug(experience.slug)) return false
+
     if (filters.season && experience.season !== filters.season) {
       return false
     }

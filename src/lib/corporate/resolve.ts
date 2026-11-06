@@ -149,7 +149,7 @@ function href(value: string | null | undefined, fallback: string): string {
   if (next.startsWith('/') && !next.startsWith('//')) return next
   try {
     const url = new URL(next)
-    if (url.protocol === 'http:' || url.protocol === 'https:') return next
+    if ((url.protocol === 'http:' || url.protocol === 'https:') && !url.username && !url.password) return next
   } catch {
     return fallback
   }

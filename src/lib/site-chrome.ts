@@ -1,4 +1,4 @@
-import { documentPath } from '@/lib/routes/paths'
+import { documentPath, isRetiredExperiencePath } from '@/lib/routes/paths'
 import {
   bookCta as fallbackBookCta,
   FOOTER_LOCATION_FALLBACK,
@@ -141,8 +141,24 @@ export function sitePath(value: string | null | undefined): string | undefined {
   if (href.includes('\\') || href.includes('..') || /\s/.test(href) || href.includes('?') || href.includes('#')) {
     return undefined
   }
-  if (!/^\/[A-Za-z0-9/_~.%+-]*$/.test(href)) return undefined
+  if (!/^\/[A-Za-z0-9/_~.%+-]*$/.test(href) || isRetiredExperiencePath(href)) return undefined
   return href
+}
+
+/** Only ordinary web links may be supplied by CMS navigation and social fields. */
+export function safeExternalUrl(value: string | null | undefined): string | undefined {
+  const href = value?.trim()
+  if (!href || href.length > 2048 || [...href].some((char) => {
+    const code = char.charCodeAt(0)
+    return code <= 31 || code === 127
+  })) return undefined
+  try {
+    const url = new URL(href)
+    if ((url.protocol !== 'https:' && url.protocol !== 'http:') || !url.hostname || url.username || url.password) return undefined
+    return href
+  } catch {
+    return undefined
+  }
 }
 
 export function resolveCmsLink(link: CmsLink | null | undefined): ChromeLink | undefined {
@@ -156,7 +172,7 @@ export function resolveCmsLink(link: CmsLink | null | undefined): ChromeLink | u
   }
 
   if (link.linkType === 'external') {
-    const href = link.href?.trim()
+    const href = safeExternalUrl(link.href)
     if (!href) {
       return undefined
     }
@@ -366,10 +382,10 @@ export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
     ),
     bookCta: bookCta ?? siteChromeFallback.bookCta,
     social: {
-      instagram: social?.instagram?.trim() || siteChromeFallback.social.instagram,
-      tiktok: social?.tiktok?.trim() || siteChromeFallback.social.tiktok,
-      ...(social?.facebook?.trim() ? { facebook: social.facebook.trim() } : {}),
-      ...(social?.youtube?.trim() ? { youtube: social.youtube.trim() } : {}),
+      instagram: safeExternalUrl(social?.instagram) || siteChromeFallback.social.instagram,
+      tiktok: safeExternalUrl(social?.tiktok) || siteChromeFallback.social.tiktok,
+      ...(safeExternalUrl(social?.facebook) ? { facebook: safeExternalUrl(social?.facebook) } : {}),
+      ...(safeExternalUrl(social?.youtube) ? { youtube: safeExternalUrl(social?.youtube) } : {}),
     },
     locationLine: locationLine || siteChromeFallback.locationLine,
     tagline: tagline || FOOTER_TAGLINE,

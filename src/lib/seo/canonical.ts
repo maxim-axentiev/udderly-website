@@ -12,7 +12,32 @@ export function getCanonicalOrigin(
     return undefined
   }
 
-  return raw.replace(/\/+$/, '')
+  try {
+    const url = new URL(raw)
+    const hostname = url.hostname.toLowerCase()
+    if (
+      url.protocol !== 'https:' ||
+      !hostname.includes('.') ||
+      hostname === 'localhost' ||
+      hostname.endsWith('.localhost') ||
+      hostname.endsWith('.example') ||
+      ['example.com', 'example.org', 'example.net'].includes(hostname) ||
+      ['.example.com', '.example.org', '.example.net'].some((suffix) => hostname.endsWith(suffix)) ||
+      hostname.endsWith('.test') ||
+      hostname.endsWith('.invalid') ||
+      url.username ||
+      url.password ||
+      url.search ||
+      url.hash ||
+      url.pathname !== '/' ||
+      url.port
+    ) {
+      return undefined
+    }
+    return url.origin
+  } catch {
+    return undefined
+  }
 }
 
 export function isIndexingEnabled(

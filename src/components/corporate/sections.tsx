@@ -150,6 +150,12 @@ export function PhotoCarousel({ images, label }: { images: CorporatePicture[]; l
         role="group"
         aria-roledescription="carousel"
         aria-label={label}
+        tabIndex={total > 1 ? 0 : undefined}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return
+          if (event.key === 'ArrowLeft') { event.preventDefault(); go(index - 1) }
+          if (event.key === 'ArrowRight') { event.preventDefault(); go(index + 1) }
+        }}
       >
         <img src={current.src} alt={current.alt} width={1280} height={960} className="aspect-[4/3] w-full object-cover" />
         {total > 1 ? (

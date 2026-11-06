@@ -47,7 +47,7 @@ export function WelfareSection() {
                     {point.name}
                   </span>
                   <span
-                    className={`absolute inset-0 flex items-center overflow-auto bg-primary-accent p-4 text-xs leading-relaxed text-primary-foreground transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 sm:text-sm ${
+                    className={`absolute inset-0 flex items-center overflow-auto bg-primary-accent p-4 text-xs leading-relaxed text-primary-foreground transition-opacity duration-200 [@media(hover:hover)]:group-hover:opacity-100 group-focus-visible:opacity-100 sm:text-sm ${
                       open ? 'opacity-100' : 'opacity-0'
                     }`}
                   >

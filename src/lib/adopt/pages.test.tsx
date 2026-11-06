@@ -5,12 +5,12 @@ import { AdoptPage } from '@/components/adopt/adopt-page'
 import { AnimalAdoptionPage } from '@/components/adopt/animal-adoption-page'
 import { AnimalsForSalePage } from '@/components/sale/animals-for-sale-page'
 import { ADOPTION_ANIMALS, ADOPT_PAGE } from '@/lib/adopt/content'
-import { buildAdoptionCards, findAdoptionAnimal, resolveAdoptionDetail, resolveAdoptionPageCopy } from '@/lib/adopt/resolve'
+import { buildAdoptionCards, checkoutHref, findAdoptionAnimal, resolveAdoptionDetail, resolveAdoptionPageCopy } from '@/lib/adopt/resolve'
 import { primaryNav } from '@/lib/navigation'
 import { RESERVED_SLUGS, routableExperienceSlug } from '@/lib/routes/paths'
 import { redirects } from '@/lib/seo/redirects'
 import { FUTURE_INTERNAL_REDIRECTS } from '@/lib/seo/future-redirects'
-import { buildSaleLists, findSaleAnimal, resolveSalePageCopy } from '@/lib/sale/resolve'
+import { buildSaleLists, findSaleAnimal, resolveSalePageCopy, safeSalePageHref } from '@/lib/sale/resolve'
 import { sanityClient } from '@/lib/sanity/client'
 import { adoptionOfferingsQuery, animalListingsQuery } from '@/lib/sanity/queries'
 import { buildRobotsTxt } from '@/lib/seo/robots'
@@ -134,8 +134,8 @@ describe('animals for sale', () => {
     expect(moved.sold.find((animal) => animal.slug === 'june')?.priceDisplay).toBe('Contact the farm')
 
     const held = buildSaleLists([{ slug: 'joe', status: 'reserved' }])
-    expect(held.available.map((animal) => animal.name)).toContain('Joe')
-    expect(held.available.find((animal) => animal.slug === 'joe')?.groupingNote).toContain('reserved')
+    expect(held.available.map((animal) => animal.name)).not.toContain('Joe')
+    expect(held.sold.map((animal) => animal.name)).not.toContain('Joe')
   })
 
   it('keeps Lovable page copy until the Sanity document is complete', () => {
@@ -189,11 +189,27 @@ describe('sanity editability', () => {
     const clara = buildAdoptionCards([{ slug: 'clara', speciesTitle: 'Mini Highland Cattle', introduction: 'Hello' }])
     expect(clara.find((card) => card.slug === 'clara')?.speciesNote).toBeUndefined()
 
-    const listing = findSaleAnimal('copperpot-puff-elton-john', [{ slug: 'copperpot-puff-elton-john', personality: 'One card.' }])
+    const listing = findSaleAnimal('copperpot-puff-elton-john', [{ slug: 'copperpot-puff-elton-john', status: 'sold', personality: 'One card.' }])
     expect(listing?.name).toBe('Copperpot, Puff & Elton John')
     expect(listing?.species).toBe('alpaca')
     expect(listing?.speciesTitle).toBeUndefined()
     expect(listing?.source).toBe('sanity')
+  })
+
+  it('does not publish fallback Tripadvisor claims on the Adopt page', () => {
+    const fallback = resolveAdoptionPageCopy(null)
+    const missingAwards = resolveAdoptionPageCopy(completeAdoptionPage())
+    for (const copy of [fallback, missingAwards]) {
+      expect(copy.showAwards).toBe(false)
+      const html = renderToStaticMarkup(<AdoptPage copy={copy} cards={[]} images={images} />)
+      expect(html).not.toContain('TripAdvisor awards')
+      expect(html).not.toContain('Top 10% of attractions worldwide')
+    }
+    const approved = resolveAdoptionPageCopy(completeAdoptionPage({
+      awardImages: [{ alt: 'Published award', asset: { _ref: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg' } }],
+    }))
+    expect(approved.showAwards).toBe(true)
+    expect(renderToStaticMarkup(<AdoptPage copy={approved} cards={[]} images={images} />)).toContain('TripAdvisor awards')
   })
 
   it('replaces complete page copy and keeps Lovable copy when the document is incomplete', () => {
@@ -220,6 +236,45 @@ describe('sanity editability', () => {
     expect(copy.intro).toBe('Editors can change this introduction.')
     expect(copy.seoSource).toBe('fallback')
     expect(copy.seoDescription).toBe(ADOPT_PAGE.intro)
+  })
+
+  it('rejects credentialed or invalid sale-page links but keeps the waitlist anchor', () => {
+    const fallback = '#waitlist'
+    expect(safeSalePageHref('#waitlist', fallback)).toBe(fallback)
+    expect(safeSalePageHref('/contact', fallback)).toBe('/contact')
+    expect(safeSalePageHref('https://example.com/contact', fallback)).toBe('https://example.com/contact')
+    for (const unsafe of [
+      'https://user:password@example.com/contact',
+      'http://user@example.com/contact',
+      'javascript:alert(1)',
+      'data:text/html,bad',
+      '//example.com/contact',
+      '#invalid anchor',
+      'https://',
+    ]) {
+      expect(safeSalePageHref(unsafe, fallback)).toBe(fallback)
+    }
+  })
+
+  it('requires secure, non-credentialed adoption checkout destinations', () => {
+    expect(checkoutHref(' https://example.com/adopt-clara ')).toBe('https://example.com/adopt-clara')
+    for (const unsafe of [
+      'http://example.com/checkout',
+      'https://user:password@example.com/checkout',
+      'javascript:alert(1)',
+      'data:text/html,hello',
+      '//example.com/checkout',
+      '/checkout',
+      'https://',
+    ]) {
+      expect(checkoutHref(unsafe)).toBeUndefined()
+    }
+    const clara = findAdoptionAnimal('clara', [{ slug: 'clara', title: 'Clara' }])!
+    const hidden = resolveAdoptionDetail(clara, [{ slug: 'clara', packages: [{
+      name: 'Silver', priceDisplay: '$35', includes: ['Digital certificate of adoption'],
+      checkoutUrl: 'http://example.com/checkout',
+    }] }])
+    expect(hidden.packages).toEqual([])
   })
 
   it('shows a published package only when checkout is a real URL', () => {
@@ -265,7 +320,7 @@ describe('sanity editability', () => {
   })
 
   it('leaves unknown animal facts empty', () => {
-    const animal = findSaleAnimal('macintosh', [{ slug: 'macintosh', priceDisplay: '$X,XXX' }])
+    const animal = findSaleAnimal('macintosh', [{ slug: 'macintosh', status: 'available', priceDisplay: '$X,XXX' }])
     expect(animal?.birthDate).toBeUndefined()
     expect(animal?.birthHeight).toBeUndefined()
     expect(animal?.birthWeight).toBeUndefined()
@@ -343,10 +398,9 @@ describe('sanity editability', () => {
       { title: 'Biscuit', slug: 'biscuit', status: 'sold', sortOrder: 3 },
       { slug: 'paused', title: 'Paused', active: false, status: 'available' },
     ])
-    expect(lists.available.map((animal) => animal.slug)).toEqual(['biscuit', 'joe'])
+    expect(lists.available.map((animal) => animal.slug)).toEqual(['biscuit'])
     expect(lists.sold.map((animal) => animal.slug)).toEqual(['june'])
-    expect(lists.available.find((animal) => animal.slug === 'joe')?.species).toBe('cow')
-    expect(lists.available.find((animal) => animal.slug === 'joe')?.groupingNote).toContain('reserved')
+    expect(lists.available.find((animal) => animal.slug === 'joe')).toBeUndefined()
     expect(lists.available.find((animal) => animal.slug === 'biscuit')?.species).toBe('other')
     expect(lists.available.find((animal) => animal.slug === 'biscuit')?.imageKey).toBeUndefined()
     expect(lists.sold.map((animal) => animal.slug)).not.toContain('pekoe-rooibos-matcha')
@@ -384,6 +438,7 @@ describe('sanity editability', () => {
     const animal = findSaleAnimal('june', [{
       slug: 'june',
       title: 'June',
+      status: 'available',
       personality: 'June stays in the story.',
       groupDescription: 'The pair stays together.',
       seo: { title: 'T'.repeat(121), description: 'June is still described.' },

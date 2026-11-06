@@ -100,6 +100,23 @@ describe('experiences hub page resolution', () => {
     expect(page.emptyHeading).toBe(publishedHub.emptyHeading)
   })
 
+  it('never displays retired experience cards from custom Sanity lists or published extras', () => {
+    const retired = [
+      'mini-cattle-for-sale', 'promotions', 'cow-wedding', 'cheryl-haskett',
+      'escape-to-the-countryside-farm-glamping', 'goatscaping',
+    ]
+    const published = retired.map((slug) => experience({ title: slug, slug }))
+    const cms = resolveExperiencesHubPage({
+      experienceCards: [
+        ...retired.map((slug) => ({ title: slug, slug })),
+        { title: 'Goat Yoga', slug: 'goat-yoga' },
+      ],
+    }, published)
+    expect(cms.cards.map((card) => card.slug)).toEqual(['goat-yoga'])
+    const fallback = resolveExperiencesHubPage(null, published)
+    for (const slug of retired) expect(fallback.cards.some((card) => card.slug === slug)).toBe(false)
+  })
+
   it('adds, reorders, and filters experience cards from Sanity', () => {
     const page = resolveExperiencesHubPage({
       experienceCards: [
@@ -127,6 +144,120 @@ describe('experiences hub page resolution', () => {
     expect(page.cards[2]?.description).toBe('A published description.')
     expect(page.cards[2]?.bookingUrl).toContain('https://fareharbor.com/')
     expect(page.cards[2]?.bookingOverlay).toBe(true)
+  })
+
+  it('hides inactive visits but keeps seasonally closed experiences listed without inventing availability', () => {
+    const winterOnly = experience({
+      title: 'Goat Cuddles',
+      slug: 'goat-cuddles',
+      active: true,
+      season: 'winter',
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      fareharborItemId: '336824',
+    })
+    const summerOnly = experience({
+      title: 'Goat Yoga',
+      slug: 'goat-yoga',
+      active: true,
+      season: 'summer',
+      bookingVerified: false,
+      bookingUrl: 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308278/',
+    })
+    const inactive = experience({
+      title: 'Retired Goat Recess',
+      slug: 'goat-recess',
+      active: false,
+      bookingVerified: true,
+      bookingProvider: 'fareharbor',
+      fareharborItemId: '999999',
+    })
+    const page = resolveExperiencesHubPage(null, [winterOnly, summerOnly, inactive])
+    const cuddles = page.cards.find((card) => card.slug === 'goat-cuddles')
+    const yoga = page.cards.find((card) => card.slug === 'goat-yoga')
+    expect(cuddles?.bookingActions?.[0]?.href).toContain('/items/336824/')
+    expect(yoga).toBeDefined()
+    expect(yoga?.bookingActions).toBeUndefined()
+    expect(page.cards.some((card) => card.slug === 'goat-recess')).toBe(false)
+    expect(JSON.stringify(page.cards)).not.toContain('/items/999999/')
+  })
+
+  it('prefers the active public donkey picnic record over an inactive legacy alias', () => {
+    const old = experience({
+      title: 'Retired private picnic',
+      slug: 'private-miniature-donkey-lunch-picnic',
+      active: false,
+      bookingVerified: true,
+      bookingUrl: 'https://example.com/retired-booking',
+    })
+    const current = experience({
+      title: 'Current donkey picnic',
+      slug: 'miniature-donkey-lunch-picnic',
+      active: true,
+      bookingVerified: true,
+      bookingUrl: 'https://example.com/current-booking',
+    })
+    const page = resolveExperiencesHubPage(null, [old, current])
+    const picnic = page.cards.find((card) => card.slug === 'private-miniature-donkey-lunch-picnic')
+      ?? page.cards.find((card) => card.slug === 'miniature-donkey-lunch-picnic')
+    expect(picnic?.title).toBe('Current donkey picnic')
+    expect(picnic?.bookingActions?.[0]?.href).toBe('https://example.com/current-booking')
+    expect(JSON.stringify(page.cards)).not.toContain('retired-booking')
+  })
+
+  it('deduplicates legacy and public CMS cards and uses the public record for bookings', () => {
+    const legacy = experience({
+      title: 'Legacy donkey picnic',
+      slug: 'private-miniature-donkey-lunch-picnic',
+      active: true,
+      bookingVerified: true,
+      bookingUrl: 'https://example.com/old-booking',
+    })
+    const current = experience({
+      title: 'Current donkey picnic',
+      slug: 'miniature-donkey-lunch-picnic',
+      active: true,
+      bookingVerified: true,
+      bookingUrl: 'https://example.com/current-booking',
+    })
+    const cmsRows = [
+      { title: 'Legacy donkey picnic', slug: legacy.slug, sortOrder: 1 },
+      { title: 'Current donkey picnic', slug: current.slug, sortOrder: 2 },
+    ]
+    for (const rows of [cmsRows, [...cmsRows].reverse()]) {
+      const page = resolveExperiencesHubPage({ experienceCards: rows }, [legacy, current])
+      expect(page.cards).toHaveLength(1)
+      expect(page.cards[0]?.slug).toBe('miniature-donkey-lunch-picnic')
+      expect(page.cards[0]?.bookingActions?.[0]?.href).toBe('https://example.com/current-booking')
+      expect(JSON.stringify(page.cards)).not.toContain('old-booking')
+    }
+    const legacyOnly = resolveExperiencesHubPage({ experienceCards: [cmsRows[0]] }, [legacy, current])
+    expect(legacyOnly.cards).toHaveLength(1)
+    expect(legacyOnly.cards[0]?.bookingActions?.[0]?.href).toBe('https://example.com/current-booking')
+  })
+
+  it('does not append duplicate fallback cards for active legacy and public records', () => {
+    const legacy = experience({
+      title: 'Old farm activity',
+      slug: 'private-miniature-donkey-sunset-picnic',
+      active: true,
+      bookingVerified: true,
+      bookingUrl: 'https://example.com/legacy-picnic',
+    })
+    const current = experience({
+      title: 'Current farm activity',
+      slug: 'miniature-donkey-sunset-picnic',
+      active: true,
+      bookingVerified: true,
+      bookingUrl: 'https://example.com/current-picnic',
+    })
+    for (const published of [[legacy, current], [current, legacy]]) {
+      const page = resolveExperiencesHubPage(null, published)
+      const picnics = page.cards.filter((card) => card.href === '/miniature-donkey-sunset-picnic')
+      expect(picnics).toHaveLength(1)
+      expect(picnics[0]?.bookingActions?.[0]?.href).toBe('https://example.com/current-picnic')
+      expect(JSON.stringify(page.cards)).not.toContain('legacy-picnic')
+    }
   })
 
   it('keeps an unverified experience booking link off the hub card', () => {
@@ -256,8 +387,13 @@ describe('experiences hub page resolution', () => {
       images: {},
     }))
     expect(html).toContain('Book Experience')
+    expect(html).toContain('aria-label="Learn more about Goat Yoga"')
+    expect(html).toContain('aria-label="Book Experience for Goat Yoga"')
+    expect(html).toContain('aria-label="Book Public Experience for Mini Highland Cow Experience"')
+    expect(html).toContain('aria-label="Book Private Experience for Private Miniature Donkey Lunch Picnic"')
     expect(html).toContain('Book Public Experience')
     expect(html).toContain('Book Private Experience')
+    expect(html).toContain('w-full min-w-0 px-5 text-center whitespace-normal break-words sm:px-6')
     expect(html).toContain('href="/tower-of-goats-discovery-trail"')
     expect(html).toContain('items/308278/')
     expect(html).toContain('items/523759/')
@@ -498,10 +634,16 @@ describe('experiences hub page resolution', () => {
     expect(html).toContain('src="/glamping.webp"')
     expect(html).toContain('src="/ice-cream.webp"')
     expect(html).toContain('src="/training.webp"')
+    expect(html).toContain('href="#farm-experiences"')
+    expect(html).toContain('Browse farm experiences')
+    expect(html).toContain('id="farm-experiences" tabindex="-1"')
     expect(html).toContain('id="rainbow-registered"')
     expect(html).not.toContain('<img src="/rainbow')
     expect(html).toContain('disabled=""')
     expect(html).toContain('Newsletter signup is not available yet.')
+    expect(html).toContain('aria-describedby="experience-newsletter-unavailable"')
+    expect(html).toContain('id="experience-newsletter-unavailable" role="status"')
+    expect(html).not.toContain('type="submit"')
     expect(html).not.toContain('fareharbor')
     expect(html).not.toContain('Farm Hopping')
   })

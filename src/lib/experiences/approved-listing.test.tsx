@@ -132,6 +132,8 @@ describe('approved experiences listing', () => {
     expect(publicBookingUrl('#farm-experiences')).toBeUndefined()
     expect(publicBookingUrl('/experiences')).toBeUndefined()
     expect(publicBookingUrl('javascript:alert(1)')).toBeUndefined()
+    expect(publicBookingUrl('http://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/')).toBeUndefined()
+    expect(publicBookingUrl('https://user:password@fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/336824/')).toBeUndefined()
 
     const cards = buildApprovedExperienceListing([
       card({ title: 'Goat Yoga', slug: 'goat-yoga', bookingUrl: '#book' }),

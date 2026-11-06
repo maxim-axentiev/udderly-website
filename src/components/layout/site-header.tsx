@@ -7,9 +7,10 @@ import { chromeLinkProps, type ChromeNavItem, type SiteChrome } from '@/lib/site
 const topLink =
   'font-display text-[0.95rem] font-bold uppercase text-headline no-underline decoration-secondary-accent decoration-[3px] underline-offset-8 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-accent rounded-sm'
 
-function DesktopDropdown({ group }: { group: ChromeNavItem }) {
+function DesktopDropdown({ group, alignEnd = false }: { group: ChromeNavItem; alignEnd?: boolean }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
   const id = `nav-${group.label.toLowerCase().replace(/\s+/g, '-')}`
 
   useEffect(() => {
@@ -26,9 +27,18 @@ function DesktopDropdown({ group }: { group: ChromeNavItem }) {
       ref={ref}
       className="relative"
       onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseLeave={() => {
+        if (!ref.current?.contains(document.activeElement)) setOpen(false)
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+      }}
       onKeyDown={(event) => {
-        if (event.key === 'Escape') setOpen(false)
+        if (event.key === 'Escape' && open) {
+          event.preventDefault()
+          setOpen(false)
+          toggleRef.current?.focus()
+        }
       }}
     >
       <div className="flex items-center gap-1">
@@ -49,6 +59,7 @@ function DesktopDropdown({ group }: { group: ChromeNavItem }) {
         )}
         <button
           type="button"
+          ref={toggleRef}
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls={id}
@@ -58,7 +69,7 @@ function DesktopDropdown({ group }: { group: ChromeNavItem }) {
           <ChevronDownIcon size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
       </div>
-      <div id={id} className={`absolute left-1/2 top-full z-50 -translate-x-1/2 pt-4 ${open ? 'block' : 'hidden'}`}>
+      <div id={id} className={`absolute top-full z-50 pt-4 ${alignEnd ? 'right-0' : 'left-1/2 -translate-x-1/2'} ${open ? 'block' : 'hidden'}`}>
         <ul className="w-72 border-2 border-headline bg-background p-2 shadow-[7px_7px_0_var(--color-secondary-accent)]">
           {group.children?.map((child) => (
             <li key={`${child.href}-${child.label}`}>
@@ -120,11 +131,48 @@ function MobileGroup({ group, onNavigate }: { group: ChromeNavItem; onNavigate: 
 
 export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const mobileToggleRef = useRef<HTMLButtonElement>(null)
+  const mobilePanelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1280px)')
+    const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false) }
+    desktop.addEventListener('change', closeOnDesktop)
+    return () => desktop.removeEventListener('change', closeOnDesktop)
+  }, [])
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    if (!mobileOpen) return () => { document.body.style.overflow = '' }
+
+    const toggle = mobileToggleRef.current
+    const panel = mobilePanelRef.current
+    panel?.querySelector<HTMLElement>('button, a[href]')?.focus()
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setMobileOpen(false)
+        toggle?.focus()
+      }
+      if (event.key !== 'Tab' || !panel || !toggle) return
+      const focusable = [toggle, ...panel.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')]
+        .filter((item) => item.getClientRects().length > 0)
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (!first || !last) return
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onEscape)
     return () => {
       document.body.style.overflow = ''
+      document.removeEventListener('keydown', onEscape)
     }
   }, [mobileOpen])
 
@@ -133,6 +181,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
       <div className="mx-auto flex min-h-24 max-w-[1500px] items-center justify-between gap-6 px-5 md:px-8">
         <Link
           to="/"
+          onClick={() => setMobileOpen(false)}
           className="group flex max-w-52 -rotate-1 flex-col font-display font-black uppercase leading-[0.78] text-headline no-underline md:max-w-60"
           aria-label={`${chrome.siteName} home`}
         >
@@ -143,9 +192,9 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
         </Link>
 
         <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6" aria-label="Main navigation">
-          {chrome.primaryNav.map((group) =>
+          {chrome.primaryNav.map((group, index) =>
             group.children?.length ? (
-              <DesktopDropdown key={group.label} group={group} />
+              <DesktopDropdown key={group.label} group={group} alignEnd={index >= chrome.primaryNav.length - 2} />
             ) : (
               <a key={group.label} href={group.href} className={topLink} {...(group.href ? chromeLinkProps({ ...group, href: group.href }) : {})}>
                 {group.label}
@@ -155,6 +204,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
         </nav>
 
         <button
+          ref={mobileToggleRef}
           type="button"
           onClick={() => setMobileOpen((open) => !open)}
           aria-expanded={mobileOpen}
@@ -168,6 +218,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
 
       {mobileOpen ? (
         <div
+          ref={mobilePanelRef}
           id="mobile-nav"
           className="absolute inset-x-0 top-full max-h-[calc(100dvh-6rem)] overflow-y-auto border-b-2 border-headline bg-background px-5 pb-8 shadow-[0_7px_0_var(--color-secondary-accent)] xl:hidden"
         >
@@ -182,6 +233,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
                       href={group.href}
                       onClick={() => setMobileOpen(false)}
                       className="block py-4 font-display text-xl font-bold uppercase text-headline no-underline"
+                      {...(group.href ? chromeLinkProps({ ...group, href: group.href }) : {})}
                     >
                       {group.label}
                     </a>

@@ -83,7 +83,7 @@ export function ButtonLink({
 
   if (useInternalLink) {
     return (
-      <Link to={href === '/' ? '/' : '/experiences'} className={classes}>
+      <Link to={href === '/' ? '/' : '/experiences'} className={classes} {...props}>
         {children}
       </Link>
     )

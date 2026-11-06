@@ -44,7 +44,8 @@ export function GiftGoatCounter({ target = 118 }: { target?: number }) {
       ref={ref}
       className="block font-display text-[clamp(5rem,14vw,10rem)] font-black leading-[0.8] text-primary-accent tabular-nums"
     >
-      {value}
+      <span className="sr-only">{target}</span>
+      <span aria-hidden="true">{value}</span>
     </span>
   )
 }

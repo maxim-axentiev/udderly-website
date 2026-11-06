@@ -93,6 +93,7 @@ describe('visit pages', () => {
     expect(gift).toContain('https://www.rainbowregistered.com/')
     expect(gift).toContain('https://feaston.com/')
     expect(gift).toContain('FeastON Certified Local logo')
+    expect(gift).toContain('mx-auto h-auto w-full max-w-sm')
     expect(gift).not.toMatch(/\b140\b|local producers/)
     expect(gift).not.toContain('never expire')
     expect(gift).not.toContain('Guest cuddling a mini goat')

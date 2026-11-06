@@ -134,15 +134,15 @@ export function ContactPage({
               </p>
               <label className="block font-semibold">
                 {page.nameLabel}
-                <input name="name" autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} className={field} />
+                <input name="name" autoComplete="name" required maxLength={100} value={name} onChange={(event) => setName(event.target.value)} className={field} />
               </label>
               <label className="mt-5 block font-semibold">
                 {page.emailLabel}
-                <input name="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className={field} />
+                <input name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} className={field} />
               </label>
               <label className="mt-5 block font-semibold">
                 {page.messageLabel}
-                <textarea name="message" rows={6} value={message} onChange={(event) => setMessage(event.target.value)} className={field} />
+                <textarea name="message" rows={6} required minLength={2} maxLength={4000} value={message} onChange={(event) => setMessage(event.target.value)} className={field} />
               </label>
               <Button type="submit" size="lg" className="mt-7 w-full" disabled={status === 'sending'}>
                 {page.submitLabel}
@@ -168,11 +168,9 @@ export function ContactPage({
             </fieldset>
           )}
           {deliveryAvailable ? (
-            notice ? (
-              <p id="contact-status" className={notice === CONTACT_SUCCESS ? "mt-6 text-center font-display text-4xl font-black uppercase text-headline" : "mt-4 font-semibold text-headline"} role="status">
-                {notice}
-              </p>
-            ) : null
+            <p id="contact-status" className={notice === CONTACT_SUCCESS ? "mt-6 text-center font-display text-4xl font-black uppercase text-headline" : notice ? "mt-4 font-semibold text-headline" : "sr-only"} role="status">
+              {notice}
+            </p>
           ) : (
             <p id="contact-unavailable" className="mt-4 font-semibold text-headline" role="status">
               {page.unavailable}

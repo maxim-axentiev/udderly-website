@@ -189,7 +189,12 @@ describe('contact page', () => {
   it('shows a working form only when delivery is configured', () => {
     const html = renderToStaticMarkup(<ContactPage page={resolveContactPage(null, null)} deliveryAvailable />)
     expect(html).toContain('type="submit"')
+    expect(html).toContain('aria-describedby="contact-status"')
+    expect(html).toMatch(/<p id="contact-status"[^>]*role="status"><\/p>/)
     expect(html).toContain('name="contact_extra"')
+    expect(html).toMatch(/<input[^>]*required=""[^>]*maxLength="100"[^>]*name="name"/)
+    expect(html).toMatch(/<input[^>]*required=""[^>]*maxLength="254"[^>]*name="email"/)
+    expect(html).toMatch(/name="message"[^>]*required=""[^>]*minLength="2"[^>]*maxLength="4000"/)
     expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
     expect(html).not.toContain('Contact messages are not available yet.')
     expect(html).not.toContain('The mail server accepted')
@@ -277,6 +282,22 @@ describe('legal pages', () => {
     expect(resolveLegalPage('cookies-policy', null).title).toBe('Cookies Policy')
   })
 
+  it('rejects a published policy assigned to the wrong legal page type', () => {
+    const page = resolveLegalPage('privacy-policy', {
+      _id: 'misassigned-terms',
+      policyType: 'terms',
+      publicSlug: 'privacy-policy',
+      heading: 'Wrong legal document',
+      seo: { title: 'Wrong SEO title', description: 'Wrong description' },
+      content: body('This is not a privacy policy.'),
+    })
+    const html = renderToStaticMarkup(<LegalPolicyPage page={page} />)
+    expect(page.title).toBe('Privacy Policy')
+    expect(page.seo.title).not.toBe('Wrong SEO title')
+    expect(html).not.toContain('This is not a privacy policy.')
+    expect(html).toContain('Information We Collect')
+  })
+
   it('lets a published matching policy replace the body without inventing sections', () => {
     const page = resolveLegalPage('cookies-policy', {
       _id: 'cookies',
@@ -298,12 +319,18 @@ describe('legal pages', () => {
       _id: 'terms',
       policyType: 'terms',
       publicSlug: 'terms-of-service',
-      heading: 'Farm terms',
+      heading: 'Unapproved draft terms',
+      revisionLabel: 'Last Updated: January 2, 2027',
+      seo: { title: 'Unapproved terms', description: 'Unapproved copy', noIndex: false },
       content: [],
     })
     const html = renderToStaticMarkup(<LegalPolicyPage page={page} />)
 
-    expect(html).toContain('Farm terms')
+    expect(page.title).toBe('Terms of Service')
+    expect(page.seo.title).not.toBe('Unapproved terms')
+    expect(html).toContain('Last Updated: October 10, 2026')
+    expect(html).not.toContain('Unapproved draft terms')
+    expect(html).not.toContain('January 2, 2027')
     expect(html).toContain('Website Use')
   })
 })
