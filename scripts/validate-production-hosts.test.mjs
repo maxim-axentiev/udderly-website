@@ -100,7 +100,7 @@ test('rejects production container exposure and unsafe network settings', () => 
   for (const modify of changes) {
     const unsafe = config()
     modify(unsafe)
-    assert.throws(() => validateProductionHosts(unsafe), /network|ports|volumes|privileges/i)
+    assert.throws(() => validateProductionHosts(unsafe), /network|ports|volumes?|privileges/i)
   }
 })
 

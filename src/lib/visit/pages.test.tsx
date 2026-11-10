@@ -87,8 +87,8 @@ describe('visit pages', () => {
     expect(ice).not.toMatch(/lactose friendly|A2 casein|twenty minutes|World Vision/i)
     expect(ice).not.toContain('A news clip will appear here once a video is added.')
     expect(ice).not.toContain('youtube.com')
-    expect(gift).toContain('Gift card purchase is not available yet.')
-    expect(gift).toContain('disabled')
+    expect(gift).toContain('fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308290/')
+    expect(gift).not.toContain('Gift card purchase is not available yet.')
     expect(gift).toContain('Rainbow Registered')
     expect(gift).toContain('https://www.rainbowregistered.com/')
     expect(gift).toContain('https://feaston.com/')
@@ -146,15 +146,16 @@ describe('visit pages', () => {
     expect(resolveFarmMarket(null).seo.description).not.toMatch(/140|100/)
   })
 
-  it('keeps gift purchase and glamping booking unavailable, and ignores an unsafe video URL', () => {
+  it('links gift purchases to verified FareHarbor and keeps unverified glamping booking unavailable', () => {
     const gift = resolveGiftCard({
       amounts: [{ name: 'CA$50', description: 'Editor label only' }],
     })
     expect(gift.amounts).toEqual([{ name: 'CA$50', description: 'Editor label only' }])
     const giftHtml = renderToStaticMarkup(<GiftCardPage page={{ amounts: gift.amounts }} />)
     expect(giftHtml).toContain('CA$50')
-    expect(giftHtml).toContain(GIFT_CARD_UNAVAILABLE)
-    expect(giftHtml).toContain('disabled')
+    expect(giftHtml).toContain('fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308290/')
+    expect(giftHtml).toContain('Get a Gift Card')
+    expect(giftHtml).not.toContain(GIFT_CARD_UNAVAILABLE)
     expect(giftHtml).not.toContain('href="#buy"')
 
     const stay = renderToStaticMarkup(<GlampingPage page={{ showCancellation: false, showCheese: false }} />)
@@ -210,8 +211,8 @@ describe('visit pages', () => {
     expect(publishedGift).toContain('Rainbow Registered')
     expect(publishedGift).toContain('feaston.com')
     expect(publishedGift).not.toMatch(/\b140\b|local producers/)
-    expect(publishedGift).toContain(GIFT_CARD_UNAVAILABLE)
-    expect(publishedGift).toContain('disabled')
+    expect(publishedGift).toContain('fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308290/')
+    expect(publishedGift).not.toContain(GIFT_CARD_UNAVAILABLE)
 
     const hiddenCertifications = renderToStaticMarkup(
       <GiftCardPage page={{ showRainbow: false, showFeast: false }} />,

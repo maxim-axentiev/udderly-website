@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import feastOn from '@/assets/experiences/feast-on-logo.webp'
-import { GIFT_CARD_UNAVAILABLE } from '@/lib/visit/model'
+import { GIFT_CARD_FAREHARBOR_URL } from '@/lib/visit/model'
 import { resolveGiftCard } from '@/lib/visit/resolve'
 
 export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard>[0] }) {
@@ -42,6 +42,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
 
   return (
     <>
+      <script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async />
       <section className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden bg-headline">
         <div className="mx-auto max-w-4xl px-5 py-24 text-center">
           <h1 className="font-display text-[clamp(2.6rem,8vw,7rem)] font-black uppercase leading-[0.82] text-background">
@@ -66,10 +67,9 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
                 ))}
               </ul>
             ) : null}
-            <p className="mt-6 text-lg font-semibold" role="status">{GIFT_CARD_UNAVAILABLE}</p>
-            <button type="button" disabled className="mt-8 inline-flex min-h-14 cursor-not-allowed items-center rounded-full bg-cta px-8 font-display text-lg font-extrabold uppercase text-cta-foreground opacity-70">
+            <a href={GIFT_CARD_FAREHARBOR_URL} target="_blank" rel="noreferrer" className="mt-8 inline-flex min-h-14 items-center rounded-full bg-cta px-8 font-display text-lg font-extrabold uppercase text-cta-foreground transition-transform hover:-translate-y-0.5 focus-visible:outline-4 focus-visible:outline-primary-accent">
               Get a Gift Card
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -101,7 +101,7 @@ export function GiftCardPage({ page }: { page: Parameters<typeof resolveGiftCard
               <li key={tip} className="leading-relaxed">{tip}</li>
             ))}
           </ul>
-          <p className="mt-6 font-semibold">{GIFT_CARD_UNAVAILABLE}</p>
+          <a href={GIFT_CARD_FAREHARBOR_URL} target="_blank" rel="noreferrer" className="mt-6 inline-block font-display text-lg font-black uppercase text-primary-accent underline">Get a Gift Card</a>
         </div>
       </section>
       ) : null}

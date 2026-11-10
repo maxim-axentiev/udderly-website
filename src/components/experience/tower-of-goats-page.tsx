@@ -109,7 +109,7 @@ export function TowerOfGoatsPage() {
               <OptionalEmbed
                 title={towerOfGoatsLocation.mapTitle}
                 src={towerOfGoatsLocation.mapSrc}
-                actionLabel="Load map"
+                autoLoad actionLabel="Load map"
                 description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
                 referrerPolicy="no-referrer-when-downgrade"
                 className="h-[420px] w-full border-0 md:h-[520px]"

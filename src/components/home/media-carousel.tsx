@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 
 import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
+import { getVideoPosterSrc } from '@/lib/youtube'
 import { useHomepageContent } from './homepage-content-context'
 import { HomeImage } from './homepage-content'
 
@@ -45,7 +46,8 @@ export function MediaCarousel() {
               title={`${current.outlet} video`}
               src={current.embedUrl}
               actionLabel="Load video"
-              description="This video stays off until you load it."
+              description="Play this video"
+              posterSrc={getVideoPosterSrc(current.embedUrl, current.logo.src)}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
               className="h-full w-full border-0"

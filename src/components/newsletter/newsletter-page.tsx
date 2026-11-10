@@ -1,4 +1,3 @@
-import type { FormEvent } from 'react'
 
 import mobileFirst from '@/assets/home/newsletter-first-mobile.webp'
 import mobileFourth from '@/assets/home/newsletter-fourth-mobile.webp'
@@ -8,11 +7,8 @@ import rightLower from '@/assets/home/newsletter-right-lower-desktop.webp'
 import rightUpper from '@/assets/home/newsletter-right-upper-desktop.webp'
 import mobileSecond from '@/assets/home/newsletter-second-mobile.webp'
 import mobileThird from '@/assets/home/newsletter-third-mobile.webp'
-import { Button } from '@/components/ui/button'
+import { MailchimpSignup } from '@/components/newsletter/mailchimp-signup'
 import type { NewsletterPageContent } from '@/lib/newsletter/resolve'
-
-const fieldClass =
-  'min-h-12 w-full rounded-full border-2 border-headline bg-background px-5 text-base text-headline placeholder:text-body-copy/60 disabled:cursor-not-allowed disabled:opacity-70'
 
 const mobileAnimals = [
   { src: mobileFirst, alt: 'Alpaca peeking over the newsletter form', rotate: '-rotate-3' },
@@ -32,10 +28,6 @@ const rightAnimals = [
 ]
 
 export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-  }
-
   return (
     <section className="relative overflow-hidden bg-farm-beige py-20 md:py-28">
       <div className="mx-auto max-w-3xl px-5 md:px-8">
@@ -87,32 +79,7 @@ export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
               {page.title}
             </h1>
             <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">{page.copy}</p>
-            <form
-              className="mx-auto mt-8 grid max-w-md gap-3 text-left"
-              onSubmit={submit}
-              aria-describedby="newsletter-unavailable"
-            >
-              <fieldset disabled className="grid gap-3 border-0 p-0">
-                <div>
-                  <label htmlFor="newsletter-page-first-name" className="mb-1 block font-display text-sm font-bold uppercase text-headline">
-                    {page.firstNameLabel}
-                  </label>
-                  <input id="newsletter-page-first-name" name="firstName" type="text" autoComplete="given-name" className={fieldClass} />
-                </div>
-                <div>
-                  <label htmlFor="newsletter-page-email" className="mb-1 block font-display text-sm font-bold uppercase text-headline">
-                    {page.emailLabel}
-                  </label>
-                  <input id="newsletter-page-email" name="email" type="email" autoComplete="email" className={fieldClass} />
-                </div>
-                <Button type="button" className="mt-2 justify-self-center" disabled>
-                  {page.submitLabel}
-                </Button>
-              </fieldset>
-            </form>
-            <p id="newsletter-unavailable" className="mt-4 font-semibold text-headline" role="status">
-              {page.unavailable}
-            </p>
+            <MailchimpSignup id="newsletter-page" firstNameLabel={page.firstNameLabel} emailLabel={page.emailLabel} dateOfBirthLabel={page.dateOfBirthLabel} submitLabel={page.submitLabel}/>
           </div>
         </div>
       </div>

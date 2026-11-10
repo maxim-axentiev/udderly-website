@@ -1,4 +1,5 @@
 import { pathToFileURL } from 'node:url'
+import { validateWaitlistVolume } from './validate-waitlist-volume.mjs'
 
 /**
  * Validate Docker Compose's resolved production configuration before a deploy.
@@ -23,6 +24,7 @@ export function validateProductionHosts(config) {
   const website = config?.services?.website
   const host = website?.environment?.APP_HOST
   const canonical = website?.environment?.PUBLIC_CANONICAL_ORIGIN
+  validateWaitlistVolume(config, 'udderly-website-production')
   if (website.read_only !== true || !Array.isArray(website.cap_drop) ||
       !website.cap_drop.includes('ALL') || !Array.isArray(website.security_opt) ||
       !website.security_opt.some((option) => option === 'no-new-privileges:true' || option === 'no-new-privileges')) {
@@ -61,8 +63,8 @@ export function validateProductionHosts(config) {
     throw Error('Production website must connect only to the external web network')
   }
   if (website.ports?.length || website.expose?.some((port) => String(port) !== '3000') ||
-      website.privileged === true || website.network_mode || website.volumes?.length) {
-    throw Error('Production website must not publish host ports, mount volumes, or gain elevated network privileges')
+      website.privileged === true || website.network_mode) {
+    throw Error('Production website must not publish host ports or gain elevated network privileges')
   }
   if (String(getLabel('traefik.enable')) !== 'true' || getLabel('traefik.docker.network') !== 'web') {
     throw Error('Production must enable Traefik only on the external web network')

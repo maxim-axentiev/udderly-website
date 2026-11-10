@@ -24,6 +24,9 @@ ENV PORT=3000
 
 COPY --from=build /app/.output ./.output
 
+# Writable persistent waitlist data is mounted here even though the app filesystem is read-only.
+RUN mkdir -p /data/waitlist && chown node:node /data/waitlist
+
 USER node
 EXPOSE 3000
 

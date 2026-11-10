@@ -361,7 +361,9 @@ export function ExperiencesPresentation({
               <img src={page.rainbow.image.src} alt={page.rainbow.image.alt} width={1920} height={620} loading="lazy" className="h-auto w-full" />
             </a>
           ) : (
-            <p className="font-display text-2xl font-black uppercase text-headline">{page.rainbow.imageAlt}</p>
+            <a href={page.rainbow.href} target="_blank" rel="noreferrer" className="mx-auto block w-full max-w-md">
+              <img src="/images/rainbow-registered.png" alt={page.rainbow.imageAlt} width={1920} height={640} loading="lazy" className="h-auto w-full" />
+            </a>
           )}
           <div>
             <p className="font-accent text-xl italic text-primary-accent">{page.rainbow.kicker}</p>
@@ -458,7 +460,7 @@ export function ExperiencesPresentation({
             <OptionalEmbed
               title="Map showing the location of Udderly Ridiculous Farm Life"
               src={MAPS_EMBED}
-              actionLabel="Load map"
+              autoLoad actionLabel="Load map"
               description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
               className="h-[420px] w-full border-2 border-headline md:h-[520px]"
             />

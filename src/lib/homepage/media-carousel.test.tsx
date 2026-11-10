@@ -21,7 +21,9 @@ describe('homepage media carousel', () => {
 
   it('does not offer ineffective previous and next controls with one video', () => {
     const html = renderWithVideos(1)
-    expect(html).toContain('Load video')
+    expect(html).toContain('aria-label="Play')
+    expect(html).toContain('i.ytimg.com/vi/')
+    expect(html).not.toContain('This video stays off until you load it.')
     expect(html).not.toContain('aria-label="Previous video"')
     expect(html).not.toContain('aria-label="Next video"')
   })

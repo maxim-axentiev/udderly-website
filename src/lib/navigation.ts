@@ -22,18 +22,9 @@ export const primaryNav: NavGroup[] = [
   { label: 'Gift Cards', href: '/gift-card' },
   { label: 'Animals for Sale', href: '/animals-for-sale' },
   { label: 'Adopt an Animal', href: '/adopt-an-animal' },
-  {
-    label: 'Corporate Training',
-    href: '/corporate-training',
-    children: [
-      { label: 'All Corporate Training Programs', href: '/corporate-training' },
-      { label: 'Team Building Experiences', href: '/corporate-training/team-building-experiences' },
-      {
-        label: 'Experiential Tourism Development',
-        href: '/corporate-training/experiential-tourism-development',
-      },
-    ],
-  },
+  { label: 'Corporate Training', href: '/corporate-training' },
+  { label: 'Team Building', href: '/corporate-training/team-building-experiences' },
+  { label: 'Experiential Tourism Development', href: '/corporate-training/experiential-tourism-development' },
   {
     label: 'Explore',
     children: [

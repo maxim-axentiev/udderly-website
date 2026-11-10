@@ -335,6 +335,23 @@ function formatAddress(address: NonNullable<CmsSiteSettings>['address']): string
   return line || undefined
 }
 
+/** Keep the two corporate destinations as independent menu entries even when CMS navigation nests them. */
+export function separateCorporateNavigation(items: ChromeNavItem[]): ChromeNavItem[] {
+  const paths = [
+    { href: '/corporate-training/team-building-experiences', label: 'Team Building' },
+    { href: '/corporate-training/experiential-tourism-development', label: 'Experiential Tourism Development' },
+  ]
+  const promoted = items.map((item) => ({
+    ...item,
+    ...(item.children ? { children: item.children.filter((child) => !paths.some((path) => path.href === child.href)) } : {}),
+  }))
+  const present = new Set(promoted.map((item) => item.href))
+  const insertAfter = promoted.findIndex((item) => item.href === '/corporate-training')
+  const newItems = paths.filter((path) => !present.has(path.href))
+  if (insertAfter >= 0) promoted.splice(insertAfter + 1, 0, ...newItems)
+  return promoted
+}
+
 export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
   const navigation = documents?.navigation
   const settings = documents?.siteSettings
@@ -352,13 +369,13 @@ export function mergeSiteChrome(documents: SiteChromeDocuments): SiteChrome {
 
   return {
     siteName: siteName || siteChromeFallback.siteName,
-    primaryNav: publishedOrFallback(
+    primaryNav: separateCorporateNavigation(publishedOrFallback(
       hrefsOf(siteChromeFallback.primaryNav),
       header.present,
       header.hidden,
       header.items,
       siteChromeFallback.primaryNav,
-    ),
+    )),
     footerNav: publishedOrFallback(
       siteChromeFallback.footerNav.map((item) => item.href),
       footer.present,

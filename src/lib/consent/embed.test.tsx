@@ -35,11 +35,11 @@ describe('optional embeds', () => {
     expect(video).not.toContain('youtube-nocookie.com')
   })
 
-  it('does not put the Google map frame on the Tower of Goats page', () => {
+  it('shows the Google map immediately on the Tower of Goats page', () => {
     const html = renderToStaticMarkup(createElement(TowerOfGoatsPage))
-    expect(html).toContain('Load map')
     expect(html).toContain('Get directions')
-    expect(html).not.toContain('output=embed')
-    expect(html).not.toContain('<iframe')
+    expect(html).toContain('<iframe')
+    expect(html).toContain('output=embed')
+    expect(html).not.toContain('This map is hosted by Google.')
   })
 })

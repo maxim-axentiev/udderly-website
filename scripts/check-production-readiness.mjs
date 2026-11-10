@@ -17,9 +17,9 @@ export function parseProductionReadinessArgs(args) {
 export function evaluateProductionReadiness({ compose, gitRoot, gitStatus, content, envFileExists = true }) {
   const blockers = []
   const review = []
-  // These features are intentionally disabled in the current website build.
-  review.push('Newsletter signup is not integrated; signup forms will remain disabled')
-  review.push('Gift card checkout is not integrated; purchase buttons will remain disabled')
+  // External customer transactions require real visitor verification before launch.
+  review.push('Mailchimp signup requires a real end-to-end opt-in test before production cutover')
+  review.push('FareHarbor gift card checkout requires a real end-to-end purchase-flow test before production cutover')
   if (!envFileExists) blockers.push('Selected environment file does not exist')
   if (compose.error) blockers.push('Docker Compose configuration unavailable: ' + compose.error)
   else {

@@ -45,8 +45,8 @@ function ready(overrides = {}) {
 }
 test('approves only a complete configuration, clean checkout and published content', () => {
   assert.deepEqual(ready(), { blockers: [], review: [
-    'Newsletter signup is not integrated; signup forms will remain disabled',
-    'Gift card checkout is not integrated; purchase buttons will remain disabled',
+    'Mailchimp signup requires a real end-to-end opt-in test before production cutover',
+    'FareHarbor gift card checkout requires a real end-to-end purchase-flow test before production cutover',
   ] })
 })
 test('reports independent host, checkout, and legal blockers together', () => {

@@ -8,6 +8,8 @@ export function glampingAliasRedirect() {
   return { href: FARM_GLAMPING_PATH }
 }
 
+// Existing farm gift-certificate purchase destination, verified from the published site's FareHarbor CTA.
+export const GIFT_CARD_FAREHARBOR_URL = 'https://fareharbor.com/embeds/book/udderlyridiculousfarmlife/items/308290/?flow=573099&full-items=yes'
 export const GIFT_CARD_UNAVAILABLE = 'Gift card purchase is not available yet.'
 export const GLAMPING_UNAVAILABLE = 'Farm glamping booking is not available yet.'
 

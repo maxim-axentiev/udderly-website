@@ -1,20 +1,12 @@
-import type { FormEvent } from 'react'
 
+import { homepageNewsletter } from '@/content/homepage'
 import { Container } from '@/components/layout/container'
-import { Button } from '@/components/ui/button'
-import { NEWSLETTER_UNAVAILABLE } from '@/lib/newsletter/model'
+import { MailchimpSignup } from '@/components/newsletter/mailchimp-signup'
 import { useHomepageContent } from './homepage-content-context'
 import { HomeImage } from './homepage-content'
 
-const fieldClass =
-  'min-h-12 w-full rounded-full border-2 border-headline bg-background px-5 text-base text-headline placeholder:text-body-copy/60'
-
 export function NewsletterSection() {
   const newsletter = useHomepageContent().newsletter
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-  }
 
   return (
     <section id="newsletter" className="relative overflow-hidden bg-farm-beige py-20 md:py-28">
@@ -24,10 +16,10 @@ export function NewsletterSection() {
             className="pointer-events-none absolute inset-x-[-0.5rem] top-0 z-0 grid h-32 grid-cols-4 items-end md:hidden"
             aria-hidden="true"
           >
-            {newsletter.mobileAnimals.map((animal) => (
+            {homepageNewsletter.mobileAnimals.map((animal) => (
               <HomeImage
                 key={animal.src}
-                image={animal}
+                image={{ ...animal, width: 768, height: 768 }}
                 loading="lazy"
                 className={`h-32 w-full object-contain object-bottom ${animal.rotate}`}
               />
@@ -38,10 +30,10 @@ export function NewsletterSection() {
             className="pointer-events-none absolute inset-y-0 -left-36 z-0 hidden w-72 md:block"
             aria-hidden="true"
           >
-            {newsletter.leftAnimals.map((animal) => (
+            {homepageNewsletter.leftAnimals.map((animal) => (
               <HomeImage
                 key={animal.src}
-                image={animal}
+                image={{ ...animal, width: 768, height: 768 }}
                 loading="lazy"
                 className={`absolute right-0 h-64 w-64 object-contain object-right ${animal.position}`}
               />
@@ -51,10 +43,10 @@ export function NewsletterSection() {
             className="pointer-events-none absolute inset-y-0 -right-36 z-0 hidden w-72 md:block"
             aria-hidden="true"
           >
-            {newsletter.rightAnimals.map((animal) => (
+            {homepageNewsletter.rightAnimals.map((animal) => (
               <HomeImage
                 key={animal.src}
-                image={animal}
+                image={{ ...animal, width: 768, height: 768 }}
                 loading="lazy"
                 className={`absolute left-0 h-64 w-64 object-contain object-left ${animal.position}`}
               />
@@ -69,52 +61,7 @@ export function NewsletterSection() {
               {newsletter.copy}
             </p>
 
-            <form
-              className="mx-auto mt-8 grid max-w-md gap-3 text-left"
-              onSubmit={onSubmit}
-              aria-describedby="newsletter-unavailable"
-            >
-              <fieldset disabled className="grid gap-3 border-0 p-0">
-                <div>
-                  <label
-                    htmlFor="newsletter-first-name"
-                    className="mb-1 block font-display text-sm font-bold uppercase text-headline"
-                  >
-                    {newsletter.firstNameLabel}
-                  </label>
-                  <input
-                    id="newsletter-first-name"
-                    name="firstName"
-                    type="text"
-                    autoComplete="given-name"
-                    placeholder={newsletter.firstNamePlaceholder}
-                    className={fieldClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="newsletter-email"
-                    className="mb-1 block font-display text-sm font-bold uppercase text-headline"
-                  >
-                    {newsletter.emailLabel}
-                  </label>
-                  <input
-                    id="newsletter-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder={newsletter.emailPlaceholder}
-                    className={fieldClass}
-                  />
-                </div>
-                <Button type="button" className="mt-2 justify-self-center" disabled>
-                  {newsletter.submitLabel}
-                </Button>
-              </fieldset>
-            </form>
-            <p id="newsletter-unavailable" className="mt-4 font-semibold text-headline" role="status">
-              {NEWSLETTER_UNAVAILABLE}
-            </p>
+            <MailchimpSignup id="homepage-newsletter" firstNameLabel={newsletter.firstNameLabel} emailLabel={newsletter.emailLabel} submitLabel={newsletter.submitLabel} firstNamePlaceholder={newsletter.firstNamePlaceholder} emailPlaceholder={newsletter.emailPlaceholder}/>
           </div>
         </div>
       </Container>

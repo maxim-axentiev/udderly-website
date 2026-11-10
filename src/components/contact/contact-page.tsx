@@ -173,7 +173,7 @@ export function ContactPage({
             </p>
           ) : (
             <p id="contact-unavailable" className="mt-4 font-semibold text-headline" role="status">
-              {page.unavailable}
+              Online messages are being configured. Please <a href={page.emailHref} className="font-bold underline">email us directly</a> in the meantime.
             </p>
           )}
         </form>

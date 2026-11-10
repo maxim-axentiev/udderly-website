@@ -1,3 +1,15 @@
+/** A lightweight poster for YouTube embeds. Other hosts use the supplied local fallback image. */
+export function getVideoPosterSrc(embedUrl: string, fallback: string): string {
+  try {
+    const url = new URL(embedUrl)
+    if (url.hostname === 'www.youtube-nocookie.com' || url.hostname === 'youtube-nocookie.com') {
+      const match = /^\/embed\/([a-zA-Z0-9_-]{11})$/.exec(url.pathname)
+      if (match) return `https://i.ytimg.com/vi/${match[1]}/hqdefault.jpg`
+    }
+  } catch { /* Keep the verified local image if the URL is not a YouTube embed. */ }
+  return fallback
+}
+
 export function getYoutubeEmbedUrl(videoUrl: string): string {
   try {
     const parsed = new URL(videoUrl)

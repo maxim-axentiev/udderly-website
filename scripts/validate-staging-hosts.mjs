@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url'
 import { validatePublicHostname } from './validate-production-hosts.mjs'
+import { validateWaitlistVolume } from './validate-waitlist-volume.mjs'
 
 /** Verify staging cannot route a placeholder host or accidentally become indexable. */
 export function validateStagingHosts(config) {
@@ -26,9 +27,10 @@ export function validateStagingHosts(config) {
     throw Error('Staging website must connect only to the external web network')
   }
   if (website.ports?.length || website.expose?.some((port) => String(port) !== '3000') ||
-      website.privileged === true || website.network_mode || website.volumes?.length) {
-    throw Error('Staging website must not publish host ports, mount volumes, or gain elevated network privileges')
+      website.privileged === true || website.network_mode) {
+    throw Error('Staging website must not publish host ports or gain elevated network privileges')
   }
+  validateWaitlistVolume(config, 'udderly-website-staging')
   if (website.read_only !== true || !Array.isArray(website.cap_drop) ||
       !website.cap_drop.includes('ALL') || !Array.isArray(website.security_opt) ||
       !website.security_opt.some((option) => option === 'no-new-privileges:true' || option === 'no-new-privileges')) {

@@ -119,7 +119,7 @@ test('rejects unsafe container network exposure and elevated privileges', () => 
   for (const modify of changes) {
     const unsafe = config()
     modify(unsafe)
-    assert.throws(() => validateStagingHosts(unsafe), /network|ports|volumes|privileges/i)
+    assert.throws(() => validateStagingHosts(unsafe), /network|ports|volumes?|privileges/i)
   }
 })
 

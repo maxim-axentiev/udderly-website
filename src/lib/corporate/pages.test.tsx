@@ -12,7 +12,6 @@ import { corporateProgramBySlugQuery, corporateProgramCardsQuery, corporateTrain
 import { createPageHead } from '@/lib/seo/page-head'
 
 import type { CorporateImages } from './images'
-import { CORPORATE_ENQUIRY_UNAVAILABLE } from './model'
 import {
   resolveCorporateLanding,
   resolveDisc,
@@ -110,9 +109,9 @@ describe('corporate training pages', () => {
     expect(html).not.toContain('Placeholder review')
     expect(html).not.toContain('$125/hour')
     expect(html).not.toContain('Capacity &amp; Setup')
-    expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
-    expect(html).toContain('href="/contact"')
-    expect(html).not.toContain('name="email"')
+    expect(html).not.toContain('Corporate enquiries are not available yet.')
+    expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
+    expect(html).toContain('name="email"')
     expect(html).not.toContain('nothing was sent')
     expect(html).toContain('Corporate team enjoying a farm lunch experience with alpacas')
     expect(html).not.toContain('farm classroom')
@@ -199,8 +198,8 @@ describe('corporate training pages', () => {
     expect(unapproved.close.reviews).toBeNull()
     const html = renderToStaticMarkup(<DiscProgram page={unapproved} />)
     expect(html).not.toContain('Not approved yet')
-    expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
-    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Corporate enquiries are not available yet.')
+    expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
     expect(html).not.toContain('Program Selection')
     expect(html).not.toContain('Phone Number')
   })
@@ -236,8 +235,8 @@ describe('corporate training pages', () => {
     expect(html).toContain('Your business,')
     expect(html).toContain('Who I help')
     expect(html).toContain('Farms')
-    expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
-    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Corporate enquiries are not available yet.')
+    expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
     expect(html).not.toContain('Phone Number')
     expect(html).not.toContain('14-time award winning')
     expect(html).not.toContain('$125/hour')
@@ -245,7 +244,7 @@ describe('corporate training pages', () => {
     expect(html).not.toContain('$3000')
     expect(html).not.toContain('Placeholder')
     expect(html).not.toContain('Cheryl, experiential tourism coach')
-    expect(html).not.toContain('name="email"')
+    expect(html).toContain('name="email"')
 
     const replaced = resolveTourism(
       {
@@ -364,9 +363,9 @@ describe('corporate training pages', () => {
       expect(html).not.toContain('Top 10%')
       expect(html).not.toContain('Cheryl, the farm')
       expect(html).not.toContain('Capacity')
-      expect(html).not.toContain('name="email"')
-      expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
-      expect(html).toContain('href="/contact"')
+      expect(html).toContain('name="email"')
+      expect(html).not.toContain('Corporate enquiries are not available yet.')
+      expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
     }
     expect(landingHtml).toContain('Team Building Experiences')
     expect(landingHtml).toContain('href="/corporate-training/team-building-experiences"')
@@ -465,14 +464,14 @@ describe('corporate training pages', () => {
     expect(html).toContain('Alpaca Emotional')
     expect(html).toContain('Beyond')
     expect(html).toContain('Innovation on')
-    expect(html).toContain(CORPORATE_ENQUIRY_UNAVAILABLE)
-    expect(html).toContain('href="/contact"')
+    expect(html).not.toContain('Corporate enquiries are not available yet.')
+    expect(html).toContain('mailto:info@udderlyridiculousfarmlife.com')
     expect(html).not.toContain('Placeholder')
     expect(html).not.toContain('20+ years')
     expect(html).not.toContain('farm classroom')
     expect(html).not.toContain('Myers-Briggs')
     expect(html).not.toContain('Innovation in a Box')
-    expect(html).not.toContain('name="email"')
+    expect(html).toContain('name="email"')
     expect(html).not.toContain('We will get back to you')
 
     const publishedDisc = resolveDisc(
@@ -569,13 +568,15 @@ describe('corporate training pages', () => {
     expect(corporateProgramCardsQuery).not.toContain('drafts.')
   })
 
-  it('does not add corporate training to the current header', () => {
+  it('lists corporate programs as separate header destinations', () => {
     expect(primaryNav.map((item) => item.label)).toEqual([
       'Experiences',
       'Gift Cards',
       'Animals for Sale',
       'Adopt an Animal',
       'Corporate Training',
+      'Team Building',
+      'Experiential Tourism Development',
       'Explore',
       'About',
       'Contact',

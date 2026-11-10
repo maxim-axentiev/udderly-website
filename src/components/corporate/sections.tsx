@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from 'react'
 
 import { OptionalEmbed } from '@/components/consent/optional-embed'
+import { CorporateEnquiryFormFields } from './corporate-enquiry-form-fields'
 import { PortableTextRenderer } from '@/components/portable-text/portable-text-renderer'
 import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
 import { ButtonLink } from '@/components/ui/button'
-import { CONTACT_PATH } from '@/lib/contact/model'
 import type {
   CorporateAwards,
   CorporateClose,
@@ -203,16 +203,7 @@ export function PhotoCarousel({ images, label }: { images: CorporatePicture[]; l
 }
 
 export function CorporateEnquiryForm({ enquiry }: { enquiry: CorporateEnquiry }) {
-  return (
-    <div className="mt-10 border-2 border-headline bg-background p-6 shadow-[12px_12px_0_var(--color-headline)] md:p-10">
-      <p id="corporate-enquiry-status" className="font-accent text-lg italic text-primary-accent" role="status">
-        {enquiry.unavailable}
-      </p>
-      <ButtonLink href={CONTACT_PATH} size="lg" className="mt-8">
-        Contact <ArrowRightIcon />
-      </ButtonLink>
-    </div>
-  )
+  return <CorporateEnquiryFormFields enquiry={enquiry} />
 }
 
 export function CopyBlock({
@@ -467,7 +458,7 @@ export function CorporateLocation() {
           <OptionalEmbed
             title={towerOfGoatsLocation.mapTitle}
             src={towerOfGoatsLocation.mapSrc}
-            actionLabel="Load map"
+            autoLoad actionLabel="Load map"
             description="This map is hosted by Google. It stays off until you load it. The address is listed beside this box."
             className="h-[420px] w-full border-2 border-headline md:h-[520px]"
           />

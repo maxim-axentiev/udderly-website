@@ -168,7 +168,8 @@ describe('contact page', () => {
     expect(html).toContain('Open Friday this week.')
     expect(html).toContain('10:00 – 16:00')
     expect(html).not.toContain('Winter Hours')
-    expect(html).toContain('Contact messages are not available yet.')
+    expect(html).toContain('Online messages are being configured.')
+    expect(html).toContain('mailto:hello@example.com')
     expect(html).not.toContain('Thanks!')
     expect(html).toContain('disabled')
     expect(html).not.toContain('type="submit"')
@@ -202,23 +203,23 @@ describe('contact page', () => {
 })
 
 describe('newsletter page', () => {
-  it('shows the approved presentation and does not submit', () => {
+  it('renders the working Mailchimp subscription form', () => {
     const page = resolveNewsletterPage({ title: 'Farm notes' })
     const html = renderToStaticMarkup(<NewsletterPage page={page} />)
 
     expect(html).toContain('Farm notes')
     expect(html).toContain('gasp, ooh, aw, and woah')
-    expect(html).toContain('Newsletter signup is not available yet.')
-    expect(html).not.toContain('Date of birth')
-    expect(html).not.toContain('dateOfBirth')
-    expect(html).not.toContain('nothing is stored')
-    expect(html).toContain('disabled')
-    expect(html).not.toContain('type="submit"')
+    expect(html).toContain('udderlyridiculousfarmlife.us1.list-manage.com/subscribe/post')
+    expect(html).toContain('name="DOB[year]"')
+    expect(html).toContain('name="tags" value="6362546"')
+    expect(html).toContain('name="EMAIL"')
+    expect(html).toContain('type="submit"')
+    expect(html).not.toContain('Newsletter signup is not available yet.')
   })
 })
 
 describe('homepage newsletter and URBORT cards', () => {
-  it('disables homepage signup and hides a published confirmation', () => {
+  it('connects homepage signup to Mailchimp without displaying an unverified confirmation', () => {
     const content = localHomepageContent()
     content.newsletter.confirmation =
       "Thanks for joining the Udderly Update. There's no turning back now. Good luck haha."
@@ -228,12 +229,11 @@ describe('homepage newsletter and URBORT cards', () => {
       </HomepageContentProvider>,
     )
 
-    expect(html).toContain('Newsletter signup is not available yet.')
-    expect(html).toContain('name="email"')
-    expect(html).not.toContain('Date of birth')
-    expect(html).not.toContain('dateOfBirth')
-    expect(html).toContain('disabled')
-    expect(html).not.toContain('type="submit"')
+    expect(html).toContain('udderlyridiculousfarmlife.us1.list-manage.com/subscribe/post')
+    expect(html).toContain('name="EMAIL"')
+    expect(html).toContain('name="DOB[day]"')
+    expect(html).toContain('type="submit"')
+    expect(html).not.toContain('Newsletter signup is not available yet.')
     expect(html).not.toContain('Thanks for joining')
     expect(html).not.toContain('nothing is stored')
     expect(html).not.toContain('Placeholder confirmation')
@@ -386,13 +386,15 @@ describe('content page publishing rules', () => {
     )
   })
 
-  it('leaves the current header links unchanged', () => {
+  it('lists corporate programs as independent header destinations', () => {
     expect(primaryNav.map((item) => item.label)).toEqual([
       'Experiences',
       'Gift Cards',
       'Animals for Sale',
       'Adopt an Animal',
       'Corporate Training',
+      'Team Building',
+      'Experiential Tourism Development',
       'Explore',
       'About',
       'Contact',

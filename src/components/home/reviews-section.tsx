@@ -33,10 +33,7 @@ export function ReviewsSection({ reviewsFeed }: { reviewsFeed: ReviewsFeed }) {
             <h2 className="font-display text-[clamp(2.6rem,7.5vw,7rem)] font-black uppercase leading-[0.8] text-headline">
               {copy.title}
             </h2>
-            <p className="mt-4 max-w-xl text-sm font-semibold">
-              {copy.attribution}
-              {reviews.length ? ` ${copy.orderNote}` : null}
-            </p>
+
           </div>
 
           <div className="flex items-center gap-4 border-2 border-headline bg-background px-5 py-4 shadow-[6px_6px_0_var(--color-headline)]">

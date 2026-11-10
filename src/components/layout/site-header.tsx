@@ -135,7 +135,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
   const mobilePanelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 1280px)')
+    const desktop = window.matchMedia('(min-width: 1536px)')
     const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false) }
     desktop.addEventListener('change', closeOnDesktop)
     return () => desktop.removeEventListener('change', closeOnDesktop)
@@ -177,21 +177,18 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
   }, [mobileOpen])
 
   return (
-    <header className="relative z-50 border-b-2 border-headline bg-background">
+    <header className="sticky top-0 z-50 border-b-2 border-headline bg-background">
       <div className="mx-auto flex min-h-24 max-w-[1500px] items-center justify-between gap-6 px-5 md:px-8">
         <Link
           to="/"
           onClick={() => setMobileOpen(false)}
-          className="group flex max-w-52 -rotate-1 flex-col font-display font-black uppercase leading-[0.78] text-headline no-underline md:max-w-60"
+          className="group flex w-44 shrink-0 items-center rounded-sm outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary-accent md:w-56"
           aria-label={`${chrome.siteName} home`}
         >
-          <span className="text-[1.7rem] md:text-[2rem]">Udderly Ridiculous</span>
-          <span className="mt-1 flex items-center gap-2 text-sm tracking-[0.16em] text-primary-accent">
-            <span className="h-1.5 w-7 bg-secondary-accent" aria-hidden="true" /> Farm Life
-          </span>
+          <img src="/images/udderly-logo.png" alt="" width={1588} height={629} className="block h-auto w-full" />
         </Link>
 
-        <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6" aria-label="Main navigation">
+        <nav className="hidden flex-1 flex-wrap items-center justify-end gap-x-3 gap-y-2 2xl:flex" aria-label="Main navigation">
           {chrome.primaryNav.map((group, index) =>
             group.children?.length ? (
               <DesktopDropdown key={group.label} group={group} alignEnd={index >= chrome.primaryNav.length - 2} />
@@ -210,7 +207,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
           aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
-          className="flex size-12 items-center justify-center rounded-full border-2 border-headline bg-farm-beige text-headline xl:hidden"
+          className="flex size-12 items-center justify-center rounded-full border-2 border-headline bg-farm-beige text-headline 2xl:hidden"
         >
           {mobileOpen ? <CloseIcon size={22} /> : <MenuIcon size={22} />}
         </button>
@@ -220,7 +217,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
         <div
           ref={mobilePanelRef}
           id="mobile-nav"
-          className="absolute inset-x-0 top-full max-h-[calc(100dvh-6rem)] overflow-y-auto border-b-2 border-headline bg-background px-5 pb-8 shadow-[0_7px_0_var(--color-secondary-accent)] xl:hidden"
+          className="absolute inset-x-0 top-full max-h-[calc(100dvh-6rem)] overflow-y-auto border-b-2 border-headline bg-background px-5 pb-8 shadow-[0_7px_0_var(--color-secondary-accent)] 2xl:hidden"
         >
           <nav aria-label="Mobile navigation">
             <ul>
