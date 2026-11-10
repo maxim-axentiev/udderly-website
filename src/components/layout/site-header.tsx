@@ -135,7 +135,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
   const mobilePanelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 1536px)')
+    const desktop = window.matchMedia('(min-width: 1280px)')
     const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false) }
     desktop.addEventListener('change', closeOnDesktop)
     return () => desktop.removeEventListener('change', closeOnDesktop)
@@ -188,7 +188,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
           <img src="/images/udderly-logo.png" alt="" width={1588} height={629} className="block h-auto w-full" />
         </Link>
 
-        <nav className="hidden flex-1 flex-wrap items-center justify-end gap-x-3 gap-y-2 2xl:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6" aria-label="Main navigation">
           {chrome.primaryNav.map((group, index) =>
             group.children?.length ? (
               <DesktopDropdown key={group.label} group={group} alignEnd={index >= chrome.primaryNav.length - 2} />
@@ -207,7 +207,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
           aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
-          className="flex size-12 items-center justify-center rounded-full border-2 border-headline bg-farm-beige text-headline 2xl:hidden"
+          className="flex size-12 items-center justify-center rounded-full border-2 border-headline bg-farm-beige text-headline xl:hidden"
         >
           {mobileOpen ? <CloseIcon size={22} /> : <MenuIcon size={22} />}
         </button>
@@ -217,7 +217,7 @@ export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
         <div
           ref={mobilePanelRef}
           id="mobile-nav"
-          className="absolute inset-x-0 top-full max-h-[calc(100dvh-6rem)] overflow-y-auto border-b-2 border-headline bg-background px-5 pb-8 shadow-[0_7px_0_var(--color-secondary-accent)] 2xl:hidden"
+          className="absolute inset-x-0 top-full max-h-[calc(100dvh-6rem)] overflow-y-auto border-b-2 border-headline bg-background px-5 pb-8 shadow-[0_7px_0_var(--color-secondary-accent)] xl:hidden"
         >
           <nav aria-label="Mobile navigation">
             <ul>

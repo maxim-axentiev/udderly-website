@@ -21,6 +21,11 @@ export function WaitlistSection({ title, copy }: { title: string; copy: string }
     if (!available || state === 'sending') return
     const form = event.currentTarget
     const fields = new FormData(form)
+    if (fields.getAll('interests').length === 0) {
+      setState('error')
+      setNotice('Please select at least one animal type to receive updates about.')
+      return
+    }
     setState('sending')
     setNotice('')
     try {
@@ -28,7 +33,7 @@ export function WaitlistSection({ title, copy }: { title: string; copy: string }
         name: fields.get('name'),
         email: fields.get('email'),
         phone: fields.get('phone'),
-        interest: fields.get('interest'),
+        interests: fields.getAll('interests'),
         notes: fields.get('notes'),
         consent: fields.get('consent') === 'on',
         website: fields.get('website'),
@@ -64,12 +69,18 @@ export function WaitlistSection({ title, copy }: { title: string; copy: string }
           <label className="font-semibold text-headline">Phone (optional)
             <input name="phone" type="tel" autoComplete="tel" maxLength={50} className={field}/>
           </label>
-          <label className="font-semibold text-headline">Animal you are interested in *
-            <select name="interest" required defaultValue="" className={field}>
-              <option value="" disabled>Select an animal</option>
-              {interests.map((interest) => <option key={interest} value={interest}>{interest}</option>)}
-            </select>
-          </label>
+          <fieldset className="min-w-0 sm:col-span-2">
+            <legend className="font-semibold text-headline">Which types of animals would you like updates about? *</legend>
+            <p className="mt-1 text-sm text-body-copy">Select all that interest you. We'll contact you when we have updates about the animal types you choose.</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {interests.map((interest) => (
+                <label key={interest} className="flex min-h-12 items-center gap-3 border-2 border-headline bg-background px-4 py-2 text-sm font-semibold text-headline">
+                  <input name="interests" type="checkbox" value={interest} className="size-5 shrink-0" />
+                  {interest}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <label className="font-semibold text-headline sm:col-span-2">Anything else we should know? (optional)
             <textarea name="notes" rows={4} maxLength={1000} className={field}/>
           </label>

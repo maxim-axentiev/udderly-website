@@ -575,8 +575,6 @@ describe('corporate training pages', () => {
       'Animals for Sale',
       'Adopt an Animal',
       'Corporate Training',
-      'Team Building',
-      'Experiential Tourism Development',
       'Explore',
       'About',
       'Contact',

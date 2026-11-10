@@ -8,7 +8,7 @@ const RATE_WINDOW = 60 * 60 * 1000
 const MAX_PER_HOUR = 5
 const attempts = new Map<string, number[]>()
 
-type Entry = { name: string; email: string; phone: string; interest: string; notes: string; consent: boolean }
+type Entry = { name: string; email: string; phone: string; interests: string[]; notes: string; consent: boolean }
 type Result = { ok: true } | { ok: false; error: 'invalid' | 'unavailable' | 'rate_limited' | 'save_failed' }
 const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -18,15 +18,19 @@ function parse(data: unknown): Entry | null {
   const name = typeof r.name === 'string' ? r.name.trim() : ''
   const email = typeof r.email === 'string' ? r.email.trim() : ''
   const phone = typeof r.phone === 'string' ? r.phone.trim() : ''
-  const interest = typeof r.interest === 'string' ? r.interest : ''
+  // Accept legacy single-choice payloads while using an array for new submissions.
+  const requested = Array.isArray(r.interests) ? r.interests : [r.interest]
+  const interests = requested.filter((value): value is string => typeof value === 'string')
+  if (interests.length !== requested.length || interests.length === 0 || interests.length > INTERESTS.size ||
+      new Set(interests).size !== interests.length || interests.some((value) => !INTERESTS.has(value))) return null
   const notes = typeof r.notes === 'string' ? r.notes.trim() : ''
   if (name.length < 2 || name.length > 100 || email.length > 254 || !validEmail.test(email) ||
-      phone.length > 50 || notes.length > 1000 || !INTERESTS.has(interest) || r.consent !== true ||
+      phone.length > 50 || notes.length > 1000 || r.consent !== true ||
       [name, email, phone, notes].some((s) => [...s.replace(/[\r\n]/g, '')].some((char) => {
         const code = char.charCodeAt(0)
         return code < 32 || code === 127
       }))) return null
-  return { name, email, phone, interest, notes, consent: true }
+  return { name, email, phone, interests, notes, consent: true }
 }
 
 /** Escape formula cells as well as CSV quotes so Excel will not evaluate user-supplied text. */
@@ -37,7 +41,7 @@ export function csvCell(value: string): string {
 }
 
 export function serializeWaitlistEntry(input: Entry, at: Date): string {
-  return [at.toISOString(), input.name, input.email, input.phone, input.interest, input.notes, 'Yes']
+  return [at.toISOString(), input.name, input.email, input.phone, input.interests.join('; '), input.notes, 'Yes']
     .map(csvCell).join(',') + '\n'
 }
 

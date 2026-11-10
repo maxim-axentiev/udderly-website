@@ -232,6 +232,9 @@ describe('homepage newsletter and URBORT cards', () => {
     expect(html).toContain('udderlyridiculousfarmlife.us1.list-manage.com/subscribe/post')
     expect(html).toContain('name="EMAIL"')
     expect(html).toContain('name="DOB[day]"')
+    expect(html).toContain('newsletter-first-mobile')
+    expect(html).toContain('newsletter-left-upper-desktop')
+    expect(html).toContain('lg:hidden')
     expect(html).toContain('type="submit"')
     expect(html).not.toContain('Newsletter signup is not available yet.')
     expect(html).not.toContain('Thanks for joining')
@@ -386,15 +389,13 @@ describe('content page publishing rules', () => {
     )
   })
 
-  it('lists corporate programs as independent header destinations', () => {
+  it('leaves the approved header link structure unchanged', () => {
     expect(primaryNav.map((item) => item.label)).toEqual([
       'Experiences',
       'Gift Cards',
       'Animals for Sale',
       'Adopt an Animal',
       'Corporate Training',
-      'Team Building',
-      'Experiential Tourism Development',
       'Explore',
       'About',
       'Contact',

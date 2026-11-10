@@ -7,7 +7,7 @@ import { csvCell, saveWaitlistSubmission, waitlistConfigured } from './waitlist-
 
 const valid = {
   name: 'Test Visitor', email: 'visitor@example.com', phone: '555-555-5555',
-  interest: 'Mini Highland Heifer', notes: 'Please contact me.', consent: true,
+  interests: ['Mini Highland Heifer', 'Goat'], notes: 'Please contact me.', consent: true,
 }
 
 describe('animal sale waitlist', () => {
@@ -17,8 +17,8 @@ describe('animal sale waitlist', () => {
   })
 
   it('rejects incomplete or unconsented information', async () => {
-    for (const change of [{ consent: false }, { email: 'bad' }, { interest: 'anything' }, { name: 'x' }]) {
-      const result = await saveWaitlistSubmission({ ...valid, ...change }, { env: { WAITLIST_DATA_DIR: '/unused' }, ip: '198.51.100.2' })
+    for (const [index, change] of [{ consent: false }, { email: 'bad' }, { interests: ['anything'] }, { interests: [] }, { interests: ['Goat', 'Goat'] }, { name: 'x' }].entries()) {
+      const result = await saveWaitlistSubmission({ ...valid, ...change }, { env: { WAITLIST_DATA_DIR: '/unused' }, ip: `198.51.100.${index + 2}` })
       expect(result).toEqual({ ok: false, error: 'invalid' })
     }
   })
@@ -34,6 +34,7 @@ describe('animal sale waitlist', () => {
       const csv = await readFile(join(dir, 'animal-sale-waitlist.csv'), 'utf8')
       expect(csv).toContain('"Submitted At (UTC)","Name","Email","Phone","Animal Interest","Notes","Consent"')
       expect(csv).toContain('"2026-11-09T10:00:00.000Z","Test Visitor"')
+      expect(csv).toContain('"Mini Highland Heifer; Goat"')
       expect(csv).toContain("'=HYPERLINK")
       expect(csv).toContain('"First line\nSecond line"')
       expect(csv.match(/"Submitted At \(UTC\)"/g)).toHaveLength(1)

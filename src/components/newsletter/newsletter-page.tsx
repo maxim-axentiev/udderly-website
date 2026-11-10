@@ -31,9 +31,9 @@ export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
   return (
     <section className="relative overflow-hidden bg-farm-beige py-20 md:py-28">
       <div className="mx-auto max-w-3xl px-5 md:px-8">
-        <div className="relative pt-20 md:pt-0">
+        <div className="relative pt-36 lg:pt-0">
           <div
-            className="pointer-events-none absolute inset-x-[-0.5rem] top-0 z-0 grid h-32 grid-cols-4 items-end md:hidden"
+            className="pointer-events-none absolute inset-x-0 top-0 z-0 grid h-36 grid-cols-4 items-end lg:hidden"
             aria-hidden="true"
           >
             {mobileAnimals.map((animal) => (
@@ -44,11 +44,11 @@ export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
                 width={768}
                 height={768}
                 loading="lazy"
-                className={`h-32 w-full object-contain object-bottom ${animal.rotate}`}
+                className={`h-36 w-full object-contain object-bottom ${animal.rotate}`}
               />
             ))}
           </div>
-          <div className="pointer-events-none absolute inset-y-0 -left-36 z-0 hidden w-72 md:block" aria-hidden="true">
+          <div className="pointer-events-none absolute inset-y-0 -left-36 z-0 hidden w-72 lg:block" aria-hidden="true">
             {leftAnimals.map((animal) => (
               <img
                 key={animal.alt}
@@ -61,7 +61,7 @@ export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
               />
             ))}
           </div>
-          <div className="pointer-events-none absolute inset-y-0 -right-36 z-0 hidden w-72 md:block" aria-hidden="true">
+          <div className="pointer-events-none absolute inset-y-0 -right-36 z-0 hidden w-72 lg:block" aria-hidden="true">
             {rightAnimals.map((animal) => (
               <img
                 key={animal.alt}
