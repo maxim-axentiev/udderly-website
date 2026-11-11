@@ -39,6 +39,18 @@ function experience(overrides: Partial<ExperienceCardData> & Pick<ExperienceCard
 }
 
 describe('experiences hub page resolution', () => {
+  it('uses an experience-specific card image without changing the experience hero', () => {
+    const cardImage = {alt: 'Guest holding a miniature goat',asset:{_ref:'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-1080x1080-png'}}
+    const page = resolveExperiencesHubPage(null, [experience({
+      title:'Goat Cuddles',slug:'goat-cuddles',cardImage,heroImage:{alt:'Original hero',asset:{_ref:'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-1920x1080-png'}}
+    })])
+    const card = page.cards.find((row) => row.slug === 'goat-cuddles')
+    expect(card?.image?.alt).toBe(cardImage.alt)
+    expect(card?.image?.src).toContain('1080x1080')
+    expect(card?.imageKey).toBeUndefined()
+    expect(experienceHubQuery).toContain('cardImage')
+  })
+
   it('uses the approved Lovable page when optional Sanity fields are absent', () => {
     const page = resolveExperiencesHubPage(publishedHub)
 

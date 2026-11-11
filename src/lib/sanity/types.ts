@@ -81,6 +81,7 @@ export type ExperiencePageData = {
   introductionHeading?: string | null
   body: PortableTextContent
   heroImage: SanityImage
+  cardImage?: SanityImage
   gallery: SanityImage[] | null
   category: string | null
   animalSpecies: Array<{ title: string | null; slug: string | null }> | null
@@ -167,6 +168,7 @@ export type ExperienceCardData = {
   privateBookingUrl?: string | null
   privateBookingVerified?: boolean | null
   heroImage: SanityImage
+  cardImage?: SanityImage
   animalSpecies: Array<{ title: string | null }> | null
 }
 

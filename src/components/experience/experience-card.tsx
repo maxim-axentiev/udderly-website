@@ -24,10 +24,10 @@ export function ExperienceCard({ experience }: { experience: ExperienceCardData 
   const body = (
     <>
       <div className="aspect-4/3 bg-border">
-        {isSanityImage(experience.heroImage) ? (
+        {isSanityImage(experience.cardImage ?? experience.heroImage) ? (
           <CmsImage
-            image={experience.heroImage}
-            alt={experience.heroImage.alt ?? experience.title}
+            image={experience.cardImage ?? experience.heroImage}
+            alt={(experience.cardImage ?? experience.heroImage)?.alt ?? experience.title}
             sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
           />
         ) : null}

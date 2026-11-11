@@ -23,6 +23,7 @@ export const experienceBySlugQuery = `*[_type == "experience" && active != false
   body,
   badge,
   heroImage ${altImage},
+  cardImage ${altImage},
   gallery[] ${altImage},
   category,
   animalSpecies[]->{ title, "slug": slug.current },
@@ -151,6 +152,7 @@ export const experienceHubQuery = `*[_type == "experience"] | order(sortOrder as
   privateBookingUrl,
   privateBookingVerified,
   heroImage ${altImage},
+  cardImage ${altImage},
   animalSpecies[]->{ title }
 }`
 

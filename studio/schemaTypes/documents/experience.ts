@@ -92,6 +92,13 @@ export const experience = defineType({
       description: 'Optional wide photo behind the title. Add alt text on the image. When this is empty, the website can use a local photo that matches this experience.',
     }),
     defineField({
+      name: 'cardImage',
+      title: 'Experience card image',
+      type: 'altImage',
+      group: 'content',
+      description: 'Photo used on the Experiences listing card. This does not change the hero or gallery. When empty, the listing keeps its existing image.',
+    }),
+    defineField({
       name: 'gallery',
       title: 'Gallery',
       type: 'array',
