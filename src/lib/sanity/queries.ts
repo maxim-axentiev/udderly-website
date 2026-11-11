@@ -81,6 +81,7 @@ export const experienceBySlugQuery = `*[_type == "experience" && active != false
   },
   reviewsHeading,
   reviewsApproved,
+  welfareCategory,
   welfareHeading,
   welfareNote,
   "animals": animals[]->{
@@ -160,6 +161,13 @@ export const experienceFoundationQuery = `*[_id == "siteSettings"][0]{
   experienceAwardsTitle,
   experienceAwardsTagline,
   experienceAwardImages[] ${altImage},
+  experienceWelfareProfiles {
+    goats { heading, body, image ${altImage} },
+    cows { heading, body, image ${altImage} },
+    donkeys { heading, body, image ${altImage} },
+    alpacas { heading, body, image ${altImage} },
+    mixed { heading, body, image ${altImage} }
+  },
   experienceWelfareHeading,
   experienceWelfareBody,
   experienceWelfareImage ${altImage}

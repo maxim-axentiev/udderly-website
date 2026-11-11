@@ -11,6 +11,7 @@ import {
   PRIVATE_HIGHLAND_BOOKING_LABEL,
   FEAST_ON_CERTIFICATION,
   resolveExperienceDetail,
+  resolveWelfareCategory,
 } from '@/lib/experiences/detail'
 import { TOWER_OF_GOATS_TITLE } from '@/lib/experiences/tower-of-goats'
 import { experienceBySlugQuery, experienceHubQuery, experienceSitemapSlugsQuery } from '@/lib/sanity/queries'
@@ -93,7 +94,9 @@ describe('experience detail resolution', () => {
     expect(html).toContain('id="reviews"')
     expect(html).toContain('id="meet-the-animals"')
     expect(html).toContain('id="welfare"')
-    expect(html).toContain('Design placeholders only.')
+    expect(html).not.toContain('Design placeholders only. These are not verified guest testimonials.')
+    expect(html).not.toContain('Design placeholders: animal identities and descriptions to confirm.')
+    expect(html).not.toContain('Design placeholder: welfare copy awaiting approval.')
     expect(html).toContain('Placeholder personality copy.')
     expect(html).toContain('Placeholder copy. Animal welfare information to confirm.')
     const verified = resolveExperienceDetail({...base, designPlaceholders, reviewsApproved: true,
@@ -103,6 +106,40 @@ describe('experience detail resolution', () => {
     expect(verified.reviewsArePlaceholders).toBe(false)
     expect(verified.animals[0].name).toBe('Real goat')
     expect(verified.animalsArePlaceholders).toBe(false)
+  })
+
+  it('routes each animal type to one shared Sanity welfare profile, with a mixed-animal override', () => {
+    const cases: Array<[string, string]> = [
+      ['goat-yoga', 'goats'],
+      ['mini-highland-cow-experience', 'cows'],
+      ['miniature-donkey-visits', 'donkeys'],
+      ['alpaca-walks', 'alpacas'],
+      ['taste-of-farm-life', 'mixed'],
+    ]
+    for (const [slug, key] of cases) {
+      expect(resolveWelfareCategory(experience({title: slug, slug}))).toBe(key)
+    }
+    expect(resolveWelfareCategory(experience({title:'Farm visit',slug:'farm-visit',animalSpecies:[
+      {title:'Goats',slug:'goats'}, {title:'Alpacas',slug:'alpacas'},
+    ]}))).toBe('mixed')
+    expect(resolveWelfareCategory(experience({title:'Farm visit',slug:'farm-visit',welfareCategory:'donkeys'}))).toBe('donkeys')
+    const foundation = {experienceWelfareProfiles: {
+      goats: {heading:'Happy goats.\nHappy humans.',body:'Placeholder copy. Shared goat welfare.',image:null},
+      cows: {heading:'Happy cows.\nHappy humans.',body:'Placeholder copy. Shared cow welfare.',image:null},
+      donkeys: {heading:'Happy donkeys.\nHappy humans.',body:'Placeholder copy. Shared donkey welfare.',image:null},
+      alpacas: {heading:'Happy alpacas.\nHappy humans.',body:'Placeholder copy. Shared alpaca welfare.',image:null},
+      mixed: {heading:'Happy animals.\nHappy humans.',body:'Placeholder copy. Shared animal welfare.',image:null},
+    }}
+    const goat = resolveExperienceDetail(experience({title:'Goat Yoga',slug:'goat-yoga',
+      welfareNote:'The animals choose whether to join.',designPlaceholders:{enabled:true,welfareBody:'Old Goat Yoga placeholder copy.'}}),images,foundation)
+    expect(goat.welfare?.lead).toBe('Happy goats.')
+    expect(goat.welfare?.paragraphs).toEqual(['Placeholder copy. Shared goat welfare.','The animals choose whether to join.'])
+    expect(goat.welfare?.paragraphs).not.toContain('Old Goat Yoga placeholder copy.')
+    const cow = resolveExperienceDetail(experience({title:'Mini Highland Cow Experience',slug:'mini-highland-cow-experience'}),images,foundation)
+    expect(cow.welfare?.paragraphs).toEqual(['Placeholder copy. Shared cow welfare.'])
+    const mixed = resolveExperienceDetail(experience({title:'Taste of Farm Life',slug:'taste-of-farm-life'}),images,foundation)
+    expect(mixed.welfare?.paragraphs).toEqual(['Placeholder copy. Shared animal welfare.'])
+    expect(experienceBySlugQuery).toContain('welfareCategory')
   })
 
   it('keeps the published query on published, active experiences', () => {

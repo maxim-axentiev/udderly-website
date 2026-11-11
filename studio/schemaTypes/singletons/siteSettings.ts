@@ -152,8 +152,67 @@ export const siteSettings = defineType({
       of: [defineArrayMember({type: 'altImage'})],
     }),
     defineField({
+      name: 'experienceWelfareProfiles',
+      title: 'Animal welfare by animal type',
+      type: 'object',
+      group: 'experiences',
+      description: 'Five shared, reusable sections. Edit one heading, description, or photo here to update all experience pages using that animal type. Temporary content should be identified as a placeholder here until approved.',
+      fields: [
+        defineField({
+          name: 'goats',
+          title: 'Goats',
+          type: 'object',
+          fields: [
+            defineField({name: 'heading', title: 'Section heading', type: 'text', rows: 2, description: 'Put the emphasized line on a new line.'}),
+            defineField({name: 'body', title: 'Animal welfare copy', type: 'text', rows: 6, description: 'Separate paragraphs with a blank line. Keep placeholder wording clear until approved.'}),
+            defineField({name: 'image', title: 'Animal welfare photo', type: 'altImage'}),
+          ],
+        }),
+        defineField({
+          name: 'cows',
+          title: 'Cows',
+          type: 'object',
+          fields: [
+            defineField({name: 'heading', title: 'Section heading', type: 'text', rows: 2, description: 'Put the emphasized line on a new line.'}),
+            defineField({name: 'body', title: 'Animal welfare copy', type: 'text', rows: 6, description: 'Separate paragraphs with a blank line. Keep placeholder wording clear until approved.'}),
+            defineField({name: 'image', title: 'Animal welfare photo', type: 'altImage'}),
+          ],
+        }),
+        defineField({
+          name: 'donkeys',
+          title: 'Donkeys',
+          type: 'object',
+          fields: [
+            defineField({name: 'heading', title: 'Section heading', type: 'text', rows: 2, description: 'Put the emphasized line on a new line.'}),
+            defineField({name: 'body', title: 'Animal welfare copy', type: 'text', rows: 6, description: 'Separate paragraphs with a blank line. Keep placeholder wording clear until approved.'}),
+            defineField({name: 'image', title: 'Animal welfare photo', type: 'altImage'}),
+          ],
+        }),
+        defineField({
+          name: 'alpacas',
+          title: 'Alpacas',
+          type: 'object',
+          fields: [
+            defineField({name: 'heading', title: 'Section heading', type: 'text', rows: 2, description: 'Put the emphasized line on a new line.'}),
+            defineField({name: 'body', title: 'Animal welfare copy', type: 'text', rows: 6, description: 'Separate paragraphs with a blank line. Keep placeholder wording clear until approved.'}),
+            defineField({name: 'image', title: 'Animal welfare photo', type: 'altImage'}),
+          ],
+        }),
+        defineField({
+          name: 'mixed',
+          title: 'Mixed animals',
+          type: 'object',
+          fields: [
+            defineField({name: 'heading', title: 'Section heading', type: 'text', rows: 2, description: 'Put the emphasized line on a new line.'}),
+            defineField({name: 'body', title: 'Animal welfare copy', type: 'text', rows: 6, description: 'Separate paragraphs with a blank line. Keep placeholder wording clear until approved.'}),
+            defineField({name: 'image', title: 'Animal welfare photo', type: 'altImage'}),
+          ],
+        }),
+      ],
+    }),
+    defineField({
       name: 'experienceWelfareHeading',
-      title: 'Shared animal-care heading',
+      title: 'Legacy fallback heading (use animal profiles above)',
       type: 'text',
       rows: 2,
       group: 'experiences',
@@ -162,7 +221,7 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: 'experienceWelfareBody',
-      title: 'Shared animal-care text',
+      title: 'Legacy fallback text (use animal profiles above)',
       type: 'text',
       rows: 5,
       group: 'experiences',
@@ -171,7 +230,7 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: 'experienceWelfareImage',
-      title: 'Shared animal-care image',
+      title: 'Legacy fallback image (use animal profiles above)',
       type: 'altImage',
       group: 'experiences',
       description: 'Optional photo for the care section. Goat experiences keep a local goat photo until this is set.',

@@ -437,7 +437,6 @@ export function ExperienceDetail({
         <section id="reviews" className="overflow-hidden bg-farm-blue py-20 md:py-28">
           <Container width="brand" className="max-w-[1500px]">
             <h2 className="max-w-3xl font-display text-[clamp(2.6rem,7vw,6rem)] font-black uppercase leading-[0.8] text-headline">{page.reviewsHeading}</h2>
-            {page.reviewsArePlaceholders ? <p className="mt-5 text-sm font-semibold text-headline">Design placeholders only. These are not verified guest testimonials.</p> : null}
             <div className="mt-14">
               <ScrollCarousel label="Guest reviews" itemClassName="w-[85%] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
                 {page.reviews.map((review) => (
@@ -458,7 +457,6 @@ export function ExperienceDetail({
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <Lines lead={page.animalsHeading.lead} accent={page.animalsHeading.accent} accentClassName="text-primary-accent" className="font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline" />
               <p className="max-w-md border-l-4 border-primary-accent pl-5 text-lg font-semibold">{page.animalsIntro}</p>
-              {page.animalsArePlaceholders ? <p className="text-sm font-semibold">Design placeholders: animal identities and descriptions to confirm.</p> : null}
             </div>
             <div className="mt-14">
               <ScrollCarousel label="Meet the animals" itemClassName="w-[85%] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
@@ -505,7 +503,6 @@ export function ExperienceDetail({
               </figure>
             ) : null}
             <div className="flex flex-col border-2 border-headline bg-background p-7 text-left shadow-[12px_12px_0_var(--color-headline)] md:p-9 lg:col-start-1 lg:row-start-2">
-              {page.welfareIsPlaceholder ? <p className="mb-3 text-sm font-semibold text-primary-accent">Design placeholder: welfare copy awaiting approval.</p> : null}
               {page.welfare.paragraphs.map((paragraph) => <p key={paragraph} className="text-base leading-relaxed md:text-lg">{paragraph}</p>)}
               {page.welfare.policy ? (
                 <div className="mt-6 text-base leading-relaxed md:text-lg">

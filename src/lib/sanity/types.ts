@@ -135,6 +135,7 @@ export type ExperiencePageData = {
   animalsHeading?: string | null
   animalsIntro?: string | null
   faqsHeading?: string | null
+  welfareCategory?: 'auto' | 'goats' | 'cows' | 'donkeys' | 'alpacas' | 'mixed' | null
   welfareHeading?: string | null
   welfareNote?: string | null
   animals: AnimalCardData[] | null
@@ -169,11 +170,24 @@ export type ExperienceCardData = {
   animalSpecies: Array<{ title: string | null }> | null
 }
 
+export type SharedWelfareProfile = {
+  heading?: string | null
+  body?: string | null
+  image?: SanityImage
+} | null
+
 export type ExperienceFoundation = {
   experienceAwardsEnabled?: boolean | null
   experienceAwardsTitle?: string | null
   experienceAwardsTagline?: string | null
   experienceAwardImages?: SanityImage[] | null
+  experienceWelfareProfiles?: {
+    goats?: SharedWelfareProfile
+    cows?: SharedWelfareProfile
+    donkeys?: SharedWelfareProfile
+    alpacas?: SharedWelfareProfile
+    mixed?: SharedWelfareProfile
+  } | null
   experienceWelfareHeading?: string | null
   experienceWelfareBody?: string | null
   experienceWelfareImage?: SanityImage | null

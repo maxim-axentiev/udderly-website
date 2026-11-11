@@ -409,6 +409,22 @@ export const experience = defineType({
       to: [{type: 'policy'}],
     }),
     defineField({
+      name: 'welfareCategory',
+      title: 'Shared animal welfare section',
+      type: 'string',
+      group: 'recognition',
+      description: 'Use the shared heading, copy and photo from Site settings → Experiences → Animal welfare by animal type. Automatic uses the experience animal species, or the URL for a single-species experience. Choose Mixed animals for multi-animal visits.',
+      options: {list: [
+        {title: 'Automatic', value: 'auto'},
+        {title: 'Goats', value: 'goats'},
+        {title: 'Cows', value: 'cows'},
+        {title: 'Donkeys', value: 'donkeys'},
+        {title: 'Alpacas', value: 'alpacas'},
+        {title: 'Mixed animals', value: 'mixed'},
+      ]},
+      initialValue: 'auto',
+    }),
+    defineField({
       name: 'welfarePolicy',
       title: 'Animal welfare information',
       type: 'reference',

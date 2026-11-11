@@ -244,6 +244,27 @@ function speciesKey(slug: string): 'goat' | 'alpaca' | 'highland' | 'donkey' | u
   return undefined
 }
 
+type WelfareCategory = 'goats' | 'cows' | 'donkeys' | 'alpacas' | 'mixed'
+
+export function resolveWelfareCategory(experience: ExperiencePageData): WelfareCategory {
+  const override = experience.welfareCategory
+  if (override === 'goats' || override === 'cows' || override === 'donkeys' || override === 'alpacas' || override === 'mixed') return override
+  const species = (experience.animalSpecies ?? []).map((item) => item.title?.toLowerCase().trim() ?? '').filter(Boolean)
+  const resolved = new Set(species.map((title) => {
+    if (title.includes('goat')) return 'goats'
+    if (title.includes('cow') || title.includes('highland') || title.includes('cattle')) return 'cows'
+    if (title.includes('donkey')) return 'donkeys'
+    if (title.includes('alpaca')) return 'alpacas'
+    return 'mixed'
+  }))
+  if (resolved.size > 1 || resolved.has('mixed')) return 'mixed'
+  if (resolved.size === 1) return [...resolved][0] as WelfareCategory
+  const slug = publicExperienceSlug(experience.slug)
+  if (slug.includes('taste-of-farm-life') || slug.includes('farm-glamping')) return 'mixed'
+  const fromSlug = speciesKey(slug)
+  return fromSlug === 'goat' ? 'goats' : fromSlug === 'highland' ? 'cows' : fromSlug === 'donkey' ? 'donkeys' : fromSlug === 'alpaca' ? 'alpacas' : 'mixed'
+}
+
 function speciesGallery(slug: string): DetailImageKey[] {
   const species = speciesKey(slug)
   if (species === 'goat') return GOAT_GALLERY
@@ -388,12 +409,14 @@ export function resolveExperienceDetail(
   const feastHeading = clean(experience.feastOn?.heading, 120)
   const signatureBody = paragraphs(clean(experience.signatureExperience?.body))
   const signatureHeading = clean(experience.signatureExperience?.heading, 120)
+  const sharedProfile = foundation?.experienceWelfareProfiles?.[resolveWelfareCategory(experience)]
+  const sharedProfileBody = placeholderParagraphs(sharedProfile?.body)
   const welfareParagraphs = [
-    ...paragraphs(clean(foundation?.experienceWelfareBody)),
+    ...(sharedProfileBody.length ? sharedProfileBody : paragraphs(clean(foundation?.experienceWelfareBody))),
     ...paragraphs(clean(experience.welfareNote)),
   ]
   const welfarePolicy = policyContent(experience.welfarePolicy)
-  const welfareHeading = clean(experience.welfareHeading, 120) ?? clean(foundation?.experienceWelfareHeading, 120)
+  const welfareHeading = clean(experience.welfareHeading, 120) ?? placeholderText(sharedProfile?.heading, 120) ?? clean(foundation?.experienceWelfareHeading, 120)
   const placeholders = experience.designPlaceholders?.enabled === true ? experience.designPlaceholders : null
   const placeholderReviews = (placeholders?.reviews ?? []).flatMap((item) => {
     const name = clean(item.name, 80)
@@ -411,7 +434,7 @@ export function resolveExperienceDetail(
   const publishedReviews = experience.reviewsApproved === true ? reviewItems(experience.testimonials) : []
   const publishedAnimals = animalCards(experience.animals)
   const placeholderWelfare = placeholderParagraphs(placeholders?.welfareBody)
-  const sharedWelfareImage = picture(foundation?.experienceWelfareImage ?? undefined, 1200)
+  const sharedWelfareImage = picture(sharedProfile?.image, 1200) ?? picture(foundation?.experienceWelfareImage ?? undefined, 1200)
   const cancellation = policyContent(experience.cancellationPolicy)
   const awardImages = (foundation?.experienceAwardImages ?? []).flatMap((image) => {
     const photo = picture(image, 640)
