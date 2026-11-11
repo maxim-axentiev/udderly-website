@@ -49,7 +49,6 @@ export function MailchimpSignup({
         <label>Leave this field empty<input type="text" name="b_77c143a0d69da1f925598010c_1fc8e9d605" tabIndex={-1} autoComplete="off"/></label>
       </div>
       <Button type="submit" className="mt-2 justify-self-center">{submitLabel}</Button>
-      <p className="text-center text-xs text-muted">Signup opens Mailchimp in a new tab to confirm your subscription.</p>
     </form>
   )
 }

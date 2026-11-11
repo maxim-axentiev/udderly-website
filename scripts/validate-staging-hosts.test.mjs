@@ -131,11 +131,17 @@ test('rejects disabled Traefik or an incorrect Docker network label', () => {
   }
 })
 
-test('rejects live email delivery credentials in staging', () => {
-  for (const name of ['RESEND_API_KEY', 'CONTACT_SMTP_HOST', 'CONTACT_SMTP_PORT', 'CONTACT_SMTP_USER', 'CONTACT_SMTP_PASSWORD']) {
+test('allows Resend email delivery without weakening noindex protections', () => {
+  const enabled = config()
+  enabled.services.website.environment.RESEND_API_KEY = 'test-placeholder-never-a-secret'
+  assert.equal(validateStagingHosts(enabled), true)
+})
+
+test('rejects direct SMTP email delivery credentials in staging', () => {
+  for (const name of ['CONTACT_SMTP_HOST', 'CONTACT_SMTP_PORT', 'CONTACT_SMTP_USER', 'CONTACT_SMTP_PASSWORD']) {
     const unsafe = config()
     unsafe.services.website.environment[name] = 'configured'
-    assert.throws(() => validateStagingHosts(unsafe), /live contact email delivery/i)
+    assert.throws(() => validateStagingHosts(unsafe), /SMTP email delivery/i)
   }
 })
 

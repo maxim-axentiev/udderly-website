@@ -215,6 +215,7 @@ describe('newsletter page', () => {
     expect(html).toContain('name="EMAIL"')
     expect(html).toContain('type="submit"')
     expect(html).not.toContain('Newsletter signup is not available yet.')
+    expect(html).not.toContain('Signup opens Mailchimp in a new tab')
   })
 })
 
@@ -237,6 +238,7 @@ describe('homepage newsletter and URBORT cards', () => {
     expect(html).toContain('lg:hidden')
     expect(html).toContain('type="submit"')
     expect(html).not.toContain('Newsletter signup is not available yet.')
+    expect(html).not.toContain('Signup opens Mailchimp in a new tab')
     expect(html).not.toContain('Thanks for joining')
     expect(html).not.toContain('nothing is stored')
     expect(html).not.toContain('Placeholder confirmation')

@@ -16,9 +16,11 @@ export function validateStagingHosts(config) {
   if (website?.environment?.PUBLIC_CANONICAL_ORIGIN !== '') {
     throw Error('Staging must not set PUBLIC_CANONICAL_ORIGIN')
   }
-  for (const name of ['RESEND_API_KEY', 'CONTACT_SMTP_HOST', 'CONTACT_SMTP_PORT', 'CONTACT_SMTP_USER', 'CONTACT_SMTP_PASSWORD']) {
+  // Staging may use the existing Resend sending key for controlled enquiry tests.
+  // Keep direct SMTP disabled and preserve every indexing and container safeguard.
+  for (const name of ['CONTACT_SMTP_HOST', 'CONTACT_SMTP_PORT', 'CONTACT_SMTP_USER', 'CONTACT_SMTP_PASSWORD']) {
     if (website?.environment?.[name]) {
-      throw Error(`Staging must not configure live contact email delivery: ${name}`)
+      throw Error(`Staging must not configure SMTP email delivery: ${name}`)
     }
   }
   const networks = website?.networks

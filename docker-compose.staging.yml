@@ -21,7 +21,8 @@ services:
       PUBLIC_CANONICAL_ORIGIN: ""
       GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:-}
       GOOGLE_PLACE_ID: ${GOOGLE_PLACE_ID:-}
-      RESEND_API_KEY: ""
+      # Reuse the server-owned API key without putting the credential in Git.
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
       CONTACT_SMTP_HOST: ""
       CONTACT_SMTP_PORT: ""
       CONTACT_SMTP_USER: ""
