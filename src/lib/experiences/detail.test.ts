@@ -67,6 +67,44 @@ function htmlFor(page: ExperiencePageData) {
 }
 
 describe('experience detail resolution', () => {
+  it('renders Lovable placeholders only when explicitly enabled, without treating them as approved testimonials', () => {
+    const designPlaceholders = {
+      enabled: true, awardsEnabled: true,
+      reviewsHeading: 'People came for goats. They left different.',
+      reviews: [{name: 'Marissa T.', quote: 'Placeholder review copy. Sample only.'}],
+      animalsHeading: 'Meet some of\nthe icons.',
+      animalsIntro: 'These are temporary animal profiles.',
+      animals: [{name: 'Biscuit', lines: ['Placeholder personality copy.'], image: null}],
+      welfareHeading: 'Happy goats.\nHappy humans.',
+      welfareBody: 'Placeholder copy. Animal welfare information to confirm.',
+    }
+    const base = experience({title: 'Goat Yoga', slug: 'goat-yoga', shortDescription: 'Approved introduction.'})
+    const hidden = resolveExperienceDetail({...base, designPlaceholders: {...designPlaceholders, enabled: false}}, images)
+    const shown = resolveExperienceDetail({...base, designPlaceholders}, images)
+    const html = renderToStaticMarkup(createElement(ExperienceDetail, {page: shown, awards}))
+    expect(hidden.reviews).toEqual([])
+    expect(hidden.animals).toEqual([])
+    expect(hidden.welfare).toBeUndefined()
+    expect(hidden.showAwards).toBe(false)
+    expect(shown.reviewsArePlaceholders).toBe(true)
+    expect(shown.animalsArePlaceholders).toBe(true)
+    expect(shown.welfareIsPlaceholder).toBe(true)
+    expect(shown.intro).toBe('Approved introduction.')
+    expect(html).toContain('id="reviews"')
+    expect(html).toContain('id="meet-the-animals"')
+    expect(html).toContain('id="welfare"')
+    expect(html).toContain('Design placeholders only.')
+    expect(html).toContain('Placeholder personality copy.')
+    expect(html).toContain('Placeholder copy. Animal welfare information to confirm.')
+    const verified = resolveExperienceDetail({...base, designPlaceholders, reviewsApproved: true,
+      testimonials: [{_id:'approved', guestName:'Real Guest', quote:'Confirmed quotation.', source: null, sourceUrl: null, image: null}],
+      animals: [{_id:'real-animal', name:'Real goat', slug:'real-goat', shortIntro:'Approved story.', funFact:null, status:null, speciesTitle:null, profileImage:null}]}, images)
+    expect(verified.reviews).toEqual([{name:'Real Guest', quote:'Confirmed quotation.'}])
+    expect(verified.reviewsArePlaceholders).toBe(false)
+    expect(verified.animals[0].name).toBe('Real goat')
+    expect(verified.animalsArePlaceholders).toBe(false)
+  })
+
   it('keeps the published query on published, active experiences', () => {
     expect(experienceBySlugQuery).toMatch(/^\*\[_type == "experience" && active != false && defined\(title\) && title != "" && slug\.current in \$slugs\]/)
     expect(experienceBySlugQuery).toContain('order(select(slug.current == $slug => 0, 1))')

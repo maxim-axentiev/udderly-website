@@ -67,6 +67,18 @@ export const experienceBySlugQuery = `*[_type == "experience" && active != false
     href,
     image ${altImage}
   },
+  designPlaceholders {
+    enabled,
+    awardsEnabled,
+    reviewsHeading,
+    reviews[]{name, quote},
+    animalsHeading,
+    animalsIntro,
+    animals[]{name, lines, image ${altImage}},
+    welfareHeading,
+    welfareBody,
+    welfareImage ${altImage}
+  },
   reviewsHeading,
   reviewsApproved,
   welfareHeading,

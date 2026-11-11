@@ -74,11 +74,13 @@ export type ExperienceDetailModel = {
   cancellation?: NonNullable<PolicyContent>
   reviewsHeading: string
   reviews: Array<{ quote: string; name: string }>
+  reviewsArePlaceholders?: boolean
   faqsHeading: string
   faqs: Array<{ id: string; question: string; answer: PortableTextContent }>
   animalsHeading: { lead: string; accent?: string }
   animalsIntro: string
   animals: Array<{ name: string; lines: string[]; image?: DetailPicture }>
+  animalsArePlaceholders?: boolean
   instructor?: { heading: string; paragraphs: string[]; images: DetailPicture[] }
   welfare?: {
     lead: string
@@ -87,6 +89,7 @@ export type ExperienceDetailModel = {
     policy?: NonNullable<PolicyContent>
     image?: DetailPicture
   }
+  welfareIsPlaceholder?: boolean
   signature?: {
     kicker: string
     lead: string
@@ -158,6 +161,16 @@ function clean(value: unknown, max = 800): string | undefined {
   const trimmed = value.trim()
   if (!trimmed || trimmed.length > max || /^placeholder\b/i.test(trimmed)) return undefined
   return trimmed
+}
+
+function placeholderText(value: unknown, max = 800): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const trimmed = value.trim()
+  return trimmed && trimmed.length <= max ? trimmed : undefined
+}
+
+function placeholderParagraphs(value: unknown): string[] {
+  return (placeholderText(value, 2000) ?? '').split(/\n+/).map((part) => part.trim()).filter(Boolean)
 }
 
 function paragraphs(value: string | undefined): string[] {
@@ -381,6 +394,23 @@ export function resolveExperienceDetail(
   ]
   const welfarePolicy = policyContent(experience.welfarePolicy)
   const welfareHeading = clean(experience.welfareHeading, 120) ?? clean(foundation?.experienceWelfareHeading, 120)
+  const placeholders = experience.designPlaceholders?.enabled === true ? experience.designPlaceholders : null
+  const placeholderReviews = (placeholders?.reviews ?? []).flatMap((item) => {
+    const name = clean(item.name, 80)
+    const quote = placeholderText(item.quote, 2000)
+    return name && quote ? [{name, quote}] : []
+  })
+  const placeholderAnimals = (placeholders?.animals ?? []).flatMap((item) => {
+    const name = clean(item.name, 80)
+    if (!name) return []
+    return [{name, lines: (item.lines ?? []).flatMap((line) => {
+      const text = placeholderText(line, 240)
+      return text ? [text] : []
+    }), image: picture(item.image, 1024)}]
+  })
+  const publishedReviews = experience.reviewsApproved === true ? reviewItems(experience.testimonials) : []
+  const publishedAnimals = animalCards(experience.animals)
+  const placeholderWelfare = placeholderParagraphs(placeholders?.welfareBody)
   const sharedWelfareImage = picture(foundation?.experienceWelfareImage ?? undefined, 1200)
   const cancellation = policyContent(experience.cancellationPolicy)
   const awardImages = (foundation?.experienceAwardImages ?? []).flatMap((image) => {
@@ -431,13 +461,15 @@ export function resolveExperienceDetail(
     visitorInfo: usablePortableText(experience.visitorInfo),
     accessibilityInfo: usablePortableText(experience.accessibilityInfo),
     cancellation,
-    reviewsHeading: clean(experience.reviewsHeading, 120) ?? 'Reviews',
-    reviews: experience.reviewsApproved === true ? reviewItems(experience.testimonials) : [],
+    reviewsHeading: clean(experience.reviewsHeading, 120) ?? clean(placeholders?.reviewsHeading, 120) ?? 'Reviews',
+    reviews: publishedReviews.length ? publishedReviews : placeholderReviews,
+    reviewsArePlaceholders: !publishedReviews.length && placeholderReviews.length > 0,
     faqsHeading: clean(experience.faqsHeading, 80) ?? 'FAQs',
     faqs,
-    animalsHeading: designedLines(clean(experience.animalsHeading, 120), 'Meet some of', 'the animals.'),
-    animalsIntro: clean(experience.animalsIntro, 300) ?? 'There are a lot more animals than this. These are a few of the personalities who might be part of your visit.',
-    animals: animalCards(experience.animals),
+    animalsHeading: designedLines(clean(experience.animalsHeading, 120) ?? clean(placeholders?.animalsHeading, 120), 'Meet some of', 'the animals.'),
+    animalsIntro: clean(experience.animalsIntro, 300) ?? clean(placeholders?.animalsIntro, 300) ?? 'There are a lot more animals than this. These are a few of the personalities who might be part of your visit.',
+    animals: publishedAnimals.length ? publishedAnimals : placeholderAnimals,
+    animalsArePlaceholders: !publishedAnimals.length && placeholderAnimals.length > 0,
     instructor: instructorHeading || instructorParagraphs.length || instructorImages.length
       ? {
           heading: instructorHeading ?? 'Your instructor',
@@ -445,14 +477,17 @@ export function resolveExperienceDetail(
           images: instructorImages,
         }
       : undefined,
-    welfare: welfareParagraphs.length || welfarePolicy
+    welfare: welfareParagraphs.length || welfarePolicy || placeholderWelfare.length
       ? {
-          ...(welfareHeading ? designedLines(welfareHeading, welfareHeading, '') : { lead: 'Animal care' }),
-          paragraphs: welfareParagraphs,
+          ...(welfareHeading || clean(placeholders?.welfareHeading, 120)
+            ? designedLines(welfareHeading ?? clean(placeholders?.welfareHeading, 120), 'Happy goats.', 'Happy humans.')
+            : { lead: 'Animal care' }),
+          paragraphs: welfareParagraphs.length ? welfareParagraphs : placeholderWelfare,
           policy: welfarePolicy,
-          image: sharedWelfareImage ?? (speciesKey(slug) === 'goat' ? localPicture('goat-icon-2', images) : undefined),
+          image: sharedWelfareImage ?? picture(placeholders?.welfareImage, 1200) ?? (speciesKey(slug) === 'goat' ? localPicture('goat-icon-2', images) : undefined),
         }
       : undefined,
+    welfareIsPlaceholder: !welfareParagraphs.length && !welfarePolicy && placeholderWelfare.length > 0,
     signature: signatureEnabled
       ? {
           kicker: clean(experience.signatureExperience?.kicker, 80) ?? "An Ontario's Southwest Signature Experience",
@@ -479,7 +514,7 @@ export function resolveExperienceDetail(
     location: SHARED_LOCATION,
     awardsTitle: clean(foundation?.experienceAwardsTitle, 80) ?? "TripAdvisor Travellers' Choice",
     awardsTagline: clean(foundation?.experienceAwardsTagline, 160) ?? 'Top 10% of attractions worldwide by Tripadvisor.',
-    showAwards: foundation?.experienceAwardsEnabled === true,
+    showAwards: foundation?.experienceAwardsEnabled === true || placeholders?.awardsEnabled === true,
     awardImages,
   }
 }

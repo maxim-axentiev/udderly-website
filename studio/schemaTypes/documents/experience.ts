@@ -15,6 +15,7 @@ export const experience = defineType({
     {name: 'practical', title: 'Things to know'},
     {name: 'related', title: 'Animals and reviews'},
     {name: 'recognition', title: 'Care and recognition'},
+    {name: 'design', title: 'Lovable placeholders'},
     {name: 'seo', title: 'SEO'},
     {name: 'settings', title: 'Settings'},
   ],
@@ -432,6 +433,50 @@ export const experience = defineType({
       group: 'recognition',
       description: 'Added after the shared farm welfare text from Site settings. Leave empty to use only the shared foundation.',
       validation: (rule) => rule.max(800),
+    }),
+    defineField({
+      name: 'designPlaceholders',
+      title: 'Lovable layout placeholders',
+      type: 'object',
+      group: 'design',
+      description: 'Temporary layout content copied from the Lovable design. Replace it with approved content before launch. Does not modify approved descriptions, bookings, prices, or real testimonials.',
+      fields: [
+        defineField({name: 'enabled', title: 'Show design placeholders on this page', type: 'boolean', initialValue: false}),
+        defineField({name: 'awardsEnabled', title: 'Show the awards strip', type: 'boolean', initialValue: false, description: 'Confirm that the displayed awards and years are correct before launch.'}),
+        defineField({name: 'reviewsHeading', title: 'Reviews section heading', type: 'string'}),
+        defineField({
+          name: 'reviews',
+          title: 'Placeholder review cards (not verified testimonials)',
+          type: 'array',
+          description: 'Visible only when verified reviews are unavailable. Keep “Placeholder review copy.” in each quote until replaced by approved real testimonials.',
+          of: [defineArrayMember({
+            type: 'object',
+            fields: [
+              defineField({name: 'name', title: 'Temporary display name', type: 'string', validation: (rule) => rule.required()}),
+              defineField({name: 'quote', title: 'Placeholder review copy', type: 'text', rows: 5, validation: (rule) => rule.required()}),
+            ],
+          })],
+        }),
+        defineField({name: 'animalsHeading', title: 'Meet the icons heading', type: 'text', rows: 2}),
+        defineField({name: 'animalsIntro', title: 'Meet the icons introduction', type: 'text', rows: 3}),
+        defineField({
+          name: 'animals',
+          title: 'Temporary animal cards',
+          type: 'array',
+          description: 'Only shown when no actual animals are selected. These are design placeholders, not verified animal identities.',
+          of: [defineArrayMember({
+            type: 'object',
+            fields: [
+              defineField({name: 'name', title: 'Display name', type: 'string', validation: (rule) => rule.required()}),
+              defineField({name: 'lines', title: 'Personality description lines', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+              defineField({name: 'image', title: 'Temporary image', type: 'altImage'}),
+            ],
+          })],
+        }),
+        defineField({name: 'welfareHeading', title: 'Animal welfare heading', type: 'text', rows: 2}),
+        defineField({name: 'welfareBody', title: 'Temporary animal welfare copy', type: 'text', rows: 5, description: 'Replace placeholder copy with approved welfare information before launch.'}),
+        defineField({name: 'welfareImage', title: 'Temporary animal welfare image', type: 'altImage'}),
+      ],
     }),
     defineField({
       name: 'instructor',

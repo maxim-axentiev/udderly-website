@@ -118,6 +118,18 @@ export type ExperiencePageData = {
   } | null
   feastOn?: ExperienceStatement
   signatureExperience?: ExperienceStatement
+  designPlaceholders?: {
+    enabled?: boolean | null
+    awardsEnabled?: boolean | null
+    reviewsHeading?: string | null
+    reviews?: Array<{name?: string | null; quote?: string | null}> | null
+    animalsHeading?: string | null
+    animalsIntro?: string | null
+    animals?: Array<{name?: string | null; lines?: string[] | null; image?: SanityImage}> | null
+    welfareHeading?: string | null
+    welfareBody?: string | null
+    welfareImage?: SanityImage
+  } | null
   reviewsHeading?: string | null
   reviewsApproved?: boolean | null
   animalsHeading?: string | null
