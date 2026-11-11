@@ -27,9 +27,10 @@ const rightAnimals = [
   { src: rightLower, alt: 'Mini Highland cow peeking from behind the newsletter form', position: 'bottom-[5%]' },
 ]
 
-export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
+export function NewsletterPage({ page, sectionId, headingLevel = 'h1', signupId = 'newsletter-page' }: { page: Pick<NewsletterPageContent, 'title' | 'copy'> & Partial<Pick<NewsletterPageContent, 'firstNameLabel' | 'emailLabel' | 'dateOfBirthLabel' | 'submitLabel'>>; sectionId?: string; headingLevel?: 'h1' | 'h2'; signupId?: string }) {
+  const Heading = headingLevel
   return (
-    <section className="relative overflow-hidden bg-farm-beige py-20 md:py-28">
+    <section id={sectionId} className="relative overflow-hidden bg-farm-beige py-20 md:py-28">
       <div className="mx-auto max-w-3xl px-5 md:px-8">
         <div className="relative pt-36 lg:pt-0">
           <div
@@ -75,11 +76,11 @@ export function NewsletterPage({ page }: { page: NewsletterPageContent }) {
             ))}
           </div>
           <div className="relative z-10 border-2 border-headline bg-background p-7 text-center shadow-[10px_10px_0_var(--color-secondary-accent)] md:p-12">
-            <h1 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">
+            <Heading className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">
               {page.title}
-            </h1>
+            </Heading>
             <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">{page.copy}</p>
-            <MailchimpSignup id="newsletter-page" firstNameLabel={page.firstNameLabel} emailLabel={page.emailLabel} dateOfBirthLabel={page.dateOfBirthLabel} submitLabel={page.submitLabel}/>
+            <MailchimpSignup id={signupId} firstNameLabel={page.firstNameLabel} emailLabel={page.emailLabel} dateOfBirthLabel={page.dateOfBirthLabel} submitLabel={page.submitLabel}/>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useRef, useState, type ReactNode, type TouchEvent } from 'react'
 import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { Container } from '@/components/layout/container'
+import { NewsletterPage } from '@/components/newsletter/newsletter-page'
 import { PortableTextRenderer } from '@/components/portable-text/portable-text-renderer'
 import { Button, ButtonLink } from '@/components/ui/button'
 import type { DetailPicture, ExperienceDetailModel } from '@/lib/experiences/detail'
@@ -269,7 +270,7 @@ export function ExperienceDetail({
     <>
       <section id="experience-hero" className="relative isolate flex min-h-[68vh] items-center justify-center overflow-hidden bg-headline">
         {page.hero ? (
-          <img src={page.hero.src} alt={page.hero.alt} width={1920} height={1080} fetchPriority="high" className="absolute inset-0 -z-10 h-full w-full object-cover" />
+          <img src={page.hero.src} alt={page.hero.alt} width={1920} height={1080} fetchPriority="high" className={`absolute inset-0 -z-10 h-full w-full object-cover ${page.slug === 'goat-yoga' ? 'object-top' : ''}`} />
         ) : null}
         <div className="absolute inset-0 -z-10 bg-headline/65" aria-hidden="true" />
         <Container width="brand" className="max-w-4xl py-24 text-center md:py-32">
@@ -288,7 +289,7 @@ export function ExperienceDetail({
             <span className="text-secondary-accent">{page.titleAccent}</span>
           </h1>
           {page.intro ? <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">{page.intro}</p> : null}
-          {hasBookingOptions && showIntroduction ? (
+          {hasBookingOptions && showIntroduction && page.slug !== 'goat-yoga' ? (
             <a href="#booking-options" className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full border-2 border-headline bg-cta px-8 py-3 font-display text-lg font-extrabold uppercase text-cta-foreground shadow-[4px_4px_0_var(--color-headline)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-background">
               View booking options
             </a>
@@ -547,26 +548,7 @@ export function ExperienceDetail({
         </section>
       ) : null}
 
-      <section id="newsletter" className="bg-farm-beige py-20 md:py-28">
-        <Container width="narrow" className="max-w-3xl">
-          <div className="border-2 border-headline bg-background p-7 text-center shadow-[10px_10px_0_var(--color-secondary-accent)] md:p-12">
-            <h2 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">{page.newsletter.title}</h2>
-            <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">{page.newsletter.copy}</p>
-            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" aria-describedby="experience-newsletter-unavailable" onSubmit={(event) => event.preventDefault()}>
-              <label className="font-display text-sm font-bold uppercase text-headline">
-                First name
-                <input disabled name="firstName" className="mt-1 min-h-12 w-full rounded-full border-2 border-headline bg-background px-5" />
-              </label>
-              <label className="font-display text-sm font-bold uppercase text-headline">
-                Email
-                <input disabled type="email" name="email" className="mt-1 min-h-12 w-full rounded-full border-2 border-headline bg-background px-5" />
-              </label>
-              <button type="button" disabled className="mt-2 justify-self-center rounded-full bg-cta px-8 py-3 font-display font-extrabold uppercase">Sign me up</button>
-            </form>
-            <p id="experience-newsletter-unavailable" role="status" className="mt-4 font-accent text-lg italic text-primary-accent">{page.newsletter.unavailable}</p>
-          </div>
-        </Container>
-      </section>
+      <NewsletterPage page={page.newsletter} sectionId="newsletter" headingLevel="h2" signupId="experience-newsletter" />
 
       <section id="location" className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">

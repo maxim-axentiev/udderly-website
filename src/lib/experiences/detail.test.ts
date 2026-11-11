@@ -216,12 +216,13 @@ describe('experience detail resolution', () => {
     expect(html).not.toContain('fareharbor')
     expect(html).not.toContain('#book')
     expect(html).not.toContain('$18')
-    expect(html).toContain('Newsletter signup is not available yet.')
-    expect(html).toContain('aria-describedby="experience-newsletter-unavailable"')
-    expect(html).toContain('id="experience-newsletter-unavailable" role="status"')
-    expect(html).not.toContain('type="submit"')
+    expect(html).not.toContain('Newsletter signup is not available yet.')
+    expect(html).toContain('list-manage.com/subscribe/post')
+    expect(html).toContain('name="DOB[year]"')
+    expect(html).toContain('newsletter-first-mobile.webp')
+    expect(html).toContain('type="submit"')
     expect(html).not.toContain('Additional fees may apply at booking.')
-    expect(html).toContain('disabled=""')
+    expect(html).not.toContain('disabled=""')
   })
 
   it('keeps a direct experience address bookable when the listing switch is off', () => {
@@ -422,6 +423,19 @@ describe('experience detail resolution', () => {
     expect(verified).toContain('View booking options')
     expect(closed).not.toContain('href="#booking-options"')
     expect(closed).not.toContain('id="booking-options"')
+  })
+
+  it('keeps Goat Yoga booking options below the hero and crops its hero image from the top', () => {
+    const html = htmlFor(experience({
+      title: 'Goat Yoga', slug: 'goat-yoga', shortDescription: 'Meet the goats.',
+      heroImage: { _type: 'image', alt: 'Goat yoga photo', asset: { _ref: 'image-abc123-1920x1080-png' } },
+      bookingVerified: true, bookingProvider: 'fareharbor', fareharborItemId: '336824',
+    }))
+    const hero = html.split('id="experience-hero"')[1]?.split('</section>')[0] ?? ''
+    expect(hero).toContain('object-top')
+    expect(hero).not.toContain('View booking options')
+    expect(html).toContain('id="booking-options"')
+    expect(html).toContain('Book Goat Yoga')
   })
 
   it('shows a booking button for a verified experience with no introduction content', () => {

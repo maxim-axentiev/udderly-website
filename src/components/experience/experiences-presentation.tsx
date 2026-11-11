@@ -4,6 +4,7 @@ import { OptionalEmbed } from '@/components/consent/optional-embed'
 import { ReviewStars } from '@/components/home/review-stars'
 import { ReviewsCarousel } from '@/components/home/reviews-carousel'
 import { Container } from '@/components/layout/container'
+import { NewsletterPage } from '@/components/newsletter/newsletter-page'
 import { Button, ButtonLink } from '@/components/ui/button'
 import type { HubFeature, HubImageKey, HubPicture, ExperiencesHubPageModel } from '@/lib/experiences/hub-page'
 import { formatGoogleRating, formatGoogleReviewCount } from '@/lib/google-places/map'
@@ -408,28 +409,7 @@ export function ExperiencesPresentation({
         </Container>
       </section>
 
-      <section id="newsletter" className="bg-farm-beige py-20 md:py-28">
-        <Container width="narrow" className="max-w-3xl">
-          <div className="border-2 border-headline bg-background p-7 text-center shadow-[10px_10px_0_var(--color-secondary-accent)] md:p-12">
-            <h2 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black uppercase leading-[0.85] text-headline">{page.newsletter.title}</h2>
-            <p className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed">{page.newsletter.copy}</p>
-            <form className="mx-auto mt-8 grid max-w-md gap-3 text-left" aria-describedby="experience-newsletter-unavailable" onSubmit={(event) => event.preventDefault()}>
-              <label className="font-display text-sm font-bold uppercase text-headline">
-                First name
-                <input disabled name="firstName" className="mt-1 min-h-12 w-full rounded-full border-2 border-headline bg-background px-5" />
-              </label>
-              <label className="font-display text-sm font-bold uppercase text-headline">
-                Email
-                <input disabled type="email" name="email" className="mt-1 min-h-12 w-full rounded-full border-2 border-headline bg-background px-5" />
-              </label>
-              <Button type="button" disabled className="mt-2 justify-self-center">
-                Sign me up
-              </Button>
-            </form>
-            <p id="experience-newsletter-unavailable" role="status" className="mt-4 font-accent text-lg italic text-primary-accent">{page.newsletter.unavailable}</p>
-          </div>
-        </Container>
-      </section>
+      <NewsletterPage page={page.newsletter} sectionId="newsletter" headingLevel="h2" signupId="experiences-newsletter" />
 
       <section id="location" className="bg-farm-beige py-20 md:py-28">
         <Container width="brand" className="max-w-[1500px]">

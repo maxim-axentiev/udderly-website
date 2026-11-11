@@ -52,6 +52,7 @@ export type DetailImageKey = HubImageKey | 'goat-icon-1' | 'goat-icon-2' | 'goat
 export type DetailPicture = { src: string; alt: string }
 
 export type ExperienceDetailModel = {
+  slug?: string
   titleLead: string
   titleAccent: string
   hero?: DetailPicture
@@ -394,6 +395,7 @@ export function resolveExperienceDetail(
   })
 
   return {
+    slug,
     titleLead: title.lead,
     titleAccent: title.accent,
     badge: experienceBadge(experience),
