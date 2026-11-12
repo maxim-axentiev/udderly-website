@@ -361,12 +361,18 @@ function detailFacts(experience: ExperiencePageData): ExperienceDetailModel['det
   const season = clean(experience.seasonLabel, 80) ?? (experience.season ? SEASON_LABELS[experience.season] : undefined)
   const privatePrice = clean(experience.privatePriceDisplay, 80)
   const privateCapacity = clean(experience.privateGroupSize, 80)
+  const openPrices = priceLines(experience)
+  const openCapacity = clean(experience.groupSize, 80)
+  const prices = privatePrice
+    ? [...openPrices.map((value) => `Open: ${value}`), `Private: ${privatePrice}`]
+    : openPrices
+  const capacities = privateCapacity
+    ? [...(openCapacity ? [`Open: ${openCapacity}`] : []), `Private: ${privateCapacity}`]
+    : openCapacity ? [openCapacity] : []
   const pairs: Array<[string, string[]]> = [
-    ['Price', priceLines(experience)],
+    ['Price', prices],
     ['Duration', [clean(experience.duration, 80)].filter((value): value is string => Boolean(value))],
-    ['Capacity', [clean(experience.groupSize, 80)].filter((value): value is string => Boolean(value))],
-    ['Private price', privatePrice ? [privatePrice] : []],
-    ['Private capacity', privateCapacity ? [privateCapacity] : []],
+    ['Capacity', capacities],
     ['Age', [clean(experience.ageGuidance, 80)].filter((value): value is string => Boolean(value))],
     ['Season', [season].filter((value): value is string => Boolean(value))],
   ]

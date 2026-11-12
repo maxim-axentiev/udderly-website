@@ -698,6 +698,8 @@ describe('experience detail resolution', () => {
     const priced = resolveExperienceDetail(experience({
       title: 'Mini Highland Cow Experience',
       slug: 'mini-highland-cow-experience',
+      priceDisplay: '$45 per person',
+      groupSize: 'Up to 10 guests',
       privatePriceDisplay: '$265 for up to 4 guests, plus $58.30 each extra',
       privateGroupSize: 'Maximum 8 guests',
     }), images)
@@ -706,8 +708,14 @@ describe('experience detail resolution', () => {
     expect(closed.details.find((detail) => detail.label === 'Capacity')?.lines).toEqual(['Up to 10 guests'])
     expect(closed.details.find((detail) => detail.label === 'Private price')).toBeUndefined()
     expect(closed.details.find((detail) => detail.label === 'Private capacity')).toBeUndefined()
-    expect(priced.details.find((detail) => detail.label === 'Private price')?.lines).toEqual(['$265 for up to 4 guests, plus $58.30 each extra'])
-    expect(priced.details.find((detail) => detail.label === 'Private capacity')?.lines).toEqual(['Maximum 8 guests'])
+    expect(priced.details.find((detail) => detail.label === 'Price')?.lines).toEqual([
+      'Open: $45 per person', 'Private: $265 for up to 4 guests, plus $58.30 each extra',
+    ])
+    expect(priced.details.find((detail) => detail.label === 'Capacity')?.lines).toEqual([
+      'Open: Up to 10 guests', 'Private: Maximum 8 guests',
+    ])
+    expect(priced.details.find((detail) => detail.label === 'Private price')).toBeUndefined()
+    expect(priced.details.find((detail) => detail.label === 'Private capacity')).toBeUndefined()
     expect(closed.bookingChoices?.map((choice) => choice.label)).toEqual([
       OPEN_HIGHLAND_BOOKING_LABEL,
       PRIVATE_HIGHLAND_BOOKING_LABEL,
@@ -814,9 +822,13 @@ describe('experience detail resolution', () => {
     expect(other.bookingNote).toBeUndefined()
     expect(both.bookingChoices?.[0]?.href).not.toContain('/items/222222/')
     expect(both.bookingChoices?.[1]?.href).not.toContain('/items/222222/')
-    expect(both.details.find((detail) => detail.label === 'Private price')?.lines).toEqual([
-      '$250 for up to 4 guests, plus $55 each extra',
+    expect(both.details.find((detail) => detail.label === 'Price')?.lines).toEqual([
+      'Private: $250 for up to 4 guests, plus $55 each extra',
     ])
+    expect(both.details.find((detail) => detail.label === 'Capacity')?.lines).toEqual([
+      'Private: Maximum 8 guests',
+    ])
+    expect(both.details.find((detail) => detail.label === 'Private price')).toBeUndefined()
     expect(other.bookingChoices).toBeUndefined()
     expect(other.bookingUrl).toContain('/items/308278/')
     expect(other.bookingUrl).not.toBe(calfPrivate)
