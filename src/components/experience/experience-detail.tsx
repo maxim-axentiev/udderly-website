@@ -290,11 +290,6 @@ export function ExperienceDetail({
             <span className="text-secondary-accent">{page.titleAccent}</span>
           </h1>
           {page.intro ? <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-background md:text-xl">{page.intro}</p> : null}
-          {hasBookingOptions && showIntroduction && page.slug !== 'goat-yoga' ? (
-            <a href="#booking-options" className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full border-2 border-headline bg-cta px-8 py-3 font-display text-lg font-extrabold uppercase text-cta-foreground shadow-[4px_4px_0_var(--color-headline)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-background">
-              View booking options
-            </a>
-          ) : null}
         </Container>
       </section>
 

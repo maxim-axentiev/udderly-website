@@ -487,15 +487,17 @@ describe('experience detail resolution', () => {
     expect(page.reviews).toEqual([])
   })
 
-  it('links from the hero to verified booking actions and omits the shortcut for closed experiences', () => {
+  it('keeps booking actions below the hero without a hero button on experience pages', () => {
     const verified = htmlFor(experience({
       title: 'Goat Cuddles', slug: 'goat-cuddles', bookingVerified: true,
       bookingProvider: 'fareharbor', fareharborItemId: '336824',
     }))
     const closed = htmlFor(experience({ title: 'Goat Yoga', slug: 'goat-yoga' }))
-    expect(verified).toContain('href="#booking-options"')
+    const hero = verified.split('id="experience-hero"')[1]?.split('</section>')[0] ?? ''
+    expect(hero).not.toContain('<a ')
+    expect(verified).not.toContain('href="#booking-options"')
     expect(verified).toContain('id="booking-options" tabindex="-1"')
-    expect(verified).toContain('View booking options')
+    expect(verified).toContain('Book Goat Cuddles')
     expect(closed).not.toContain('href="#booking-options"')
     expect(closed).not.toContain('id="booking-options"')
   })
