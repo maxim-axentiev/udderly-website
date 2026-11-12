@@ -68,6 +68,25 @@ function htmlFor(page: ExperiencePageData) {
 }
 
 describe('experience detail resolution', () => {
+  it('retains testimonials and icons sections in the requested order on the Mini Highland Cow page without invented content', () => {
+    const html = htmlFor(experience({
+      title: 'Mini Highland Cow Experience', slug: 'mini-highland-cow-experience',
+      practicalTips: ['Guests must be 12 or older.'],
+      gallery: [{_type: 'altImage', alt: 'Cow grazing at the farm', asset: {_ref: 'image-abc123-1080x1080-png'}}],
+    }))
+    const sections = ['id="important-information"', 'id="reviews"', 'id="meet-the-animals"', 'id="welfare"']
+    // With a welfare paragraph supplied, the last section must also render.
+    const withWelfare = htmlFor(experience({
+      title: 'Mini Highland Cow Experience', slug: 'mini-highland-cow-experience',
+      practicalTips: ['Guests must be 12 or older.'], welfareNote: 'We respect each cow’s choice to participate.',
+      gallery: [{_type: 'altImage', alt: 'Cow grazing at the farm', asset: {_ref: 'image-abc123-1080x1080-png'}}],
+    }))
+    expect(sections.map((section) => withWelfare.indexOf(section))).toEqual([...sections.map((section) => withWelfare.indexOf(section))].sort((a,b) => a-b))
+    expect(sections.every((section) => withWelfare.includes(section))).toBe(true)
+    expect(html).toContain('Guest testimonials will be added here once approved.')
+    expect(html).toContain('Individual profiles and names will be added here soon.')
+    expect(html).not.toContain('Marissa T.')
+  })
   it('renders Lovable placeholders only when explicitly enabled, without treating them as approved testimonials', () => {
     const designPlaceholders = {
       enabled: true, awardsEnabled: true,
