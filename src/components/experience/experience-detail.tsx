@@ -428,19 +428,17 @@ export function ExperienceDetail({
         </section>
       ) : null}
 
-      {(page.reviews.length || page.slug === 'mini-highland-cow-experience') ? (
+      {page.reviews.length ? (
         <section id="reviews" className="overflow-hidden bg-farm-blue py-20 md:py-28">
           <Container width="brand" className="max-w-[1500px]">
             <h2 className="max-w-3xl font-display text-[clamp(2.6rem,7vw,6rem)] font-black uppercase leading-[0.8] text-headline">{page.reviewsHeading}</h2>
-            {page.reviews.length ? (
-              <div className="mt-14">
+            <div className="mt-14">
                 <ScrollCarousel label="Guest reviews" itemClassName="w-[85%] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
                   {page.reviews.map((review) => (
                     <ReviewCard key={`${review.name}-${review.quote.slice(0, 24)}`} review={review} placeholder={page.reviewsArePlaceholders} />
                   ))}
                 </ScrollCarousel>
               </div>
-            ) : <p className="mt-10 max-w-2xl border-2 border-headline bg-background p-7 text-lg font-semibold">Guest testimonials will be added here once approved.</p>}
             <div className="mt-10 flex justify-center">
               <BookingActions page={page} />
             </div>
@@ -448,14 +446,14 @@ export function ExperienceDetail({
         </section>
       ) : null}
 
-      {(page.animals.length || page.slug === 'mini-highland-cow-experience') ? (
+      {page.animals.length ? (
         <section id="meet-the-animals" className="overflow-hidden bg-background py-20 md:py-28">
           <Container width="brand" className="max-w-[1500px]">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <Lines lead={page.slug === 'mini-highland-cow-experience' && !page.animals.length ? 'Meet some of' : page.animalsHeading.lead} accent={page.slug === 'mini-highland-cow-experience' && !page.animals.length ? 'the icons.' : page.animalsHeading.accent} accentClassName="text-primary-accent" className="font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline" />
-              <p className="max-w-md border-l-4 border-primary-accent pl-5 text-lg font-semibold">{page.animals.length ? page.animalsIntro : 'Meet some of our Mini Highland personalities. Individual profiles and names will be added here soon.'}</p>
+              <Lines lead={page.animalsHeading.lead} accent={page.animalsHeading.accent} accentClassName="text-primary-accent" className="font-display text-[clamp(2.8rem,7.5vw,6.6rem)] font-black uppercase leading-[0.78] text-headline" />
+              <p className="max-w-md border-l-4 border-primary-accent pl-5 text-lg font-semibold">{page.animalsIntro}</p>
             </div>
-            {page.animals.length ? <div className="mt-14">
+            <div className="mt-14">
               <ScrollCarousel label="Meet the animals" itemClassName="w-[85%] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
                 {page.animals.map((animal, index) => (
                   <article key={animal.name} className={`h-full border-2 border-headline bg-background p-3 shadow-[10px_10px_0_var(--color-headline)] ${index % 2 === 0 ? '-rotate-1' : 'rotate-1'}`}>
@@ -467,7 +465,7 @@ export function ExperienceDetail({
                   </article>
                 ))}
               </ScrollCarousel>
-            </div> : <div className="mt-12 grid gap-5 sm:grid-cols-3">{page.gallery.slice(0, 3).map((photo) => <Photo key={photo.src} image={photo} className="aspect-square w-full border-2 border-headline object-cover" />)}</div>}
+            </div>
             {hasBookingOptions ? <div className="mt-10 flex justify-center"><BookingActions page={page} /></div> : null}
           </Container>
         </section>
