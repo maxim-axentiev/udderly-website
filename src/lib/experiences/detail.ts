@@ -28,7 +28,9 @@ export const FEAST_ON_CERTIFICATION = [
   FEAST_ON.paragraphs[1],
 ] as const
 
-function feastParagraphs(body: string[]) {
+function feastParagraphs(body: string[], slug: string) {
+  // The Alpaca Lunch Picnic copy is approved in its Lovable design and editable in Sanity.
+  if (slug === 'alpaca-lunch-picnic' && body.some((paragraph) => paragraph.includes('This experience only includes local, Ontario-made food'))) return body
   const withoutCount = body.filter((paragraph) => !/\b140\b|local producers/i.test(paragraph))
   return withoutCount.some((paragraph) => /FeastON/i.test(paragraph)) ? withoutCount : [...FEAST_ON_CERTIFICATION]
 }
@@ -536,7 +538,7 @@ export function resolveExperienceDetail(
           ...(feastHeading
             ? designedLines(feastHeading, FEAST_ON.headingLead, FEAST_ON.headingAccent)
             : { lead: FEAST_ON.headingLead, accent: FEAST_ON.headingAccent }),
-          paragraphs: feastParagraphs(feastBody),
+          paragraphs: feastParagraphs(feastBody, slug),
           href: publicBookingUrl(experience.feastOn?.href) ?? FEAST_ON.href,
           image: localPicture('feast', images),
         }

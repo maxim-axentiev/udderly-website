@@ -68,6 +68,24 @@ function htmlFor(page: ExperiencePageData) {
 }
 
 describe('experience detail resolution', () => {
+  it('renders the exact Alpaca Lunch FeastON copy and heading from Lovable without changing other pages', () => {
+    const first = 'FeastON officially verifies that a significant portion of our ingredients and products are sourced right here in Ontario. This experience only includes local, Ontario-made food, so you are tasting the neighbourhood with every bite.'
+    const second = 'So far we have had the privilege of supporting more than 140 local producers through everything we serve, sell and celebrate on the farm.'
+    const custom = experience({
+      title: 'Alpaca Lunch Picnic', slug: 'alpaca-lunch-picnic',
+      feastOn: {enabled: true, heading: 'We eat\nand serve local.', body: first + '\n\n' + second},
+    })
+    const model = resolveExperienceDetail(custom, images)
+    expect(model.feast?.paragraphs).toEqual([first, second])
+    const html = htmlFor(custom)
+    expect(html).toContain('We eat<br/>and serve<br/>local.')
+    expect(html).toContain('max-w-[1200px]')
+    expect(html).toContain('max-w-sm transition-transform')
+    expect(html).toContain('more than 140 local producers')
+    const another = resolveExperienceDetail(experience({title: 'Alpaca Sunset Picnic',slug: 'alpaca-sunset-picnic',feastOn: {enabled: true, body: first + '\n\n' + second}}), images)
+    expect(another.feast?.paragraphs.join(' ')).not.toContain('140 local producers')
+  })
+
   it('uses an explicit starting-at price instead of a group price breakdown in the detail card', () => {
     const page = resolveExperienceDetail(experience({
       title: 'Alpaca Lunch Picnic', slug: 'alpaca-lunch-picnic',
