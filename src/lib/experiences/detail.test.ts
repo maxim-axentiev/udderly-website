@@ -68,6 +68,17 @@ function htmlFor(page: ExperiencePageData) {
 }
 
 describe('experience detail resolution', () => {
+  it('uses an explicit starting-at price instead of a group price breakdown in the detail card', () => {
+    const page = resolveExperienceDetail(experience({
+      title: 'Alpaca Lunch Picnic', slug: 'alpaca-lunch-picnic',
+      priceDisplay: 'Starting at $60 per person',
+      priceOptions: [
+        {label: '2 guests', price: '$120'},
+        {label: '4 guests', price: '$240'},
+      ],
+    }))
+    expect(page.details.find((fact) => fact.label === 'Price')?.lines).toEqual(['Starting at $60 per person'])
+  })
   it('renders Sanity-managed cow review and icon placeholders in the requested section order', () => {
     const html = htmlFor(experience({
       title: 'Mini Highland Cow Experience', slug: 'mini-highland-cow-experience',

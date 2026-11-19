@@ -526,8 +526,8 @@ export function ExperienceDetail({
       ) : null}
 
       {page.feast ? (
-        <section id="feast-on" className="bg-farm-beige py-20 md:py-28">
-          <Container width="brand" className="grid max-w-[1200px] items-center gap-12 lg:grid-cols-[1fr_0.85fr]">
+        <section id="feast-on" className="bg-farm-beige py-16 md:py-20">
+          <Container width="brand" className="grid max-w-[980px] items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.75fr)] lg:gap-10">
             <div className="order-2 lg:order-1">
               <p className="font-accent text-xl italic text-primary-accent">{page.feast.kicker}</p>
               <Lines lead={page.feast.lead} accent={page.feast.accent} className="mt-3 font-display text-[clamp(2.6rem,6vw,5.4rem)] font-black uppercase leading-[0.82] text-headline" />
@@ -537,7 +537,7 @@ export function ExperienceDetail({
               <BookingActions page={page} />
             </div>
             {page.feast.image && page.feast.href ? (
-              <a href={page.feast.href} target="_blank" rel="noreferrer" className="order-1 mx-auto block w-full max-w-sm lg:order-2">
+              <a href={page.feast.href} target="_blank" rel="noreferrer" className="order-1 mx-auto block w-full max-w-[280px] lg:order-2">
                 <Photo image={page.feast.image} className="h-auto w-full" />
               </a>
             ) : null}

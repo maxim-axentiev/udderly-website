@@ -207,6 +207,8 @@ function experienceBadge(experience: ExperiencePageData): ExperienceDetailModel[
 }
 
 function priceLines(experience: ExperiencePageData): string[] {
+  const summaryPrice = clean(experience.priceDisplay, 80)
+  if (summaryPrice && /^starting at\b/i.test(summaryPrice)) return [summaryPrice]
   const options = (experience.priceOptions ?? []).flatMap((option) => {
     const price = clean(option?.price, 40)
     if (!price) return []
