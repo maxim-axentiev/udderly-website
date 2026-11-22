@@ -73,9 +73,12 @@ describe('experience detail resolution', () => {
     const lunch = htmlFor(experience({title: 'Alpaca Lunch Picnic', slug: 'alpaca-lunch-picnic', feastOn: {enabled: true}}))
     const sunsetSection = sunset.split('id="feast-on"')[1]?.split('</section>')[0] ?? ''
     const lunchSection = lunch.split('id="feast-on"')[1]?.split('</section>')[0] ?? ''
-    expect(sunsetSection).toContain('max-w-[1120px]')
+    expect(sunsetSection).toContain('max-w-[1240px]')
+    expect(sunsetSection).toContain('lg:px-[64px]')
+    expect(sunsetSection).toContain('lg:grid-cols-[minmax(0,1fr)_400px]')
     expect(sunsetSection).toContain('lg:gap-6')
     expect(sunsetSection).toContain('max-w-[400px]')
+    expect(sunsetSection).toContain('lg:mr-0 lg:ml-auto')
     expect(lunchSection).toContain('max-w-[1200px]')
     expect(lunchSection).toContain('max-w-sm transition-transform')
   })

@@ -527,7 +527,7 @@ export function ExperienceDetail({
 
       {page.feast ? (
         <section id="feast-on" className={page.slug === 'alpaca-lunch-picnic' ? 'bg-farm-beige py-20 md:py-28' : 'bg-farm-beige py-16 md:py-20'}>
-          <Container width="brand" className={page.slug === 'alpaca-lunch-picnic' ? 'grid max-w-[1200px] items-center gap-12 lg:grid-cols-[1fr_0.85fr]' : page.slug === 'alpaca-sunset-picnic' ? 'grid max-w-[1120px] items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.75fr)] lg:gap-6' : 'grid max-w-[980px] items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.75fr)] lg:gap-10'}>
+          <Container width="brand" className={page.slug === 'alpaca-lunch-picnic' ? 'grid max-w-[1200px] items-center gap-12 lg:grid-cols-[1fr_0.85fr]' : page.slug === 'alpaca-sunset-picnic' ? 'grid max-w-[1240px] items-center gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-6 lg:px-[64px]' : 'grid max-w-[980px] items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.75fr)] lg:gap-10'}>
             <div className="order-2 lg:order-1">
               <p className="font-accent text-xl italic text-primary-accent">{page.feast.kicker}</p>
               {page.slug === 'alpaca-lunch-picnic' ? (
@@ -541,7 +541,7 @@ export function ExperienceDetail({
               <BookingActions page={page} />
             </div>
             {page.feast.image && page.feast.href ? (
-              <a href={page.feast.href} target="_blank" rel="noreferrer" className={page.slug === 'alpaca-lunch-picnic' ? 'order-1 mx-auto block w-full max-w-sm transition-transform duration-300 hover:scale-105 hover:rotate-2 active:scale-95 lg:order-2' : page.slug === 'alpaca-sunset-picnic' ? 'order-1 mx-auto block w-full max-w-[400px] lg:order-2' : 'order-1 mx-auto block w-full max-w-[280px] lg:order-2'}>
+              <a href={page.feast.href} target="_blank" rel="noreferrer" className={page.slug === 'alpaca-lunch-picnic' ? 'order-1 mx-auto block w-full max-w-sm transition-transform duration-300 hover:scale-105 hover:rotate-2 active:scale-95 lg:order-2' : page.slug === 'alpaca-sunset-picnic' ? 'order-1 mx-auto block w-full max-w-[400px] lg:order-2 lg:mr-0 lg:ml-auto' : 'order-1 mx-auto block w-full max-w-[280px] lg:order-2'}>
                 <Photo image={page.feast.image} className="h-auto w-full" />
               </a>
             ) : null}
