@@ -68,6 +68,17 @@ function htmlFor(page: ExperiencePageData) {
 }
 
 describe('experience detail resolution', () => {
+  it('enlarges and brings the Sunset Picnic FeastON logo closer without changing Lunch Picnic', () => {
+    const sunset = htmlFor(experience({title: 'Alpaca Sunset Picnic', slug: 'alpaca-sunset-picnic', feastOn: {enabled: true}}))
+    const lunch = htmlFor(experience({title: 'Alpaca Lunch Picnic', slug: 'alpaca-lunch-picnic', feastOn: {enabled: true}}))
+    const sunsetSection = sunset.split('id="feast-on"')[1]?.split('</section>')[0] ?? ''
+    const lunchSection = lunch.split('id="feast-on"')[1]?.split('</section>')[0] ?? ''
+    expect(sunsetSection).toContain('max-w-[1120px]')
+    expect(sunsetSection).toContain('lg:gap-6')
+    expect(sunsetSection).toContain('max-w-[400px]')
+    expect(lunchSection).toContain('max-w-[1200px]')
+    expect(lunchSection).toContain('max-w-sm transition-transform')
+  })
   it('renders the exact Alpaca Lunch FeastON copy and heading from Lovable without changing other pages', () => {
     const first = 'FeastON officially verifies that a significant portion of our ingredients and products are sourced right here in Ontario. This experience only includes local, Ontario-made food, so you are tasting the neighbourhood with every bite.'
     const second = 'So far we have had the privilege of supporting more than 140 local producers through everything we serve, sell and celebrate on the farm.'
