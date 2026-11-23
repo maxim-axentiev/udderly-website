@@ -81,7 +81,7 @@ export async function fetchExperienceBySlug(
   slug: string,
 ): Promise<ExperiencePageData | null> {
   const experience = await withTimeout(
-    sanityClient.fetch<ExperiencePageData | null>(
+    sanityClient.withConfig({useCdn: false}).fetch<ExperiencePageData | null>(
       experienceBySlugQuery,
       { slug, slugs: experienceSlugAliases(slug) },
     ),
@@ -104,7 +104,7 @@ export async function fetchExperienceBySlug(
 export async function fetchExperienceHub(): Promise<ExperienceCardData[]> {
   try {
     const experiences = await withTimeout(
-      sanityClient.fetch<ExperienceCardData[] | null>(experienceHubQuery),
+      sanityClient.withConfig({useCdn: false}).fetch<ExperienceCardData[] | null>(experienceHubQuery),
       CHROME_FETCH_TIMEOUT_MS,
     )
     return (experiences ?? []).filter(

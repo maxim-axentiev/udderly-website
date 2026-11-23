@@ -10,6 +10,7 @@ import type {
 } from '@/lib/sanity/types'
 
 import { FEAST_ON, publicBookingUrl, resolvePublicBooking, resolveVerifiedExternalBooking } from './approved-listing'
+import { activeExperienceImages } from './seasonal-media'
 
 /** Food experiences hid this section only while the FeastON designation was unconfirmed. */
 const FEAST_ON_FOOD_SLUGS = new Set([
@@ -389,13 +390,14 @@ export function resolveExperienceDetail(
   foundation: ExperienceFoundation = null,
 ): ExperienceDetailModel {
   const slug = experience.slug
+  const selectedImages = activeExperienceImages(experience)
   const bundledGallery = localGallery(slug, images)
-  const cmsGallery = (experience.gallery ?? []).flatMap((image) => {
+  const cmsGallery = (selectedImages.gallery ?? []).flatMap((image) => {
     const photo = picture(image, 1280)
     return photo ? [photo] : []
   })
   const gallery = cmsGallery.length ? cmsGallery : bundledGallery
-  const hero = picture(experience.heroImage, 1920) ?? gallery[0]
+  const hero = picture(selectedImages.heroImage, 1920) ?? gallery[0]
   const title = titleLines(clean(experience.title, 120) ?? experience.title, clean(experience.titleAccent, 80))
   const booking = resolvePublicBooking(experience)
   const dualBooking = dualBookingCopy(slug)

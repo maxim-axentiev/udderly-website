@@ -108,6 +108,40 @@ export const experience = defineType({
       options: {layout: 'grid'},
     }),
     defineField({
+      name: 'seasonalMedia',
+      title: 'Alpaca Walks: Summer / Winter Photos',
+      type: 'object',
+      group: 'content',
+      description: 'For Alpaca Walks only. Select Summer or Winter and publish. This switches the hero, experience card and entire gallery together. No other page content changes.',
+      hidden: ({document}) => (document?.slug as {current?: string} | undefined)?.current !== 'alpaca-walks',
+      fields: [
+        defineField({
+          name: 'activeSeason',
+          title: 'Photos displayed on the website',
+          type: 'string',
+          initialValue: 'summer',
+          options: {list: [{title: 'Summer photos', value: 'summer'}, {title: 'Winter photos', value: 'winter'}], layout: 'radio'},
+          validation: (rule) => rule.required(),
+        }),
+        ...(['summer', 'winter'] as const).map((season) => defineField({
+          name: season,
+          title: season === 'summer' ? 'Summer photo set' : 'Winter photo set',
+          type: 'object',
+          fields: [
+            defineField({name: 'heroImage', title: 'Hero image', type: 'altImage'}),
+            defineField({name: 'cardImage', title: 'Experience card image', type: 'altImage'}),
+            defineField({name: 'gallery', title: 'Gallery photos', type: 'array', of: [defineArrayMember({type: 'altImage'})], options: {layout: 'grid'}}),
+          ],
+        })),
+      ],
+      validation: (rule) => rule.custom((value) => {
+        if (!value) return true
+        const media = value as {activeSeason?: string; summer?: {heroImage?: unknown; cardImage?: unknown; gallery?: unknown[]}; winter?: {heroImage?: unknown; cardImage?: unknown; gallery?: unknown[]}}
+        const chosen = media.activeSeason === 'winter' ? media.winter : media.summer
+        return chosen?.heroImage && chosen.cardImage && chosen.gallery?.length ? true : 'The selected season requires a hero, experience card, and gallery.'
+      }),
+    }),
+    defineField({
       name: 'badge',
       title: 'Page badge',
       type: 'string',

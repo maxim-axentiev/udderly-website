@@ -12,6 +12,7 @@ import {
   resolveVerifiedExternalBooking,
 } from './approved-listing'
 import { experienceSlugAliases, publicExperienceSlug } from './public-paths'
+import { activeExperienceImages } from './seasonal-media'
 
 export type HubImageKey =
   | 'hero'
@@ -426,13 +427,14 @@ function hubBookingActions(experience: ExperienceCardData): HubBookingAction[] {
 
 function applyBooking(entry: HubExperienceCard, match: ExperienceCardData): HubExperienceCard {
   const bookingActions = hubBookingActions(match)
+  const selected = activeExperienceImages(match)
   return {
     ...entry,
     title: match.title.trim() || entry.title,
     description: text(match.shortDescription, 500) ?? entry.description,
-    image: picture(match.cardImage, 1280) ?? entry.image,
-    imageKey: picture(match.cardImage, 1280) ? undefined : entry.imageKey,
-    imageAlt: picture(match.cardImage, 1280)?.alt ?? entry.imageAlt,
+    image: picture(selected.cardImage, 1280) ?? entry.image,
+    imageKey: picture(selected.cardImage, 1280) ? undefined : entry.imageKey,
+    imageAlt: picture(selected.cardImage, 1280)?.alt ?? entry.imageAlt,
     href: `/${publicExperienceSlug(match.slug)}`,
     bookingActions: bookingActions.length ? bookingActions : undefined,
     bookingUrl: bookingActions[0]?.href,

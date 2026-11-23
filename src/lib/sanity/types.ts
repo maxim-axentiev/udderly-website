@@ -19,6 +19,9 @@ export type SanityImage = {
   asset?: SanityImageAsset | { _ref: string; _type?: string }
 } | null
 
+export type SeasonalPhotoSet = {heroImage?: SanityImage; cardImage?: SanityImage; gallery?: SanityImage[] | null} | null
+export type SeasonalMedia = {activeSeason?: 'summer' | 'winter' | null; summer?: SeasonalPhotoSet; winter?: SeasonalPhotoSet} | null
+
 export type PortableTextContent = Array<Record<string, unknown>> | null
 
 export type AnimalCardData = {
@@ -83,6 +86,7 @@ export type ExperiencePageData = {
   heroImage: SanityImage
   cardImage?: SanityImage
   gallery: SanityImage[] | null
+  seasonalMedia?: SeasonalMedia
   category: string | null
   animalSpecies: Array<{ title: string | null; slug: string | null }> | null
   season: string | null
@@ -169,6 +173,7 @@ export type ExperienceCardData = {
   privateBookingVerified?: boolean | null
   heroImage: SanityImage
   cardImage?: SanityImage
+  seasonalMedia?: SeasonalMedia
   animalSpecies: Array<{ title: string | null }> | null
 }
 

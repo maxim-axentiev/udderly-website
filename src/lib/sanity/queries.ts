@@ -25,6 +25,11 @@ export const experienceBySlugQuery = `*[_type == "experience" && active != false
   heroImage ${altImage},
   cardImage ${altImage},
   gallery[] ${altImage},
+  seasonalMedia {
+    activeSeason,
+    summer {heroImage ${altImage}, cardImage ${altImage}, gallery[] ${altImage}},
+    winter {heroImage ${altImage}, cardImage ${altImage}, gallery[] ${altImage}}
+  },
   category,
   animalSpecies[]->{ title, "slug": slug.current },
   season,
@@ -153,6 +158,11 @@ export const experienceHubQuery = `*[_type == "experience"] | order(sortOrder as
   privateBookingVerified,
   heroImage ${altImage},
   cardImage ${altImage},
+  seasonalMedia {
+    activeSeason,
+    summer {heroImage ${altImage}, cardImage ${altImage}, gallery[] ${altImage}},
+    winter {heroImage ${altImage}, cardImage ${altImage}, gallery[] ${altImage}}
+  },
   animalSpecies[]->{ title }
 }`
 
