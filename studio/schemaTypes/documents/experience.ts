@@ -109,11 +109,11 @@ export const experience = defineType({
     }),
     defineField({
       name: 'seasonalMedia',
-      title: 'Alpaca Walks: Summer / Winter Photos',
+      title: 'Summer / Winter Photos',
       type: 'object',
       group: 'content',
-      description: 'For Alpaca Walks only. Select Summer or Winter and publish. This switches the hero, experience card and entire gallery together. No other page content changes.',
-      hidden: ({document}) => (document?.slug as {current?: string} | undefined)?.current !== 'alpaca-walks',
+      description: 'For Alpaca Walks and the Alpaca Fibre Workshop. Select Summer or Winter and publish. This switches hero, experience card and gallery together. A season without all images cannot be selected.',
+      hidden: ({document}) => !['alpaca-walks', 'alpaca-experience-and-fibre-nesting-ball-workshop'].includes((document?.slug as {current?: string} | undefined)?.current ?? ''),
       fields: [
         defineField({
           name: 'activeSeason',
