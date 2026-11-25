@@ -112,8 +112,7 @@ export const experience = defineType({
       title: 'Summer / Winter Photos',
       type: 'object',
       group: 'content',
-      description: 'For Alpaca Walks and the Alpaca Fibre Workshop. Select Summer or Winter and publish. This switches hero, experience card and gallery together. A season without all images cannot be selected.',
-      hidden: ({document}) => !['alpaca-walks', 'alpaca-experience-and-fibre-nesting-ball-workshop'].includes((document?.slug as {current?: string} | undefined)?.current ?? ''),
+      description: 'Optional for every experience. Select Summer or Winter and publish to switch the hero, experience card, and gallery together. Leave the other season empty until photos are ready. An incomplete selected season cannot be published.',
       fields: [
         defineField({
           name: 'activeSeason',
