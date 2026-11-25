@@ -112,7 +112,12 @@ export const experience = defineType({
       title: 'Summer / Winter Photos',
       type: 'object',
       group: 'content',
-      description: 'Optional for every experience. Select Summer or Winter and publish to switch the hero, experience card, and gallery together. Leave the other season empty until photos are ready. An incomplete selected season cannot be published.',
+      description: 'For year-round experiences only. Choose Summer or Winter to switch hero, experience card and gallery together. The selected season must have a complete photo set.',
+      hidden: ({document}) => {
+        const season = (document?.season as string | undefined) ?? ''
+        const label = (document?.seasonLabel as string | undefined) ?? ''
+        return season !== 'yearRound' && !/^year[ -]?round$/i.test(label.trim()) && (document?.slug as {current?: string} | undefined)?.current !== 'alpaca-walks'
+      },
       fields: [
         defineField({
           name: 'activeSeason',
